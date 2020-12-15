@@ -104,15 +104,14 @@ class InputDevice {
       offset += 1;
     }
     DIDATAFORMAT data {
-      0,
+      sizeof(DIDATAFORMAT),
       sizeof(DIOBJECTDATAFORMAT),
       DIDF_ABSAXIS,
-      (offset / 4) + 4,
-      i,
+      (DWORD) offset + (offset % 4 == 0 ? 0 : 4 - (offset % 4)),
+      (DWORD) i,
       df,
     };
-    const auto res = mDIDevice->SetDataFormat(&data);
-    printf("Result: %d\n", res);
+    mDIDevice->SetDataFormat(&data);
   }
 
  private:
