@@ -7,7 +7,6 @@
 
 #include <optional>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include <cstdint>
@@ -28,22 +27,30 @@ struct AxisInformation {
   std::string name;
 };
 
+struct VIDPID {
+	uint16_t vid;
+	uint16_t pid;
+	bool operator==(const VIDPID& other) {
+		return vid == other.vid && pid == other.pid;
+	}
+};
+
 class InputDevice {
  public:
-  InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device): mDI(di), mDevice(device) {
+  InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device): mDI(di), mDevice(*device) {
   }
 
   std::string getInstanceName() const {
-    return mDevice->tszInstanceName;
+    return mDevice.tszInstanceName;
   }
 
   std::string getProductName() const {
-    return mDevice->tszProductName;
+    return mDevice.tszProductName;
   }
 
-  std::optional<std::tuple<uint16_t, uint16_t>> getVIDPID() const {
+  std::optional<VIDPID> getVIDPID() const {
     const auto VID_PID_MAGIC = "\0\0PIDVID";
-    const auto& guid = mDevice->guidProduct;
+    const auto& guid = mDevice.guidProduct;
     if (*(uint64_t*) guid.Data4 == *(uint64_t*)(VID_PID_MAGIC)) {
       const uint16_t vid = guid.Data1 & 0xffff;
       const uint16_t pid = guid.Data1 >> 16;
@@ -71,7 +78,7 @@ class InputDevice {
     return mHats;
   }
 
-	HANDLE getEventHandle() {
+	HANDLE getEvent() {
 		return mEventHandle;
 	}
 
@@ -135,7 +142,7 @@ class InputDevice {
 
  private:
   IDirectInput8* mDI;
-  LPCDIDEVICEINSTANCE mDevice;
+  DIDEVICEINSTANCE mDevice;
   LPDIRECTINPUTDEVICE8 mDIDevice = nullptr;
 	HANDLE mEventHandle = nullptr;
   bool mEnumerated = false;
@@ -148,7 +155,7 @@ class InputDevice {
     if (mDIDevice) {
       return mDIDevice;
     }
-    mDI->CreateDevice(mDevice->guidInstance, &mDIDevice, nullptr);
+    mDI->CreateDevice(mDevice.guidInstance, &mDIDevice, nullptr);
     return mDIDevice;
   }
 
@@ -216,23 +223,27 @@ void dump_state(InputDevice* device) {
 	const auto buf = device->getState();
 	const BYTE* data = buf.data();
 	off_t offset = 0;
-	for (int i = 0; i < device->getAxisCount(); ++i) {
+	for (int i = 1; i <= device->getAxisCount(); ++i) {
 		printf("  Axis %d: %ld\n", i, *(long*)&buf[offset]);
 		offset += sizeof(long);
 	}
-	for (int i = 0; i < device->getHatCount(); ++i) {
-		printf("  Hat %d: %0.2x\n", i, *(BYTE*)&buf[offset]);
+	for (int i = 1; i <= device->getHatCount(); ++i) {
+		printf("  Hat %d: 0x%0.2x\n", i, *(BYTE*)&buf[offset]);
 		offset += 1;
 	}
-	for (int i = 0; i < device->getButtonCount(); ++i) {
-		printf("  Button %d: %0.2x\n", i, *(BYTE*)&buf[offset]);
+	printf("  Buttons:");
+	for (int i = 1; i <= device->getButtonCount(); ++i) {
+		if (buf[offset]) {
+			printf(" %d", i);
+		}
 		offset += 1;
 	}
+	printf("\n");
 }
 
-class InputManager {
+class DeviceManager {
  public:
-  InputManager() {
+  DeviceManager() : mDevices() {
     DirectInput8Create(
         GetModuleHandle(nullptr),
         DIRECTINPUT_VERSION,
@@ -247,14 +258,25 @@ class InputManager {
         DIEDFL_ATTACHEDONLY
     );
   }
+
+	InputDevice* get(const VIDPID& vidpid) {
+		for (auto device: mDevices) {
+			auto dvp = device->getVIDPID();
+			if (dvp && *dvp == vidpid) {
+				return device;
+			}
+		}
+		return nullptr;
+	}
  private:
-  IDirectInput8* mDI;
+  IDirectInput8* mDI = nullptr;
+	std::vector<InputDevice*> mDevices;
 
   static BOOL CALLBACK EnumDeviceCallback(
     LPCDIDEVICEINSTANCE device,
     LPVOID im
   ) {
-    static_cast<InputManager*>(im)->enumDeviceCallback(device);
+    static_cast<DeviceManager*>(im)->enumDeviceCallback(device);
     return DIENUM_CONTINUE;
   }
 
@@ -262,11 +284,10 @@ class InputManager {
       LPCDIDEVICEINSTANCE didi
   ) {
     auto device = new InputDevice(mDI, didi);
-    printf("Name: %s\n", device->getInstanceName().c_str());
+    printf("Name: %s\n", device->getProductName().c_str());
     auto vidpid = device->getVIDPID();
     if (vidpid) {
-      auto [vid, pid] = *vidpid;
-      printf("VID: 0x%.4x\nPID: 0x%.4x\n", vid, pid);
+      printf("VID: 0x%.4x\nPID: 0x%.4x\n", vidpid->vid, vidpid->pid);
     }
     printf("Axes: %lu\n", device->getAxisCount());
     for (const auto& axis: device->getAxesInformation()) {
@@ -274,15 +295,26 @@ class InputManager {
     }
     printf("Buttons: %lu\n", device->getButtonCount());
     printf("Hats: %lu\n", device->getHatCount());
-    device->activate();
-    dump_state(device);
     printf("---\n");
+		mDevices.push_back(device);
   }
 };
 
 
 int main() {
-	InputManager x;
+	DeviceManager devices;
+	auto throttle = devices.get({0x044f, 0x0404});
+	if (!throttle) {
+		printf("Failed to find throttle :'(\n");
+		return 0;
+	}
+	printf("Found device: %s\n", throttle->getProductName().c_str());
+	throttle->activate();
+	auto event = throttle->getEvent();
+	while(true) {
+		WaitForSingleObject(event, INFINITE);
+		dump_state(throttle);
+	}
     // Run the message loop.
 
     MSG msg = { };
