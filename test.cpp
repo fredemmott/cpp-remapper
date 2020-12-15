@@ -71,6 +71,10 @@ class InputDevice {
     return mHats;
   }
 
+	HANDLE getEventHandle() {
+		return mEventHandle;
+	}
+
   void activate() {
     const DWORD count = getAxisCount() + getHatCount() + getButtonCount();
     LPDIOBJECTDATAFORMAT df = new DIOBJECTDATAFORMAT[count];
@@ -112,47 +116,28 @@ class InputDevice {
       (DWORD) i,
       df,
     };
-    auto res = mDIDevice->SetCooperativeLevel(NULL, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
-    printf("SCL Result: %x\n", res);
-    mDIDevice->SetDataFormat(&data);
 
-    printf("State:\n");
-    BYTE* buf = new BYTE[mDataSize];
-		auto event = CreateEvent(nullptr, false, false, nullptr);
-		res = 	mDIDevice->SetEventNotification(event);
-    printf("SEN Result: %x\n", res);
-    res = mDIDevice->Acquire();
-		printf("Acquire Result: %x\n", res);
-if (res != DI_POLLEDDEVICE) {
-		res = WaitForSingleObject(event, 1000);
-    //res = mDIDevice->Poll();
-    printf("WFSO Result: %x\n", res);
-}
-		mDIDevice->Poll();
-    res = mDIDevice->GetDeviceState((DWORD) mDataSize, buf);
-    printf("GDS Result: %x\n", res);
-    offset = 0;
-    for (int j = 0; j < mAxes.size(); ++j) {
-      printf("  Axis %d: %ld\n", j, *(LONG*)&buf[offset]);
-      offset += sizeof(long);
-    }
-    for (int j = 0; j < mHats; ++j) {
-      printf("  Hat %d: %d\n", j, (int) buf[offset]);
-      offset += 1;
-    }
-    for (int j = 0; j < mButtons; ++j) {
-      printf("  Button %d: %d\n", j, (int) buf[offset]);
-      offset += 1;
-    }
-    printf("  Total bytes: %d %d\n", (int) mDataSize, (int) offset);
-    printf("  Raw data: %0.16llx\n", *(int64_t*) buf);
-    printf("  %d\n", sizeof(long));
+    mDIDevice->SetCooperativeLevel(NULL, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+    mDIDevice->SetDataFormat(&data);
+		delete[] df;
+
+		mEventHandle = CreateEvent(nullptr, false, false, nullptr);
+		mDIDevice->SetEventNotification(mEventHandle);
+    mDIDevice->Acquire();
   }
+
+	std::vector<BYTE> getState() {
+		mDIDevice->Poll();
+		std::vector<BYTE> buf(mDataSize);
+		mDIDevice->GetDeviceState(mDataSize, buf.data());
+		return buf;
+	}
 
  private:
   IDirectInput8* mDI;
   LPCDIDEVICEINSTANCE mDevice;
   LPDIRECTINPUTDEVICE8 mDIDevice = nullptr;
+	HANDLE mEventHandle = nullptr;
   bool mEnumerated = false;
   size_t mDataSize = 0;
   uint32_t mButtons = 0;
@@ -226,6 +211,25 @@ if (res != DI_POLLEDDEVICE) {
   }
 };
 
+void dump_state(InputDevice* device) {
+	printf("State:\n");
+	const auto buf = device->getState();
+	const BYTE* data = buf.data();
+	off_t offset = 0;
+	for (int i = 0; i < device->getAxisCount(); ++i) {
+		printf("  Axis %d: %ld\n", i, *(long*)&buf[offset]);
+		offset += sizeof(long);
+	}
+	for (int i = 0; i < device->getHatCount(); ++i) {
+		printf("  Hat %d: %0.2x\n", i, *(BYTE*)&buf[offset]);
+		offset += 1;
+	}
+	for (int i = 0; i < device->getButtonCount(); ++i) {
+		printf("  Button %d: %0.2x\n", i, *(BYTE*)&buf[offset]);
+		offset += 1;
+	}
+}
+
 class InputManager {
  public:
   InputManager() {
@@ -271,6 +275,7 @@ class InputManager {
     printf("Buttons: %lu\n", device->getButtonCount());
     printf("Hats: %lu\n", device->getHatCount());
     device->activate();
+    dump_state(device);
     printf("---\n");
   }
 };
