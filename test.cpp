@@ -83,7 +83,7 @@ class InputDevice {
         DIDFT_AXIS | DIDFT_ANYINSTANCE,
         NULL,
       };
-      offset += sizeof(long);
+      offset += sizeof(LONG);
     }
     for (size_t j = 0; j < mHats; j++) {
       df[i++] = {
@@ -112,19 +112,41 @@ class InputDevice {
       (DWORD) i,
       df,
     };
-    auto res = mDIDevice->SetCooperativeLevel(NULL, DISCL_BACKGROUND);
-    printf("Result: %x\n", res);
+    auto res = mDIDevice->SetCooperativeLevel(NULL, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
+    printf("SCL Result: %x\n", res);
     mDIDevice->SetDataFormat(&data);
-    mDIDevice->Acquire();
 
     printf("State:\n");
     BYTE* buf = new BYTE[mDataSize];
-    mDIDevice->GetDeviceState((DWORD) mDataSize, buf);
+		auto event = CreateEvent(nullptr, false, false, nullptr);
+		res = 	mDIDevice->SetEventNotification(event);
+    printf("SEN Result: %x\n", res);
+    res = mDIDevice->Acquire();
+		printf("Acquire Result: %x\n", res);
+if (res != DI_POLLEDDEVICE) {
+		res = WaitForSingleObject(event, 1000);
+    //res = mDIDevice->Poll();
+    printf("WFSO Result: %x\n", res);
+}
+		mDIDevice->Poll();
+    res = mDIDevice->GetDeviceState((DWORD) mDataSize, buf);
+    printf("GDS Result: %x\n", res);
     offset = 0;
     for (int j = 0; j < mAxes.size(); ++j) {
-      printf("  Axis %d: %ld\n", j, *(long*)&buf[offset]);
+      printf("  Axis %d: %ld\n", j, *(LONG*)&buf[offset]);
       offset += sizeof(long);
     }
+    for (int j = 0; j < mHats; ++j) {
+      printf("  Hat %d: %d\n", j, (int) buf[offset]);
+      offset += 1;
+    }
+    for (int j = 0; j < mButtons; ++j) {
+      printf("  Button %d: %d\n", j, (int) buf[offset]);
+      offset += 1;
+    }
+    printf("  Total bytes: %d %d\n", (int) mDataSize, (int) offset);
+    printf("  Raw data: %0.16llx\n", *(int64_t*) buf);
+    printf("  %d\n", sizeof(long));
   }
 
  private:
@@ -253,12 +275,18 @@ class InputManager {
   }
 };
 
+
 int main() {
-  auto x = InputManager();
-  MSG msg;
-  while (GetMessage(&msg, NULL, 0, 0) >= 0) {
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
-  }
-  return 0;
+	InputManager x;
+    // Run the message loop.
+
+    MSG msg = { };
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+				printf("Got message\n");
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
 }
