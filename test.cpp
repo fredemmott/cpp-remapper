@@ -103,15 +103,28 @@ class InputDevice {
       };
       offset += 1;
     }
+    mDataSize = offset + (offset % 4 == 0 ? 0 : 4 - (offset % 4));
     DIDATAFORMAT data {
       sizeof(DIDATAFORMAT),
       sizeof(DIOBJECTDATAFORMAT),
       DIDF_ABSAXIS,
-      (DWORD) offset + (offset % 4 == 0 ? 0 : 4 - (offset % 4)),
+      (DWORD) mDataSize,
       (DWORD) i,
       df,
     };
+    auto res = mDIDevice->SetCooperativeLevel(NULL, DISCL_BACKGROUND);
+    printf("Result: %x\n", res);
     mDIDevice->SetDataFormat(&data);
+    mDIDevice->Acquire();
+
+    printf("State:\n");
+    BYTE* buf = new BYTE[mDataSize];
+    mDIDevice->GetDeviceState((DWORD) mDataSize, buf);
+    offset = 0;
+    for (int j = 0; j < mAxes.size(); ++j) {
+      printf("  Axis %d: %ld\n", j, *(long*)&buf[offset]);
+      offset += sizeof(long);
+    }
   }
 
  private:
@@ -119,6 +132,7 @@ class InputDevice {
   LPCDIDEVICEINSTANCE mDevice;
   LPDIRECTINPUTDEVICE8 mDIDevice = nullptr;
   bool mEnumerated = false;
+  size_t mDataSize = 0;
   uint32_t mButtons = 0;
   uint32_t mHats = 0;
   std::vector<AxisInformation> mAxes;
