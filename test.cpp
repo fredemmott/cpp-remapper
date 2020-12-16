@@ -12,6 +12,9 @@
 #include "inputdevicecollection.h"
 #include "vjoypp.h"
 
+#include <winreg.h>
+#pragma comment(lib, "Advapi32.lib")
+
 namespace vjoypp = fredemmott::vjoypp;
 using namespace fredemmott::gameinput;
 
@@ -421,7 +424,26 @@ class Mapper {
 };
 
 int main() {
-  vjoy_init();
+  const char* prefix = "SYSTEM\\CurrentControlSet\\Services\\HidGuardian\\Parameters\\Whitelist";
+  char buf[256];
+  snprintf(buf, sizeof(buf), "%s\\%d", prefix, GetCurrentProcessId());
+  HKEY regkey;
+  auto ret = RegCreateKeyEx(HKEY_LOCAL_MACHINE, buf, NULL, NULL, REG_OPTION_VOLATILE,
+      KEY_ALL_ACCESS, 
+      nullptr, &regkey, nullptr
+      );
+  if (ret == ERROR_ACCESS_DENIED) {
+    printf(
+      "Access denied to HidGuardian whitelist. If you're Using HidGuardian,\n"
+      "Open RegEdit as administrator, create the following key, and give\n"
+      "your non-administrator user full permissions to it:\n"
+      "  HKEY_LOCAL_MACHINE\\%s\n---\n",
+      prefix
+    );
+  }
+  RegCloseKey(regkey);
+
+  vjoypp::init();
   InputDeviceCollection devices;
   auto device = devices.get({0x044f, 0x0404}); // warthog throttle
   //auto device = devices.get({0x3344, 0x40cc}); // warbrd right
