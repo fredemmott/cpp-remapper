@@ -445,34 +445,42 @@ int main() {
 
   vjoypp::init();
   InputDeviceCollection devices;
-  auto device = devices.get({0x044f, 0x0404}); // warthog throttle
-  //auto device = devices.get({0x3344, 0x40cc}); // warbrd right
-  if (!device) {
-    printf("Failed to find device:'(\n");
-    return 0;
-  }
-  printf("Found device: %s\n", device->getProductName().c_str());
 
-  MappableInputDevice s(device);
-  MappableOutputDevice t(new vjoypp::OutputDevice(1));
+  MappableInputDevice throttle(devices.get({0x44f, 0x0404})); // warthog throttle
+  MappableInputDevice stick(devices.get({0x3344, 0x40cc})); // warbrd/alpha right
+  MappableOutputDevice vj1(new vjoypp::OutputDevice(1));
+  MappableOutputDevice vj2(new vjoypp::OutputDevice(2));
 
   Mapper mapper;
-  mapper.passthrough(s, t);
-  const auto first = device->getButtonCount() + 1;
+  mapper.passthrough(throttle, vj1);
+  mapper.passthrough(stick, vj2);
+  const auto tbc = throttle.getDevice()->getButtonCount();
+  const auto sbc = stick.getDevice()->getButtonCount();
   mapper.map(
     { // axes
       {
-        s.XAxis,
+        throttle.XAxis,
         AxisToButtons {
-          { 0, 0, t.button(first) },
-          { 100, 100, t.button(first + 1) }
+          { 0, 0, vj1.button(tbc + 1) },
+          { 100, 100, vj1.button(tbc + 2) }
         },
-      },
-      {
-        s.YAxis,
+      }, {
+        throttle.YAxis,
         AxisToButtons {
-          { 0, 0, t.button(first + 2) },
-          { 100, 100, t.button(first + 3) }
+          { 0, 0, vj1.button(tbc + 3) },
+          { 100, 100, vj1.button(tbc + 4) }
+        },
+      }, {
+        stick.RXAxis,
+        AxisToButtons {
+          { 0, 0, vj2.button(sbc + 1) },
+          { 100, 100, vj2.button(sbc + 2) }
+        },
+      }, {
+        stick.RYAxis,
+        AxisToButtons {
+          { 0, 0, vj2.button(sbc + 3) },
+          { 100, 100, vj2.button(sbc + 4) }
         },
       },
     },
