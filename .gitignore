@@ -1,3 +1,4 @@
 *.exe
 *.obj
 SDK/
+vJoyInterface.dll
