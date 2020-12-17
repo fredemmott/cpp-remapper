@@ -14,88 +14,14 @@
 #include "inputdevicecollection.h"
 #include "vjoypp.h"
 
+#include "actionortarget.h"
 #include "axistobuttons.h"
 #include "passthroughs.h"
+#include "mappabledevices.h"
 
 namespace vjoypp = fredemmott::vjoypp;
 using namespace fredemmott::gameinput;
 using namespace fredemmott::inputmapping;
-
-template<typename TDevice>
-struct MappableDevice {
- MappableDevice(TDevice* dev): device(dev) {}
- MappableButton<TDevice> button(uint8_t number) {
-   return {device, number};
- }
- MappableHat<TDevice> hat(uint8_t number) {
-   return {device, number};
- }
-
- TDevice* getDevice() const {
-   return device;
- }
- protected:
-  TDevice* device;
-};
-
-struct MappableOutputDevice : public MappableDevice<vjoypp::OutputDevice> {
-  MappableOutputDevice(vjoypp::OutputDevice* dev):
-    MappableDevice(dev),
-    XAxis { dev, "X", &vjoypp::OutputDevice::setXAxis },
-    YAxis { dev, "Y", &vjoypp::OutputDevice::setYAxis },
-    ZAxis { dev, "Z", &vjoypp::OutputDevice::setZAxis },
-    RXAxis { dev, "RX", &vjoypp::OutputDevice::setRXAxis },
-    RYAxis { dev, "RY", &vjoypp::OutputDevice::setRYAxis },
-    RZAxis { dev, "RZ", &vjoypp::OutputDevice::setRZAxis },
-    Slider { dev, "Slider", &vjoypp::OutputDevice::setSlider},
-    Dial { dev, "Dial", &vjoypp::OutputDevice::setDial}
-  {
-  }
-
-  const AxisTarget XAxis;
-  const AxisTarget YAxis;
-  const AxisTarget ZAxis;
-  const AxisTarget RXAxis;
-  const AxisTarget RYAxis;
-  const AxisTarget RZAxis;
-  const AxisTarget Slider;
-  const AxisTarget Dial;
-};
-
-struct MappableInputDevice : public MappableDevice<InputDevice> {
-  MappableInputDevice(InputDevice* dev):
-    MappableDevice(dev),
-    XAxis(findAxis(AxisType::X)),
-    YAxis(findAxis(AxisType::Y)),
-    ZAxis(findAxis(AxisType::Z)),
-    RXAxis(findAxis(AxisType::RX)),
-    RYAxis(findAxis(AxisType::RY)),
-    RZAxis(findAxis(AxisType::RZ)),
-    Slider(findAxis(AxisType::SLIDER))
-  {
-  }
-  const AxisSource XAxis;
-  const AxisSource YAxis;
-  const AxisSource ZAxis;
-  const AxisSource RXAxis;
-  const AxisSource RYAxis;
-  const AxisSource RZAxis;
-  const AxisSource Slider;
-
-  AxisSource axis(uint8_t id) {
-    return { device, id };
-  }
- private:
-  AxisSource findAxis(AxisType t) {
-    const auto info = device->getAxisInformation();
-    for (uint8_t i = 0; i < info.size(); ++i) {
-      if (info[i].type == t) {
-        return {device, ++i };
-      }
-    }
-    return {device, 0};
-  }
-};
 
 namespace {
   struct DeviceOffsets {
@@ -104,27 +30,6 @@ namespace {
     const off_t firstButton;
   };
 }
-
-
-template<typename Target, typename Action, typename Passthrough>
-class ActionWrapper {
-public:
- ActionWrapper(const Target& target) {
-   mAction = new Passthrough { target } ;
- }
- template<typename T>
- ActionWrapper(const T& action) {
-   mAction = new T(action);
- }
- Action* getAction() const {
-   return mAction;
- }
-private:
- Action* mAction;
-};
-class AxisActionWrapper : public ActionWrapper<AxisTarget, AxisAction, AxisPassthrough> {};
-class ButtonActionWrapper : public ActionWrapper<ButtonTarget, ButtonAction, ButtonPassthrough> {};
-class HatActionWrapper : public ActionWrapper<HatTarget, HatAction, HatPassthrough> {};
 
 namespace {
   HANDLE gExitEvent;
@@ -140,15 +45,15 @@ class Mapper {
  public:
    struct AxisMapping {
      AxisSource source;
-     AxisActionWrapper action;
+     AxisActionOrTarget action;
    };
    struct ButtonMapping {
      ButtonSource source;
-     ButtonActionWrapper action;
+     ButtonActionOrTarget action;
     };
    struct HatMapping {
      HatSource source;
-     HatActionWrapper action;
+     HatActionOrTarget action;
    };
    void map(
      const std::initializer_list<AxisMapping>& axes,
@@ -156,13 +61,13 @@ class Mapper {
      const std::initializer_list<ButtonMapping>& buttons
   ) {
      for (const auto& mapping: axes) {
-       mMappings[mapping.source.device].axes[mapping.source.axis] = mapping.action.getAction();
+       mMappings[mapping.source.device].axes[mapping.source.axis] = mapping.action;
      }
      for (const auto& mapping: hats) {
-       mMappings[mapping.source.device].hats[mapping.source.hat] = mapping.action.getAction();
+       mMappings[mapping.source.device].hats[mapping.source.hat] = mapping.action;
      }
      for (const auto& mapping: buttons) {
-       mMappings[mapping.source.device].buttons[mapping.source.button] = mapping.action.getAction();
+       mMappings[mapping.source.device].buttons[mapping.source.button] = mapping.action;
      }
    }
 
