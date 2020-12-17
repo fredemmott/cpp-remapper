@@ -17,53 +17,6 @@
 namespace vjoypp = fredemmott::vjoypp;
 using namespace fredemmott::gameinput;
 
-void dump_state(InputDevice* device) {
-  printf("State:\n");
-  const auto buf = device->getState();
-  const BYTE* data = buf.data();
-  off_t offset = 0;
-  for (int i = 1; i <= device->getAxisCount(); ++i) {
-    std::string type;
-    switch(device->getAxisInformation()[i - 1].type) {
-      case AxisType::X:
-        type = "X";
-        break;
-      case AxisType::Y:
-        type = "Y";
-        break;
-      case AxisType::Z:
-        type = "Z";
-        break;
-      case AxisType::RX:
-        type = "Rx";
-        break;
-      case AxisType::RY:
-        type = "Ry";
-        break;
-      case AxisType::RZ:
-        type = "Rz";
-        break;
-      case AxisType::SLIDER:
-        type = "Slider";
-        break;
-    }
-    printf("  Axis %d: %ld\t(%s)\n", i, *(long*)&buf[offset], type.c_str());
-    offset += sizeof(long);
-  }
-  for (int i = 1; i <= device->getHatCount(); ++i) {
-    printf("  Hat %d: 0x%0.2x\n", i, *(int32_t*)&buf[offset]);
-    offset += sizeof(int32_t);
-  }
-  printf("  Buttons:");
-  for (int i = 1; i <= device->getButtonCount(); ++i) {
-    if (buf[offset]) {
-      printf(" %d", i);
-    }
-    offset += 1;
-  }
-  printf("\n");
-}
-
 template<typename TValue>
 class Action {
  public:
