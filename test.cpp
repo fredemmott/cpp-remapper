@@ -14,48 +14,12 @@
 #include "inputdevicecollection.h"
 #include "vjoypp.h"
 
+#include "axistobuttons.h"
+#include "passthroughs.h"
+
 namespace vjoypp = fredemmott::vjoypp;
 using namespace fredemmott::gameinput;
-
-template<typename TValue>
-class Action {
- public:
-   virtual std::set<vjoypp::OutputDevice*> getAffectedDevices() = 0;
-   virtual void map(TValue value) = 0;
-};
-
-class AxisAction: public Action<long> {};
-class ButtonAction : public Action<bool> {};
-class HatAction : public Action<int16_t> {};
-
-template<typename TDevice>
-struct MappableButton {
-  TDevice* device;
-  uint8_t button;
-};
-typedef MappableButton<InputDevice> ButtonSource;
-typedef MappableButton<vjoypp::OutputDevice> ButtonTarget;
-
-template<typename TDevice>
-struct MappableHat {
-  TDevice* device;
-  uint8_t hat;
-};
-typedef MappableHat<InputDevice> HatSource;
-typedef MappableHat<vjoypp::OutputDevice> HatTarget;
-
-
-struct AxisSource {
-  InputDevice* device;
-  uint8_t axis;
-};
-
-struct AxisTarget {
-  vjoypp::OutputDevice* device;
-  const char* label;
-  vjoypp::OutputDevice* (vjoypp::OutputDevice::*setter)(long);
-};
-
+using namespace fredemmott::inputmapping;
 
 template<typename TDevice>
 struct MappableDevice {
@@ -133,44 +97,6 @@ struct MappableInputDevice : public MappableDevice<InputDevice> {
   }
 };
 
-class AxisToButtons : public AxisAction {
- public:
-  struct Range {
-    uint8_t minPercent;
-    uint8_t maxPercent;
-    ButtonTarget target;
-  };
-
-  AxisToButtons(std::initializer_list<Range> ranges) {
-    const long max = std::numeric_limits<uint16_t>::max();
-    for (const auto& range: ranges) {
-      mRanges.push_back({(range.minPercent * max) / 100, (range.maxPercent * max) / 100, range.target});
-    }
-  }
-
-  void map(long value) {
-    for (const auto& range: mRanges) {
-      bool active = range.min <= value && range.max >= value;
-      range.target.device->setButton(range.target.button, active);
-    }
-  }
-
-  std::set<vjoypp::OutputDevice*> getAffectedDevices() {
-    std::set<vjoypp::OutputDevice*> out;
-    for (const auto& range: mRanges) {
-      out.emplace(range.target.device);
-    }
-    return out;
-  }
- private:
-  struct RawRange {
-    long min;
-    long max;
-    ButtonTarget target;
-  };
-  std::vector<RawRange> mRanges;
-};
-
 namespace {
   struct DeviceOffsets {
     const off_t firstAxis;
@@ -179,53 +105,6 @@ namespace {
   };
 }
 
-class AxisPassthrough : public AxisAction {
-  public:
-  AxisPassthrough(const AxisTarget& target): AxisAction(), mTarget(target) {
-  }
-
-  void map(long value) {
-    (mTarget.device->*(mTarget.setter))(value);
-  }
-
-  std::set<vjoypp::OutputDevice*> getAffectedDevices() {
-    return { mTarget.device };
-  }
-  private:
-    AxisTarget mTarget;
-};
-
-class ButtonPassthrough : public ButtonAction {
-  public:
-  ButtonPassthrough(const ButtonTarget& target): ButtonAction(), mTarget(target) {
-  }
-
-  void map(bool value) {
-    mTarget.device->setButton(mTarget.button, value);
-  }
-
-  std::set<vjoypp::OutputDevice*> getAffectedDevices() {
-    return { mTarget.device };
-  }
-  private:
-    ButtonTarget mTarget;
-};
-
-class HatPassthrough : public HatAction {
-  public:
-  HatPassthrough(const HatTarget& target): HatAction(), mTarget(target) {
-  }
-
-  void map(int16_t value) {
-    mTarget.device->setHat(mTarget.hat, value);
-  }
-
-  std::set<vjoypp::OutputDevice*> getAffectedDevices() {
-    return { mTarget.device };
-  }
-  private:
-    HatTarget mTarget;
-};
 
 template<typename Target, typename Action, typename Passthrough>
 class ActionWrapper {
