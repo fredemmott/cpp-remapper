@@ -1,14 +1,17 @@
 #include "inputdevice.h"
 #include "axistypes.h"
 
+#include <Cfgmgr32.h>
+#include <initguid.h> // needed for devpkey to actually define the devpkeys :)
+#include <devpkey.h>
+#include <setupapi.h>
+
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Cfgmgr32.lib")
+#pragma comment(lib, "SetupAPI.lib")
 
 namespace fredemmott::gameinput {
-
-bool VIDPID::operator==(const VIDPID& other) const {
-  return vid == other.vid && pid == other.pid;
-}
 
 namespace {
   struct ControlInfo {
@@ -104,7 +107,51 @@ std::string InputDevice::getProductName() const {
   return p->device.tszProductName;
 }
 
+std::string InputDevice::getInstanceID() const {
+  DIPROPGUIDANDPATH buf;
+  buf.diph.dwSize = sizeof(DIPROPGUIDANDPATH);
+  buf.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+  buf.diph.dwObj = 0;
+  buf.diph.dwHow = DIPH_DEVICE;
+  p->getDIDevice()->GetProperty(
+    DIPROP_GUIDANDPATH,
+    &buf.diph
+  );
+  ULONG id_size = 0;
+  DEVPROPTYPE type;
+  CM_Get_Device_Interface_PropertyW(
+    buf.wszPath,
+    &DEVPKEY_Device_InstanceId,
+    &type,
+    nullptr,
+    &id_size,
+    0
+  );
+  std::vector<BYTE> id(id_size);
+  CM_Get_Device_Interface_PropertyW(
+    buf.wszPath,
+    &DEVPKEY_Device_InstanceId,
+    &type,
+    id.data(),
+    &id_size,
+    0
+  );
+  char device_id[MAX_PATH];
+  snprintf(device_id, sizeof(device_id), "%S", (wchar_t*) id.data());
+  return device_id;
+}
+
+std::string InputDevice::getHardwareID() const {
+  auto id = getInstanceID();
+  // Totaly legit way to split off the \instanceID suffix
+  *strrchr(id.data(), '\\') = 0;
+
+  return id.data();
+}
+
+
 std::optional<VIDPID> InputDevice::getVIDPID() const {
+  // TODO: switch to DIPROP_VIDPID
   const auto VID_PID_MAGIC = "\0\0PIDVID";
   const auto& guid = p->device.guidProduct;
   if (*(uint64_t*) guid.Data4 == *(uint64_t*)(VID_PID_MAGIC)) {

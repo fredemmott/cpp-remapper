@@ -8,12 +8,11 @@
 #include <cstdio>
 
 #include "axistypes.h"
+#include "devicedb.h"
+#include "hidguardian.h"
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
 #include "vjoypp.h"
-
-#include <winreg.h>
-#pragma comment(lib, "Advapi32.lib")
 
 namespace vjoypp = fredemmott::vjoypp;
 using namespace fredemmott::gameinput;
@@ -295,6 +294,16 @@ class AxisActionWrapper : public ActionWrapper<AxisTarget, AxisAction, AxisPasst
 class ButtonActionWrapper : public ActionWrapper<ButtonTarget, ButtonAction, ButtonPassthrough> {};
 class HatActionWrapper : public ActionWrapper<HatTarget, HatAction, HatPassthrough> {};
 
+namespace {
+  HANDLE gExitEvent;
+  BOOL WINAPI exit_event_handler(
+    DWORD dwCtrlType
+  ) {
+    SetEvent(gExitEvent);
+    return true;
+  }
+}
+
 class Mapper {
  public:
    struct AxisMapping {
@@ -348,7 +357,9 @@ class Mapper {
    }
 
    void run() {
-     std::vector<HANDLE> events;
+     gExitEvent = CreateEvent(nullptr, false, false, nullptr);
+     SetConsoleCtrlHandler(&exit_event_handler, true);
+     std::vector<HANDLE> events { gExitEvent };
      std::map<HANDLE, InputDevice*> devices;
      std::map<InputDevice*, std::vector<uint8_t>> states;
      std::map<InputDevice*, DeviceOffsets> offsets;
@@ -369,6 +380,12 @@ class Mapper {
          INFINITE
        );
        auto event = events[res - WAIT_OBJECT_0];
+       if (event == gExitEvent) {
+         SetConsoleCtrlHandler(nullptr, false);
+         CloseHandle(gExitEvent);
+         break;
+       }
+
        auto device = devices[event];
        const auto old_state = states[device];
        const auto new_state = device->getState();
@@ -424,30 +441,12 @@ class Mapper {
 };
 
 int main() {
-  const char* prefix = "SYSTEM\\CurrentControlSet\\Services\\HidGuardian\\Parameters\\Whitelist";
-  char buf[256];
-  snprintf(buf, sizeof(buf), "%s\\%d", prefix, GetCurrentProcessId());
-  HKEY regkey;
-  auto ret = RegCreateKeyEx(HKEY_LOCAL_MACHINE, buf, NULL, NULL, REG_OPTION_VOLATILE,
-      KEY_ALL_ACCESS, 
-      nullptr, &regkey, nullptr
-      );
-  if (ret == ERROR_ACCESS_DENIED) {
-    printf(
-      "Access denied to HidGuardian whitelist. If you're Using HidGuardian,\n"
-      "Open RegEdit as administrator, create the following key, and give\n"
-      "your non-administrator user full permissions to it:\n"
-      "  HKEY_LOCAL_MACHINE\\%s\n---\n",
-      prefix
-    );
-  }
-  RegCloseKey(regkey);
-
+  HidGuardian hid({TM_WARTHOG_THROTTLE, VPC_RIGHT_WARBRD});
   vjoypp::init();
   InputDeviceCollection devices;
 
-  MappableInputDevice throttle(devices.get({0x44f, 0x0404})); // warthog throttle
-  MappableInputDevice stick(devices.get({0x3344, 0x40cc})); // warbrd/alpha right
+  MappableInputDevice throttle(devices.get(TM_WARTHOG_THROTTLE));
+  MappableInputDevice stick(devices.get(VPC_RIGHT_WARBRD));
   MappableOutputDevice vj1(new vjoypp::OutputDevice(1));
   MappableOutputDevice vj2(new vjoypp::OutputDevice(2));
 
@@ -487,6 +486,8 @@ int main() {
     {}, // hats
     {} // buttons
   );
+  printf("Launching profile...\n");
   mapper.run();
+  printf("Exiting cleanly.\n");
   return 0;
 }

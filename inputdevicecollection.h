@@ -8,14 +8,14 @@
 namespace fredemmott::gameinput {
 
 class InputDevice;
-struct VIDPID;
+struct DeviceID;
 
 class InputDeviceCollection {
  public:
   InputDeviceCollection();
   ~InputDeviceCollection();
 
-  InputDevice* get(const VIDPID& vidpid);
+  InputDevice* get(const DeviceID& device);
  private:
   std::vector<InputDevice*> mDevices;
 };

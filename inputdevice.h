@@ -15,7 +15,26 @@ struct AxisInformation;
 struct VIDPID {
   uint16_t vid;
   uint16_t pid;
-  bool operator==(const VIDPID& other) const;
+};
+
+struct HID_ID {
+  std::string id;
+};
+
+struct DeviceID {
+  uint16_t vid;
+  uint16_t pid;
+  std::string id;
+
+  DeviceID(const VIDPID& vidpid): vid(vidpid.vid), pid(vidpid.pid) {
+    char buf[MAX_PATH];
+    snprintf(buf, sizeof(buf), "HID\\VID_%04hx&PID_%04hx", vid, pid);
+    id = buf;
+  }
+
+  DeviceID(const HID_ID& id): id(id.id) {
+    sscanf_s(id.id.data(), "HID\\VID_%hx&PID_%hx", &vid, &pid);
+  }
 };
 
 
@@ -27,6 +46,8 @@ class InputDevice {
   std::string getInstanceName() const;
   std::string getProductName() const;
   std::optional<VIDPID> getVIDPID() const;
+  std::string getInstanceID() const;
+  std::string getHardwareID() const;
 
   uint32_t getAxisCount();
   std::vector<AxisInformation> getAxisInformation();

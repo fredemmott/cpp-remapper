@@ -17,18 +17,11 @@ void init() {
     printf("vJoy is not enabled.\n");
     return;
   }
-  printf("Initializing vJoy\n  Vendor: %S\n  Product: %S\n  Version: %S\n",
-    (wchar_t*) TEXT(GetvJoyManufacturerString()),
-    (wchar_t*) TEXT(GetvJoyProductString()),
-    (wchar_t*) TEXT(GetvJoySerialNumberString())
-  );
   WORD VerDll, VerDrv;
   if (!DriverMatch(&VerDll, &VerDrv)) {
     printf("vJoy driver version %04x does not match DLL version %04x\n", VerDrv, VerDll);
     return;
   }
-  printf("  Driver/DLL version: %04x\n", VerDll);
-  printf("---\n");
 }
 
 struct OutputDevice::Impl {

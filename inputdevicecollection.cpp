@@ -18,39 +18,26 @@ namespace {
   ) {
     auto state = reinterpret_cast<DeviceEnumeratorState*>(vpRef);
     auto device = new InputDevice(state->di8, didevinst);
-    printf("Product Name: %s\n", device->getProductName().c_str());
-    printf("Instance Name: %s\n", device->getInstanceName().c_str());
-  OLECHAR* guid;
-  StringFromCLSID(didevinst->guidInstance, &guid);
-  printf("GUID: %S\n", guid);
-  device->activate();
-    auto vidpid = device->getVIDPID();
-    if (vidpid) {
-      printf("VID: 0x%.4x\nPID: 0x%.4x\n", vidpid->vid, vidpid->pid);
-    }
-    printf("Axes: %lu\n", device->getAxisCount());
-    for (const auto& axis: device->getAxisInformation()) {
-      printf("  - %s\n", axis.name.c_str());
-    }
-    printf("Buttons: %lu\n", device->getButtonCount());
-    printf("Hats: %lu\n", device->getHatCount());
-    printf("---\n");
+    device->activate();
     state->devices.push_back(device);
 
     return DIENUM_CONTINUE;
   }
 
+  IDirectInput8* gDI8 = nullptr;
 } // namespace
 
 InputDeviceCollection::InputDeviceCollection() {
-  IDirectInput8* di8;
-  DirectInput8Create(
-      GetModuleHandle(nullptr),
-      DIRECTINPUT_VERSION,
-      IID_IDirectInput8,
-      (LPVOID*) &di8,
-      nullptr
-  );
+  if (!gDI8) {
+    DirectInput8Create(
+        GetModuleHandle(nullptr),
+        DIRECTINPUT_VERSION,
+        IID_IDirectInput8,
+        (LPVOID*) &gDI8,
+        nullptr
+    );
+  }
+  auto di8 = gDI8;
   DeviceEnumeratorState state { di8, {} };
   di8->EnumDevices(
       DI8DEVCLASS_GAMECTRL,
@@ -61,13 +48,14 @@ InputDeviceCollection::InputDeviceCollection() {
   mDevices = state.devices;
 }
 
-InputDevice* InputDeviceCollection::get(const VIDPID& vidpid) {
+InputDevice* InputDeviceCollection::get(const DeviceID& id) {
   for (auto device: mDevices) {
     auto dvp = device->getVIDPID();
-    if (dvp && *dvp == vidpid) {
+    if (dvp && dvp->vid == id.vid && dvp->pid == id.pid) {
       return device;
     }
   }
+  printf("WARNING: Returning nullptr device\n");
   return nullptr;
 }
 
