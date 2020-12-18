@@ -1,9 +1,5 @@
 #include "passthroughs.h"
 
-#include "vjoypp.h"
-
-using fredemmott::vjoypp::OutputDevice;
-
 namespace fredemmott::inputmapping {
 
 VJoyAxis::VJoyAxis(
@@ -12,7 +8,7 @@ VJoyAxis::VJoyAxis(
 }
 
 void VJoyAxis::map(long value) {
-  (mTarget.device->*(mTarget.setter))(value);
+  mTarget.set(value);
 }
 
 VJoyButton::VJoyButton(
@@ -21,7 +17,7 @@ VJoyButton::VJoyButton(
 }
 
 void VJoyButton::map(bool value) {
-  mTarget.device->setButton(mTarget.button, value);
+  mTarget.set(value);
 }
 
 VJoyHat::VJoyHat(
@@ -30,7 +26,7 @@ VJoyHat::VJoyHat(
 }
 
 void VJoyHat::map(int16_t value) {
-  mTarget.device->setHat(mTarget.hat, value);
+  mTarget.set(value);
 }
 
 } // namespace fredemmott::inputmapping
