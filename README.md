@@ -52,5 +52,11 @@ That said:
 2. Extract it to the source directory so you have an `SDK/` subdirectory
 3. Install Visual Studio 2019 or newer
 4. Open visual studio command prompt
-5. `cl /Fetest.exe /EHsc /std:c++17 *.cpp`
+5. `cl /Fetest.exe /EHsc /std:c++17 /vmg *.cpp`
+   - `/Fetest.exe`: create 'test.exe'
+   - `/EHsc`: enable standard C++ exception/stack unwinding, with no exceptions
+     from `extern "C"`
+   - `/std:c++17`: enable C++17
+   - `/vmg`: be pessimistic about member functions pointers to forward-declared
+     classes. Prevents memory corruption in these cases.
 6. Run `test.exe`
