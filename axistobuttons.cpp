@@ -19,12 +19,5 @@ void AxisToButtons::map(long value) {
     range.next->map(active);
   }
 }
-std::set<vjoypp::OutputDevice*> AxisToButtons::getAffectedDevices() {
-  std::set<vjoypp::OutputDevice*> out;
-  for (const auto& range: mRanges) {
-    out.merge(range.next->getAffectedDevices());
-  }
-  return out;
-}
 
 } // namespace fredemmott::inputmapping

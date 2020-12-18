@@ -27,6 +27,13 @@ namespace fredemmott::inputmapping {
     }
   } // namespace
 
+  void Mapper::setOutputs(const std::vector<MappableOutput>& outputs) {
+    mToFlush.clear();
+    for (const auto& output: outputs) {
+      mToFlush.push_back(output.getDevice());
+    }
+  }
+
   void Mapper::map(const AxisSource& source, const AxisActionOrTarget& handler) {
     if (source.device && source.axis && handler) {
       mMappings[source.device].axes.insert_or_assign(
@@ -95,6 +102,15 @@ namespace fredemmott::inputmapping {
   }
 
   void Mapper::run() {
+    if (mToFlush.empty()) {
+      printf(
+        "---\n"
+        "!!! WARNING !!!\n"
+        "Mapper::setOutputs() was not called, or was passed an "
+        "empty list. VJoy outputs will be stale unless manually flushed.\n"
+        "---\n"
+      );
+    }
     printf("Launching profile...\n");
     // We want to cleanly exit so that destructors are called - in particular,
     // we want to reset the HidGuardian configuration.
@@ -143,7 +159,6 @@ namespace fredemmott::inputmapping {
       auto new_button = reinterpret_cast<const uint8_t*>(&new_state.data()[device_offsets.firstButton]);
 
       const auto &mappings = mMappings[device];
-      std::set<vjoypp::OutputDevice*> affected;
 
       for (const auto [axis_id, action]: mappings.axes) {
         const auto idx = axis_id - 1;
@@ -151,7 +166,6 @@ namespace fredemmott::inputmapping {
           continue;
         }
         action->map(new_axis[idx]);
-        affected.merge(action->getAffectedDevices());
       }
       for (const auto& [hat_id, action]: mappings.hats) {
         const auto idx = hat_id - 1;
@@ -159,7 +173,6 @@ namespace fredemmott::inputmapping {
           continue;
         }
         action->map(new_hat[idx]);
-        affected.merge(action->getAffectedDevices());
       }
       for (const auto& [button_id, action]: mappings.buttons) {
         const auto idx = button_id - 1;
@@ -167,10 +180,9 @@ namespace fredemmott::inputmapping {
           continue;
         }
         action->map(new_button[idx]);
-        affected.merge(action->getAffectedDevices());
       }
 
-      for (const auto& device: affected) {
+      for (const auto& device: mToFlush) {
         device->send();
       }
     }

@@ -24,14 +24,6 @@ class ComboAction : public Action {
     }
   }
 
-  std::set<vjoypp::OutputDevice*> getAffectedDevices() {
-    std::set<vjoypp::OutputDevice*> out;
-    for (const auto& inner: mInners) {
-      out.merge(inner->getAffectedDevices());
-    }
-    return out;
-  }
-
  private:
   std::vector<Action*> mInners;
 };

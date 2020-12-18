@@ -18,7 +18,6 @@ class AxisToButtons : public AxisAction {
 
   AxisToButtons(std::initializer_list<Range> ranges);
   void map(long value);
-  std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices();
  private:
   struct RawRange {
     long min;

@@ -26,7 +26,6 @@ class Action {
  public:
    typedef TValue value_type;
    virtual ~Action() {}
-   virtual std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices() = 0;
    virtual void map(TValue value) = 0;
 };
 

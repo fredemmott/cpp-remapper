@@ -3,6 +3,7 @@
 #include "mappabledevices.h"
 
 #include <memory>
+#include <tuple>
 #include <vector>
 
 namespace fredemmott::gameinput {
@@ -74,6 +75,23 @@ namespace {
     device_ids.push_back(first);
     fill_input_ids(device_ids, rest...);
   }
+
+  std::vector<MappableOutput> select_outputs() {
+    return {};
+  }
+
+  template<typename... Rest>
+  std::vector<MappableOutput> select_outputs(const MappableInput&, Rest... rest) {
+    return select_outputs(rest...);
+  }
+
+
+  template<typename... Rest>
+  std::vector<MappableOutput> select_outputs(const MappableOutput& first, Rest... rest) {
+    auto ret = select_outputs(rest...);
+    ret.push_back(first);
+    return ret;
+  }
 }
 
 template<typename... Ts>
@@ -82,6 +100,14 @@ auto create_profile(const gameinput::DeviceID& first, Ts... rest) {
   fill_input_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
   auto devices = get_devices(&p, first, rest...);
+  // Lambda needed as the thing we're calling is a template: std::apply needs
+  // an `std::function`, and we can't take a reference to a template function
+  p->setOutputs(
+    std::apply(
+      [](auto&&... args){ return select_outputs(args...); },
+      devices
+    )
+  );
   return std::tuple_cat(std::make_tuple(std::move(p)), devices);
 }
 
