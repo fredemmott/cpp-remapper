@@ -25,7 +25,7 @@ class ComboAction : public Action {
   }
 
  private:
-  std::vector<Action*> mInners;
+  std::vector<Wrapper> mInners;
 };
 
 } // namespace fredemmott::inputmapping::actions
