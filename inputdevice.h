@@ -38,9 +38,12 @@ struct DeviceID {
 };
 
 
-class InputDevice {
+class InputDevice final {
  public:
   InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device);
+  InputDevice() = delete;
+  InputDevice(const InputDevice&) = delete;
+  void operator=(const InputDevice&) = delete;
   ~InputDevice();
 
   std::string getInstanceName() const;
@@ -56,8 +59,6 @@ class InputDevice {
 
   HANDLE getEvent();
 
-  void activate();
-
   std::vector<uint8_t> getState();
  private:
   struct Impl;
@@ -65,5 +66,7 @@ class InputDevice {
   HANDLE mEventHandle = nullptr;
   bool mActivated = false;
   size_t mDataSize = 0;
+  void activate();
+
 };
 } // namespace fredemmott::gameinput

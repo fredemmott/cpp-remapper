@@ -1,18 +1,19 @@
 #pragma once
 
 #include "actionsapi.h"
+#include "actionortarget.h"
 
 #include <vector>
 #include <cstdint>
 
-namespace fredemmott::inputmapping {
+namespace fredemmott::inputmapping::actions {
 
 class AxisToButtons : public AxisAction {
  public:
   struct Range {
     uint8_t minPercent;
     uint8_t maxPercent;
-    ButtonTarget target;
+    ButtonActionOrTarget next;
   };
 
   AxisToButtons(std::initializer_list<Range> ranges);
@@ -22,7 +23,7 @@ class AxisToButtons : public AxisAction {
   struct RawRange {
     long min;
     long max;
-    ButtonTarget target;
+    ButtonAction* next;
   };
   std::vector<RawRange> mRanges;
 };

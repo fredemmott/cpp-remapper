@@ -8,7 +8,7 @@ namespace fredemmott::vjoypp {
 
 void init();
 
-class OutputDevice {
+class OutputDevice final {
  public:
   OutputDevice(uint8_t id);
   ~OutputDevice();

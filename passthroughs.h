@@ -9,27 +9,27 @@ namespace fredemmott::inputmapping {
  * to convert them to an (Axis|Button|Hat)Action
  */
 
-class AxisPassthrough : public AxisAction {
+class VJoyAxis : public AxisAction {
   public:
-    AxisPassthrough(const AxisTarget& target);
+    VJoyAxis(const AxisTarget& target);
     void map(long value);
     std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices();
   private:
     AxisTarget mTarget;
 };
 
-class ButtonPassthrough : public ButtonAction {
+class VJoyButton : public ButtonAction {
   public:
-    ButtonPassthrough(const ButtonTarget& target);
+    VJoyButton(const ButtonTarget& target);
     void map(bool value);
     std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices();
   private:
     ButtonTarget mTarget;
 };
 
-class HatPassthrough : public HatAction {
+class VJoyHat : public HatAction {
   public:
-    HatPassthrough(const HatTarget& target);
+    VJoyHat(const HatTarget& target);
     void map(int16_t value);
     std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices();
   private:

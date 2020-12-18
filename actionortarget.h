@@ -1,6 +1,7 @@
 #pragma once
 
 #include "actionsapi.h"
+#include "comboaction.h"
 #include "passthroughs.h"
 
 namespace fredemmott::inputmapping {
@@ -19,21 +20,37 @@ template<typename Target, typename Action, typename Passthrough>
 class ActionOrTarget {
 public:
  ActionOrTarget(const Target& target) {
-   mAction = new Passthrough { target } ;
+   if (target.device) {
+     mAction = new Passthrough { target } ;
+   } else {
+     mAction = nullptr;
+    }
  }
  template<typename T>
  ActionOrTarget(const T& action) {
    mAction = new T(action);
  }
+
+ typedef ActionOrTarget<Target, Action, Passthrough> SelfType;
+ ActionOrTarget(const std::initializer_list<SelfType>& actions) {
+   mAction = new ComboAction<SelfType, Action>(actions);
+ }
+
  operator Action* () const {
+   return mAction;
+ }
+ operator bool() const {
    return mAction;
  }
 private:
  Action* mAction;
 };
 
-class AxisActionOrTarget : public ActionOrTarget<AxisTarget, AxisAction, AxisPassthrough> {};
-class ButtonActionOrTarget : public ActionOrTarget<ButtonTarget, ButtonAction, ButtonPassthrough> {};
-class HatActionOrTarget : public ActionOrTarget<HatTarget, HatAction, HatPassthrough> {};
+typedef ActionOrTarget<AxisTarget, AxisAction, VJoyAxis>
+  AxisActionOrTarget;
+typedef ActionOrTarget<ButtonTarget, ButtonAction, VJoyButton>
+  ButtonActionOrTarget;
+typedef ActionOrTarget<HatTarget, HatAction, VJoyHat>
+  HatActionOrTarget;
 
 } // namespace fredemmott::inputmapping

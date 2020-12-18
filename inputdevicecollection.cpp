@@ -18,7 +18,6 @@ namespace {
   ) {
     auto state = reinterpret_cast<DeviceEnumeratorState*>(vpRef);
     auto device = new InputDevice(state->di8, didevinst);
-    device->activate();
     state->devices.push_back(device);
 
     return DIENUM_CONTINUE;
@@ -60,6 +59,9 @@ InputDevice* InputDeviceCollection::get(const DeviceID& id) {
 }
 
 InputDeviceCollection::~InputDeviceCollection() {
+  for (auto device: mDevices) {
+    delete device;
+  }
 }
 
 } // namespace fredemmott::gameinput

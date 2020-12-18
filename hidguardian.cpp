@@ -16,6 +16,7 @@ namespace fredemmott::gameinput {
 namespace {
   // Only works as administrator :'(
   void restart_devices(const std::vector<DeviceID>& devices) {
+    printf("Restarting devices...\n");
     InputDeviceCollection collection;
     auto dil = SetupDiCreateDeviceInfoList(
       nullptr,
@@ -34,6 +35,8 @@ namespace {
       SetupDiRestartDevices(dil, &did);
       SetupDiDeleteDeviceInfo(dil, &did);
     }
+    SetupDiDestroyDeviceInfoList(dil);
+    printf("Waiting for devices to settle...\n");
     Sleep(1000);
   }
 
@@ -46,12 +49,14 @@ namespace {
 }
 
   HidGuardian::HidGuardian(const std::vector<DeviceID>& devices): mDevices(devices) {
+    printf("Configuring HidGuardian...\n");
     whitelistThisProcess();
     setDevices(devices);
     restart_devices(devices);
   }
 
   HidGuardian::~HidGuardian() {
+    printf("Cleaning up HidGuardian configuration...\n");
     setDevices({});
     restart_devices(mDevices);
     auto key = process_whitelist_key();

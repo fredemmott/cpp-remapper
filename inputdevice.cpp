@@ -17,7 +17,7 @@ namespace {
   struct ControlInfo {
     uint32_t buttons = 0;
     uint32_t hats = 0;
-    std::vector<AxisInformation> axes;
+    std::vector<AxisInformation> axes {};
   };
 
   static BOOL CALLBACK enum_controls_callback(
@@ -70,16 +70,23 @@ namespace {
 
 struct InputDevice::Impl {
   ControlInfo controlsData;
-  IDirectInput8* di8;
+  IDirectInput8* di8 = nullptr;
   DIDEVICEINSTANCE device;
-  LPDIRECTINPUTDEVICE8 diDevice;
-  bool enumerated;
+  LPDIRECTINPUTDEVICE8 diDevice = nullptr;
+  bool enumerated = false;
+  Impl() = default;
+  Impl(const Impl& other) = delete;
+  void operator=(const Impl& other) = delete;
+
+  ~Impl() {
+  }
 
   LPDIRECTINPUTDEVICE8 getDIDevice() {
     if (diDevice) {
       return diDevice;
     }
     di8->CreateDevice(device.guidInstance, &diDevice, nullptr);
+    diDevice->AddRef();
     return diDevice;
   }
 
@@ -87,6 +94,7 @@ struct InputDevice::Impl {
     if (enumerated) {
       return controlsData;
     }
+    getDIDevice()->Acquire();
     getDIDevice()->EnumObjects(&enum_controls_callback, &controlsData, DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV);
     enumerated = true;
     return controlsData;
@@ -97,6 +105,11 @@ InputDevice::InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device): p(new I
 }
 
 InputDevice::~InputDevice() {
+  auto did = p->diDevice;
+  if (did) {
+    did->Unacquire();
+    did->Release();
+  }
 }
 
 std::string InputDevice::getInstanceName() const {
@@ -179,6 +192,7 @@ uint32_t InputDevice::getHatCount() {
 }
 
 HANDLE InputDevice::getEvent() {
+  activate();
   return mEventHandle;
 }
 
@@ -243,6 +257,5 @@ std::vector<uint8_t> InputDevice::getState() {
   p->diDevice->GetDeviceState(mDataSize, buf.data());
   return buf;
 }
-
 
 } // namespace fredemmott::gameinput

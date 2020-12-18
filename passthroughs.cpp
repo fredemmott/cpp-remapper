@@ -6,42 +6,42 @@ using fredemmott::vjoypp::OutputDevice;
 
 namespace fredemmott::inputmapping {
 
-AxisPassthrough::AxisPassthrough(
+VJoyAxis::VJoyAxis(
   const AxisTarget& target
 ): AxisAction(), mTarget(target) {
 }
 
-void AxisPassthrough::map(long value) {
+void VJoyAxis::map(long value) {
   (mTarget.device->*(mTarget.setter))(value);
 }
 
-std::set<OutputDevice*> AxisPassthrough::getAffectedDevices() {
+std::set<OutputDevice*> VJoyAxis::getAffectedDevices() {
   return { mTarget.device };
 }
 
-ButtonPassthrough::ButtonPassthrough(
+VJoyButton::VJoyButton(
   const ButtonTarget& target
 ): ButtonAction(), mTarget(target) {
 }
 
-void ButtonPassthrough::map(bool value) {
+void VJoyButton::map(bool value) {
   mTarget.device->setButton(mTarget.button, value);
 }
 
-std::set<OutputDevice*> ButtonPassthrough::getAffectedDevices() {
+std::set<OutputDevice*> VJoyButton::getAffectedDevices() {
   return { mTarget.device };
 }
 
-HatPassthrough::HatPassthrough(
+VJoyHat::VJoyHat(
   const HatTarget& target
 ): HatAction(), mTarget(target) {
 }
 
-void HatPassthrough::map(int16_t value) {
+void VJoyHat::map(int16_t value) {
   mTarget.device->setHat(mTarget.hat, value);
 }
 
-std::set<OutputDevice*> HatPassthrough::getAffectedDevices() {
+std::set<OutputDevice*> VJoyHat::getAffectedDevices() {
   return { mTarget.device };
 }
 

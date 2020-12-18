@@ -24,6 +24,8 @@ namespace fredemmott::inputmapping {
 template<typename TValue>
 class Action {
  public:
+   typedef TValue value_type;
+   virtual ~Action() {}
    virtual std::set<fredemmott::vjoypp::OutputDevice*> getAffectedDevices() = 0;
    virtual void map(TValue value) = 0;
 };
@@ -59,7 +61,16 @@ struct AxisSource {
 struct AxisTarget {
   fredemmott::vjoypp::OutputDevice* device;
   const char* label;
-  fredemmott::vjoypp::OutputDevice* (vjoypp::OutputDevice::*setter)(long);
+  fredemmott::vjoypp::OutputDevice* (fredemmott::vjoypp::OutputDevice::*setter)(long);
 };
+/* This was a few hours of "why is a constructor that just initializes constants
+ * overwritting something else on the stack?!"
+ */
+static_assert(
+  sizeof(AxisTarget::setter) > sizeof(void*),
+  "Compile with /vmg for correct behavior of member function pointers with "
+  "forward-declared classes. Otherwise, sizeof() varies depending on if you"
+  "have the full declaration or not."
+);
 
 } // namespace fredemmott::inputmapping
