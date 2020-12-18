@@ -90,14 +90,11 @@ namespace fredemmott::inputmapping {
         { s.Slider, t.Slider },
         // TODO: dial (a.k.a. slider 2)
         });
-    auto sd = s.getDevice();
-    const auto hats = sd->getHatCount();
-    for (int i = 1; i <= hats; ++i) {
-      mMappings[sd].hats[i] = new VJoyHat(t.hat(i));
+    for (int i = 1; i <= s.HatCount; ++i) {
+      map(s.hat(i), t.hat(i));
     }
-    const auto buttons = sd->getButtonCount();
-    for (int i = 1; i <= buttons; ++i) {
-      mMappings[sd].buttons[i] = new VJoyButton(t.button(i));
+    for (int i = 1; i <= s.ButtonCount; ++i) {
+      map(s.button(i), t.button(i));
     }
   }
 

@@ -22,7 +22,7 @@ class AxisToButtons : public AxisAction {
   struct RawRange {
     long min;
     long max;
-    ButtonAction* next;
+    ButtonEventHandler next;
   };
   std::vector<RawRange> mRanges;
 };

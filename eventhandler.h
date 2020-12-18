@@ -4,14 +4,15 @@
 #include "comboaction.h"
 #include "passthroughs.h"
 
+#include <memory>
+
 namespace fredemmott::inputmapping {
 
-/** Given a Target or Action, get an Action.
+/** A smart pointer to an Action, created from an Action or a Target.
  *
  * Targets are converted to Actions by creating a Passthrough.
  *
- * Targets and Actions are implicity convertable to OrTargets,
- * and OrTargets are implicitly convertable to Actions.
+ * Targets and Actions are implicity convertable to EventHandlers.
  *
  * This is primarily to allow nice syntax when specifying
  * mappings.
@@ -21,29 +22,31 @@ class EventHandler {
 public:
  EventHandler(const Target& target) {
    if (target.device) {
-     mAction = new Passthrough { target } ;
+     mAction.reset(new Passthrough { target }) ;
    } else {
      mAction = nullptr;
     }
  }
+
  template<typename T>
  EventHandler(const T& action) {
-   mAction = new T(action);
+   mAction = std::make_shared<T>(action);
  }
 
  typedef EventHandler<Target, Action, Passthrough> SelfType;
  EventHandler(const std::initializer_list<SelfType>& actions) {
-   mAction = new ComboAction<SelfType, Action>(actions);
+   mAction = std::make_shared<ComboAction<SelfType, Action>>(actions);
  }
 
- operator Action* () const {
-   return mAction;
- }
  operator bool() const {
+   return (bool) mAction;
+ }
+
+ const std::shared_ptr<Action>& operator->() const {
    return mAction;
  }
 private:
- Action* mAction;
+ std::shared_ptr<Action> mAction;
 };
 
 typedef EventHandler<AxisTarget, AxisAction, VJoyAxis>

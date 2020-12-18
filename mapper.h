@@ -48,9 +48,9 @@ namespace fredemmott::inputmapping {
 
     private:
       struct DeviceMappings {
-        std::map<uint8_t, AxisAction*> axes;
-        std::map<uint8_t, ButtonAction*> buttons;
-        std::map<uint8_t, HatAction*> hats;
+        std::map<uint8_t, AxisEventHandler> axes;
+        std::map<uint8_t, ButtonEventHandler> buttons;
+        std::map<uint8_t, HatEventHandler> hats;
       };
       std::map<gameinput::InputDevice*, DeviceMappings> mMappings;
       std::vector<vjoypp::OutputDevice*> mToFlush;
