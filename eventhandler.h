@@ -17,9 +17,9 @@ namespace fredemmott::inputmapping {
  * mappings.
  */
 template<typename Target, typename Action, typename Passthrough>
-class ActionOrTarget {
+class EventHandler {
 public:
- ActionOrTarget(const Target& target) {
+ EventHandler(const Target& target) {
    if (target.device) {
      mAction = new Passthrough { target } ;
    } else {
@@ -27,12 +27,12 @@ public:
     }
  }
  template<typename T>
- ActionOrTarget(const T& action) {
+ EventHandler(const T& action) {
    mAction = new T(action);
  }
 
- typedef ActionOrTarget<Target, Action, Passthrough> SelfType;
- ActionOrTarget(const std::initializer_list<SelfType>& actions) {
+ typedef EventHandler<Target, Action, Passthrough> SelfType;
+ EventHandler(const std::initializer_list<SelfType>& actions) {
    mAction = new ComboAction<SelfType, Action>(actions);
  }
 
@@ -46,11 +46,11 @@ private:
  Action* mAction;
 };
 
-typedef ActionOrTarget<AxisTarget, AxisAction, VJoyAxis>
-  AxisActionOrTarget;
-typedef ActionOrTarget<ButtonTarget, ButtonAction, VJoyButton>
-  ButtonActionOrTarget;
-typedef ActionOrTarget<HatTarget, HatAction, VJoyHat>
-  HatActionOrTarget;
+typedef EventHandler<AxisTarget, AxisAction, VJoyAxis>
+  AxisEventHandler;
+typedef EventHandler<ButtonTarget, ButtonAction, VJoyButton>
+  ButtonEventHandler;
+typedef EventHandler<HatTarget, HatAction, VJoyHat>
+  HatEventHandler;
 
 } // namespace fredemmott::inputmapping

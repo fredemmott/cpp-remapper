@@ -1,7 +1,7 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "actionortarget.h"
+#include "eventhandler.h"
 
 #include <map>
 
@@ -26,21 +26,21 @@ namespace fredemmott::inputmapping {
 
       void passthrough(const MappableInput&, const MappableOutput&);
 
-      void map(const AxisSource& source, const AxisActionOrTarget& handler);
-      void map(const ButtonSource& source, const ButtonActionOrTarget& handler);
-      void map(const HatSource& source, const HatActionOrTarget& handler);
+      void map(const AxisSource& source, const AxisEventHandler& handler);
+      void map(const ButtonSource& source, const ButtonEventHandler& handler);
+      void map(const HatSource& source, const HatEventHandler& handler);
 
       struct ButtonMapping {
         ButtonSource source;
-        ButtonActionOrTarget action;
+        ButtonEventHandler action;
       };
       struct HatMapping {
         HatSource source;
-        HatActionOrTarget action;
+        HatEventHandler action;
       };
       struct AxisMapping {
         AxisSource source;
-        AxisActionOrTarget action;
+        AxisEventHandler action;
       };
       void map(const std::initializer_list<AxisMapping>& rules);
       void map(const std::initializer_list<ButtonMapping>& rules);

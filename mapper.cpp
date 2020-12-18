@@ -34,7 +34,7 @@ namespace fredemmott::inputmapping {
     }
   }
 
-  void Mapper::map(const AxisSource& source, const AxisActionOrTarget& handler) {
+  void Mapper::map(const AxisSource& source, const AxisEventHandler& handler) {
     if (source.device && source.axis && handler) {
       mMappings[source.device].axes.insert_or_assign(
           source.axis,
@@ -43,7 +43,7 @@ namespace fredemmott::inputmapping {
     }
   }
 
-  void Mapper::map(const ButtonSource& source, const ButtonActionOrTarget& handler) {
+  void Mapper::map(const ButtonSource& source, const ButtonEventHandler& handler) {
     if (source.device && source.button && handler) {
       mMappings[source.device].buttons.insert_or_assign(
           source.button,
@@ -52,7 +52,7 @@ namespace fredemmott::inputmapping {
     }
   }
 
-  void Mapper::map(const HatSource& source, const HatActionOrTarget& handler) {
+  void Mapper::map(const HatSource& source, const HatEventHandler& handler) {
     if (source.device && source.hat && handler) {
       mMappings[source.device].hats.insert_or_assign(
           source.hat,

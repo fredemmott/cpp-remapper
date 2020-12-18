@@ -1,7 +1,7 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "actionortarget.h"
+#include "eventhandler.h"
 
 #include <vector>
 #include <cstdint>
@@ -13,7 +13,7 @@ class AxisToButtons : public AxisAction {
   struct Range {
     uint8_t minPercent;
     uint8_t maxPercent;
-    ButtonActionOrTarget next;
+    ButtonEventHandler next;
   };
 
   AxisToButtons(std::initializer_list<Range> ranges);
