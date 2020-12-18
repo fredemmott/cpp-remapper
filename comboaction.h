@@ -18,7 +18,7 @@ class ComboAction : public Action {
     }
   }
 
-  virtual void map(typename Action::value_type value) {
+  virtual void map(typename Action::Value value) {
     for (auto inner: mInners) {
       inner->map(value);
     }

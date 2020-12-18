@@ -24,7 +24,7 @@ namespace fredemmott::inputmapping {
 template<typename TValue>
 class Action {
  public:
-   typedef TValue value_type;
+   typedef TValue Value;
    virtual ~Action() {}
    virtual void map(TValue value) = 0;
 };
@@ -43,7 +43,7 @@ struct MappableButton {
 };
 typedef MappableButton<fredemmott::gameinput::InputDevice> ButtonSource;
 struct ButtonTarget : public MappableButton<fredemmott::vjoypp::OutputDevice> {
-  void set(bool);
+  void set(bool) const;
 };
 
 template<typename TDevice>
@@ -53,7 +53,7 @@ struct MappableHat {
 };
 typedef MappableHat<fredemmott::gameinput::InputDevice> HatSource;
 struct HatTarget : public MappableHat<fredemmott::vjoypp::OutputDevice> {
-  void set(int16_t value);
+  void set(int16_t value) const;
 };
 
 struct AxisSource {
@@ -66,7 +66,7 @@ struct AxisTarget {
   const char* label;
   fredemmott::vjoypp::OutputDevice* (fredemmott::vjoypp::OutputDevice::*setter)(long);
 
-  void set(long value);
+  void set(long value) const;
 };
 /* This was a few hours of "why is a constructor that just initializes constants
  * overwritting something else on the stack?!"

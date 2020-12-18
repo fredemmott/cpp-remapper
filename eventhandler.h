@@ -2,41 +2,31 @@
 
 #include "actionsapi.h"
 #include "comboaction.h"
+#include "functionaction.h"
 #include "passthroughs.h"
 
 #include <memory>
 
 namespace fredemmott::inputmapping {
 
-/** A smart pointer to an Action, created from an Action or a Target.
+/** A smart pointer to an Action, created from various reasonable things.
  *
- * Targets are converted to Actions by creating a Passthrough.
+ * - Actions are copied.
+ * - Targets are converted to Actions by creating a Passthrough.
+ * - Callables (e.g. lambdas, function references) are converted to an
+ *   std::function<void(Value)>, then to a FunctionAction<Action>.
  *
- * Targets and Actions are implicity convertable to EventHandlers.
- *
- * This is primarily to allow nice syntax when specifying
- * mappings.
+ * This is primarily to allow
+ * `map(ButtonSource, ... any reasonable thing ...)` without explicit
+ * conversions, while predominantly using values instead of pointers for the
+ * user-facing API.
  */
 template<typename Target, typename Action, typename Passthrough>
 class EventHandler {
 public:
- EventHandler(const Target& target) {
-   if (target.device) {
-     mAction.reset(new Passthrough { target }) ;
-   } else {
-     mAction = nullptr;
-    }
- }
-
- template<typename T>
- EventHandler(const T& action) {
-   mAction = std::make_shared<T>(action);
- }
-
  typedef EventHandler<Target, Action, Passthrough> SelfType;
- EventHandler(const std::initializer_list<SelfType>& actions) {
-   mAction = std::make_shared<ComboAction<SelfType, Action>>(actions);
- }
+ typedef FunctionAction<Action> CallbackAction;
+ typedef typename CallbackAction::Callback Callback;
 
  operator bool() const {
    return (bool) mAction;
@@ -45,6 +35,33 @@ public:
  const std::shared_ptr<Action>& operator->() const {
    return mAction;
  }
+
+ EventHandler(const Target& target) {
+   if (target.device) {
+     mAction.reset(new Passthrough { target }) ;
+   }
+ }
+
+ EventHandler(const std::initializer_list<SelfType>& actions) {
+   mAction = std::make_shared<ComboAction<SelfType, Action>>(actions);
+ }
+
+ template<
+   typename T,
+   typename std::enable_if<std::is_base_of<Action, T>::value>::type* = nullptr
+ >
+ EventHandler(const T& action) {
+   mAction = std::make_shared<T>(action);
+ }
+
+ template<
+   typename T,
+   typename std::enable_if<std::is_convertible<T, Callback>::value>::type* = nullptr
+ >
+ EventHandler(const T& cb) {
+   mAction = std::make_shared<CallbackAction>(cb);
+ }
+
 private:
  std::shared_ptr<Action> mAction;
 };
