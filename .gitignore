@@ -1,3 +1,5 @@
+*.ilk
+.vs/
 *.exe
 *.obj
 SDK/
