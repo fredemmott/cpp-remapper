@@ -19,8 +19,14 @@ void init() {
   }
   WORD VerDll, VerDrv;
   if (!DriverMatch(&VerDll, &VerDrv)) {
-    printf("vJoy driver version %04x does not match DLL version %04x\n", VerDrv, VerDll);
-    return;
+    printf(
+      "---\n"
+      "!!! WARNING !!!\n"
+      "vJoy driver version %04x does not match DLL version %04x\n"
+      "---\n",
+      VerDrv,
+      VerDll
+    );
   }
 }
 
