@@ -32,7 +32,7 @@ void init() {
 
 struct OutputDevice::Impl {
   BYTE id;
-  JOYSTICK_POSITION_V2 state;
+  JOYSTICK_POSITION_V3 state;
 };
 
 OutputDevice::OutputDevice(uint8_t id): p(new Impl { id, {} }) {
@@ -54,7 +54,6 @@ namespace {
 }
 
 OutputDevice* OutputDevice::setXAxis(long value) {
-
   p->state.wAxisX = normalize_axis(value);
   return this;
 }
