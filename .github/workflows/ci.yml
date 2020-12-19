@@ -14,7 +14,7 @@ jobs:
             -Out vJoy-SDK.zip
       - name: Extract vJoy SDK
         run: Expand-Archive vJoy-SDK.zip .
-      - uses: microsoft/setup-msbuild@v1.0.2
+      - uses: ilammy/msvc-dev-cmd
         with:
           toolset: 18.6
       - name: Build example
