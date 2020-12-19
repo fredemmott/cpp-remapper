@@ -21,3 +21,24 @@ void AxisToButtons::map(long value) {
 }
 
 } // namespace fredemmott::inputmapping
+
+// --- Tests ---
+
+#include "comboaction.h"
+#include "mappabledevices.h"
+using namespace fredemmott::inputmapping;
+using namespace fredemmott::inputmapping::actions;
+
+namespace {
+
+// Check that the compiler lets us call it as intended
+void static_test() {
+  MappableOutput o(nullptr);
+  AxisToButtons {
+    { 0, 0, o.Button1 },
+    { 0, 0, { o.Button1, o.Button2 } },
+    { 100, 100, [](bool) {} },
+  };
+}
+
+} // namespace
