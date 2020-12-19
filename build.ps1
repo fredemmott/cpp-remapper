@@ -26,4 +26,4 @@ param(
   [string] $Target
 )
 
-cl "/Fe$Target.exe" /I. /Ilib /EHsc /vmg /std:c++17 lib/*.cpp "$Target.cpp"
+cl "/Fe$Target.exe" /I. /ISDK/inc /Ilib /EHsc /vmg /std:c++17 lib/*.cpp "$Target.cpp"
