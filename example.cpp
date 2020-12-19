@@ -47,6 +47,11 @@ int main() {
     },
   });
 
+  p->map(
+    stick.Button12,
+    ShortPressLongPress{ vj2.Button2, vj2.Button3 }
+  );
+
   p->run();
   return 0;
 }

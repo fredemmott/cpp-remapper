@@ -32,8 +32,16 @@ int main() {
 
   // Let's do something a but more fun...
 
-  // 1 physical button to 2 virtual buttons
+  // 1 physical button to 2 virtual buttons at the same time...
   p->map(throttle.Button1, {vj1.Button1, vj1.Button2} );
+
+  // ... or one for short press, one for long press
+  p->map(throttle.Button1, ShortPressLongPress { vj1.Button1, vj1.Button2 } );
+  // ... with a custom duration for 'long press' (default is 300ms)
+  p->map(
+    throttle.Button1,
+    ShortPressLongPress { vj1.Button1, vj1.Button2, std::chrono::seconds(1) }
+  );
 
   // Convert an axis to buttons, e.g. turn a ministick
   // into 4-way buttons
@@ -81,64 +89,6 @@ int main() {
 
 Later calls to `map()` replace any previous bindings for the specified source
 button.
-
-# What helpers are available?
-
-For now, only `AxisToButton`; you have two options to do more: defining an action, or using
-a lambda/function.
-
-## Using a lambda or function
-
-If you wanted to use a lambda to invert button 1
-(pressed -> unpressed, unpressed -> pressed):
-
-```C++
-p->map(real_device.Button1, [=](bool pressed) { vjoy.Button1.set(!pressed); });
-```
-
-Lambdas can be used in most places that accept a button; as an unrealistic example:
-
-```
-p->map(
-  real_device.XAxis,
-  AxisToButton { 0, 0, [=](bool pressed) { vjoy.Button1.set(!pressed); }
-);
-```
-
-## Defining an action
-
-An 'action' is an object that reacts to an input; you define an action by
-creating a class that extends `fredemmott::inputmapping::AxisAction`,
-`ButtonAction`, or `HatAction`, for example:
-
-```C++
-using namespace fredemmott::inputmapping;
-
-class InvertButton final : public ButtonAction {
-private:
-  ButtonEventHandler mNext;
-public:
-
-  InvertButton(const ButtonEventHandler& next) : mNext(next) {}
-  ~InvertButton() {}
-
-  void map(bool value) {
-    mNext->map(!value);
-  }
-};
-
-int main() {
-  // ...
-  p.map(source.Button1, InvertButton { vjoy.Button1 } );
-  // ...
-}
-```
-
-`fredemmott::inputmapping::ButtonEventHandler` is an abstraction to allow
-taking an action, lambda, or vJoy button identifier, for consistency
-and to allow chaining.
-
-If you implement additional actions, please consider contributing a pull request :)
 
 # How do I use this?
 
@@ -204,6 +154,100 @@ the `HID_ID` form if it contains additional data, like the HID collection
 number in the VPC WarBRD's ID above.
 
 These can then be added to your code, as shown in `devicedb.h`.
+
+# What actions are available?
+
+- `AxisToButton`
+- `ShortPressLongPress`
+
+There are two ways to do more: defining an action, or using
+a lambda/function.
+
+## Using a lambda or function
+
+If you wanted to use a lambda to invert button 1
+(pressed -> unpressed, unpressed -> pressed):
+
+```C++
+p->map(real_device.Button1, [=](bool pressed) { vjoy.Button1.set(!pressed); });
+```
+
+Lambdas can be used in most places that accept a button; as an unrealistic example:
+
+```
+p->map(
+  real_device.XAxis,
+  AxisToButton { 0, 0, [=](bool pressed) { vjoy.Button1.set(!pressed); }
+);
+```
+
+## Defining an action
+
+An 'action' is an object that reacts to an input; you define an action by
+creating a class that extends `fredemmott::inputmapping::AxisAction`,
+`ButtonAction`, or `HatAction`, for example:
+
+```C++
+using namespace fredemmott::inputmapping;
+
+class InvertButton final : public ButtonAction {
+private:
+  ButtonEventHandler mNext;
+public:
+
+  InvertButton(const ButtonEventHandler& next) : mNext(next) {}
+  ~InvertButton() {}
+
+  void map(bool value) {
+    mNext->map(!value);
+  }
+};
+
+int main() {
+  // ...
+  p.map(source.Button1, InvertButton { vjoy.Button1 } );
+  // ...
+}
+```
+
+`fredemmott::inputmapping::ButtonEventHandler` is an abstraction to allow
+taking an action, lambda, or vJoy button identifier, for consistency
+and to allow chaining.
+
+If you implement additional actions, please consider contributing a pull request :)
+
+## Pressing-and-releasing, batching, and time delays
+
+All changes to the joystick actually happen at the same time, after all handlers
+has been processed. This is good for maximizing performance and minimizing
+latency, but means that if you change the same vjoy control twice, only the last
+one happens.
+
+For example:
+
+```
+vj1.Button1.set(true); // this has no effect...
+vj1.Button1.set(false); // ... because this happened after
+```
+
+If you want to press-and-release a button, or do multiple actions over time, you
+must inject them into the system:
+
+```C++
+#include "mapper"
+#include <chrono>
+
+void MyAction::map(bool value) {
+  Mapper::inject(
+    std::chrono::milliseconds(100), // how long to wait
+    [=]() { do_something(value);
+  });
+}
+```
+
+Do not use `sleep` or similar functions:
+- they will block all mappings, including axis, until they are resolved
+- the vjoy device will not be updated until your handler returns
 
 # What support is available?
 

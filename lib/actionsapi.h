@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <functional>
 #include <set>
 
 /* This file contains definitions you're likely to need to implement

@@ -49,6 +49,17 @@ namespace fredemmott::inputmapping {
       SetEvent(gExitEvent);
       return true;
     }
+
+    Mapper* gActiveInstance = nullptr;
+
+    struct ActiveInstanceGuard {
+      ActiveInstanceGuard(Mapper* active) {
+        gActiveInstance = active;
+      }
+      ~ActiveInstanceGuard() {
+        gActiveInstance = nullptr;
+      }
+    };
   } // namespace
 
   void Mapper::setOutputs(const std::vector<MappableOutput>& outputs) {
@@ -137,14 +148,14 @@ namespace fredemmott::inputmapping {
     // we want to reset the HidGuardian configuration.
     gExitEvent = CreateEvent(nullptr, false, false, nullptr);
     SetConsoleCtrlHandler(&exit_event_handler, true);
-    std::vector<HANDLE> events { gExitEvent };
+    std::vector<HANDLE> fixed_events { gExitEvent };
 
     std::map<HANDLE, InputDevice*> devices;
     std::map<InputDevice*, std::vector<uint8_t>> states;
     std::map<InputDevice*, DeviceOffsets> offsets;
     for (const auto& [device, mapping]: mMappings) {
       auto event = device->getEvent();
-      events.push_back(event);
+      fixed_events.push_back(event);
       devices[event] = device;
 
       DeviceOffsets offs(device);
@@ -166,6 +177,10 @@ namespace fredemmott::inputmapping {
     }
     printf("---\nProfile running, hit Ctrl-C to exit and clean up HidGuardian.\n");
     while (true) {
+      auto events = fixed_events;
+      for (const auto& [event, _]: mInjected) {
+        events.push_back(event);
+      }
       const auto res = WaitForMultipleObjects(
           events.size(),
           events.data(),
@@ -180,6 +195,17 @@ namespace fredemmott::inputmapping {
         break;
       }
 
+      ActiveInstanceGuard aig(this);
+
+      auto injected = mInjected.find(event);
+      if (injected != mInjected.end()) {
+        injected->second();
+        mInjected.erase(event);
+        CloseHandle(event);
+        flush();
+        continue;
+      }
+
       auto device = devices.at(event);
       const auto& offs = offsets.at(device);
       const auto& old_buf = states.at(device);
@@ -188,7 +214,6 @@ namespace fredemmott::inputmapping {
       const DeviceState new_state(new_buf.data(), offs);
 
       const auto& mappings = mMappings.at(device);
-
       for (const auto [i, action]: mappings.axes) {
         if (old_state.axes[i] == new_state.axes[i]) {
           continue;
@@ -207,13 +232,39 @@ namespace fredemmott::inputmapping {
         }
         action->map(new_state.buttons[i]);
       }
+      gActiveInstance = nullptr;
 
       states[device] = new_buf;
-
-      for (const auto& device: mToFlush) {
-        device->send();
-      }
+      flush();
     }
+  }
+
+  void Mapper::flush() {
+    for (const auto& device: mToFlush) {
+      device->send();
+    }
+  }
+
+  namespace {
+    typedef std::chrono::duration<int64_t, std::ratio_multiply<std::hecto, std::nano>>
+
+    FILETIME_RESOLUTION;
+  }
+
+  void Mapper::inject(
+    const std::chrono::steady_clock::duration& delay,
+    const std::function<void()>& handler
+  ) {
+    if (!gActiveInstance) {
+      return;
+    }
+    int64_t target_time;
+    GetSystemTimeAsFileTime((FILETIME*) &target_time);
+    target_time += std::chrono::duration_cast<FILETIME_RESOLUTION>(delay).count();
+
+    auto timer = CreateWaitableTimer(nullptr, true, nullptr);
+    SetWaitableTimer(timer, (LARGE_INTEGER*) &target_time, 0, nullptr, nullptr, false);
+    gActiveInstance->mInjected.emplace(timer, handler);
   }
 } // namespace fredemmott::inputmapping
 
@@ -289,4 +340,5 @@ void static_test() {
     { i.Button3, {[](bool){}, [](bool){} } },
   });
 }
-}
+
+} // namespace ( tests)

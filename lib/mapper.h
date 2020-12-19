@@ -10,6 +10,9 @@
 #include "actionsapi.h"
 #include "eventhandler.h"
 
+#include <chrono>
+#include <functional>
+#include <ratio>
 #include <map>
 
 namespace fredemmott::gameinput {
@@ -53,6 +56,10 @@ namespace fredemmott::inputmapping {
       void map(const std::initializer_list<ButtonMapping>& rules);
       void map(const std::initializer_list<HatMapping>& rules);
 
+      static void inject(
+        const std::chrono::steady_clock::duration& delay,
+        const std::function<void()>& handler
+      );
     private:
       struct DeviceMappings {
         std::map<uint8_t, AxisEventHandler> axes;
@@ -61,5 +68,8 @@ namespace fredemmott::inputmapping {
       };
       std::map<gameinput::InputDevice*, DeviceMappings> mMappings;
       std::vector<vjoypp::OutputDevice*> mToFlush;
+      std::map<void*, std::function<void()>> mInjected;
+
+      void flush();
   };
 } // namespace fredemmott::inputmapping
