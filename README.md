@@ -149,7 +149,7 @@ If you implement additional actions, please consider contributing a pull request
 3. Copy the `vJoyInterface.dll` from the SDK directory to the repo root directory
 4. Install Visual Studio 2019 or newer
 5. Open visual studio command prompt
-6. `cl /Feexample.exe /I. /Ilib /EHsc /std:c++17 /vmg example.cpp lib/*.cpp`
+6. `./build.ps1 example`
 7. Run `example.exe`; run as administrator for HidGuardian support.
    - If you're in powershell: `Start-Process -Verb runas example.exe`
 
@@ -160,7 +160,7 @@ isn't listed there, you'll need it's ID; build `list-devices.exe` like the
 example above:
 
 ```
-PS > cl /Felist-devices.exe /I. /Ilib /EHsc /std:c++17 /vmg lib/*.cpp list-devices.cpp
+PS > ./build.ps1 list-devices
 PS > ./list-devices
 "T-Pendular-Rudder"
   VIDPID { 0x044f, 0xb68f }
