@@ -14,6 +14,7 @@ jobs:
             -Out vJoy-SDK.zip
       - name: Extract vJoy SDK
         run: Expand-Archive vJoy-SDK.zip
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Build example
         run: .\build.ps1 example
       - name: Build list-devices
