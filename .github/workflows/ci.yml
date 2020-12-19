@@ -13,7 +13,7 @@ jobs:
             "https://github.com/njz3/vJoy/releases/download/v2.2.1.1/vJoy-2.2.1.1-SDK.zip" `
             -Out vJoy-SDK.zip
       - name: Extract vJoy SDK
-        run: Extract-Archive vJoy-SDK.zip
+        run: Expand-Archive vJoy-SDK.zip
       - name: Build example
         run: .\build.ps1 example
       - name: Build list-devices
