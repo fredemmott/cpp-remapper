@@ -16,6 +16,23 @@ namespace fredemmott::inputmapping {
       const off_t firstAxis;
       const off_t firstHat;
       const off_t firstButton;
+      DeviceOffsets(InputDevice* dev) :
+        firstAxis(0),
+        firstHat(firstAxis + (sizeof(long) * dev->getAxisCount())),
+        firstButton(firstHat + sizeof(int32_t) * dev->getHatCount()) {
+      }
+    };
+
+    struct DeviceState {
+      const long* const axes;
+      const bool* const buttons;
+      const int32_t* const hats;
+
+      DeviceState(const uint8_t* data, const DeviceOffsets& offsets):
+        axes((long*) (data + offsets.firstAxis)),
+        buttons((bool*) (data + offsets.firstButton)),
+        hats((int32_t*) (data + offsets.firstHat)) {
+      }
     };
 
     HANDLE gExitEvent;
@@ -37,7 +54,7 @@ namespace fredemmott::inputmapping {
   void Mapper::map(const AxisSource& source, const AxisEventHandler& handler) {
     if (source.device && source.axis && handler) {
       mMappings[source.device].axes.insert_or_assign(
-          source.axis,
+          source.axis - 1,
           handler
           );
     }
@@ -46,7 +63,7 @@ namespace fredemmott::inputmapping {
   void Mapper::map(const ButtonSource& source, const ButtonEventHandler& handler) {
     if (source.device && source.button && handler) {
       mMappings[source.device].buttons.insert_or_assign(
-          source.button,
+          source.button - 1,
           handler
           );
     }
@@ -55,7 +72,7 @@ namespace fredemmott::inputmapping {
   void Mapper::map(const HatSource& source, const HatEventHandler& handler) {
     if (source.device && source.hat && handler) {
       mMappings[source.device].hats.insert_or_assign(
-          source.hat,
+          source.hat - 1,
           handler
           );
     }
@@ -90,11 +107,11 @@ namespace fredemmott::inputmapping {
         { s.Slider, t.Slider },
         // TODO: dial (a.k.a. slider 2)
         });
-    for (int i = 1; i <= s.HatCount; ++i) {
-      map(s.hat(i), t.hat(i));
-    }
     for (int i = 1; i <= s.ButtonCount; ++i) {
       map(s.button(i), t.button(i));
+    }
+    for (int i = 1; i <= s.HatCount; ++i) {
+      map(s.hat(i), t.hat(i));
     }
   }
 
@@ -118,14 +135,27 @@ namespace fredemmott::inputmapping {
     std::map<HANDLE, InputDevice*> devices;
     std::map<InputDevice*, std::vector<uint8_t>> states;
     std::map<InputDevice*, DeviceOffsets> offsets;
-    for (const auto& [device, _]: mMappings) {
+    for (const auto& [device, mapping]: mMappings) {
       auto event = device->getEvent();
       events.push_back(event);
       devices[event] = device;
-      states[device] = device->getState();
-      const off_t hat_offset = sizeof(long) * device->getAxisCount();
-      const off_t button_offset = hat_offset + (sizeof(int32_t) * device->getHatCount());
-      offsets.emplace(device, DeviceOffsets { 0, hat_offset, button_offset });
+
+      DeviceOffsets offs(device);
+      offsets.emplace(device, offs);
+
+      auto state_buf = device->getState();
+      states.emplace(device, state_buf);
+      const DeviceState state(state_buf.data(), offs);
+
+      for (const auto& [i, handler] : mapping.axes) {
+        handler->map(state.axes[i]);
+      }
+      for (const auto& [i, handler] : mapping.buttons) {
+        handler->map(state.buttons[i]);
+      }
+      for (const auto& [i, handler] : mapping.hats) {
+        handler->map(state.hats[i]);
+      }
     }
     printf("---\nProfile running, hit Ctrl-C to exit and clean up HidGuardian.\n");
     while (true) {
@@ -143,41 +173,35 @@ namespace fredemmott::inputmapping {
         break;
       }
 
-      auto device = devices[event];
-      const auto old_state = states[device];
-      const auto new_state = device->getState();
-      states[device] = new_state;
-      const auto& device_offsets = offsets.at(device);
-      auto old_axis = reinterpret_cast<const long*>(&old_state.data()[device_offsets.firstAxis]);
-      auto old_hat = reinterpret_cast<const int16_t*>(&old_state.data()[device_offsets.firstHat]);
-      auto old_button = reinterpret_cast<const uint8_t*>(&old_state.data()[device_offsets.firstButton]);
-      auto new_axis = reinterpret_cast<const long*>(&new_state.data()[device_offsets.firstAxis]);
-      auto new_hat = reinterpret_cast<const int16_t*>(&new_state.data()[device_offsets.firstHat]);
-      auto new_button = reinterpret_cast<const uint8_t*>(&new_state.data()[device_offsets.firstButton]);
+      auto device = devices.at(event);
+      const auto& offs = offsets.at(device);
+      const auto& old_buf = states.at(device);
+      const DeviceState old_state(old_buf.data(), offs);
+      const auto new_buf = device->getState();
+      const DeviceState new_state(new_buf.data(), offs);
 
-      const auto &mappings = mMappings[device];
+      const auto& mappings = mMappings.at(device);
 
-      for (const auto [axis_id, action]: mappings.axes) {
-        const auto idx = axis_id - 1;
-        if (old_axis[idx] == new_axis[idx]) {
+      for (const auto [i, action]: mappings.axes) {
+        if (old_state.axes[i] == new_state.axes[i]) {
           continue;
         }
-        action->map(new_axis[idx]);
+        action->map(new_state.axes[i]);
       }
-      for (const auto& [hat_id, action]: mappings.hats) {
-        const auto idx = hat_id - 1;
-        if (old_hat[idx] == new_hat[idx]) {
+      for (const auto& [i, action]: mappings.hats) {
+        if (old_state.hats[i] == new_state.hats[i]) {
           continue;
         }
-        action->map(new_hat[idx]);
+        action->map(new_state.hats[i]);
       }
-      for (const auto& [button_id, action]: mappings.buttons) {
-        const auto idx = button_id - 1;
-        if (old_button[idx] == new_button[idx]) {
+      for (const auto& [i, action]: mappings.buttons) {
+        if (old_state.buttons[i] == new_state.buttons[i]) {
           continue;
         }
-        action->map(new_button[idx]);
+        action->map(new_state.buttons[i]);
       }
+
+      states[device] = new_buf;
 
       for (const auto& device: mToFlush) {
         device->send();
