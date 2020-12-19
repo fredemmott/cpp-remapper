@@ -7,8 +7,8 @@ It aims to:
 - use modern standard C++ wherever possible
 - have minimum dependencies
 
-It uses vJoy, and supports HidGuardian without replugging devices if ran
-as administrator (tested with Thrustmaster and Virpil devices).
+It uses vJoy (it is a vJoy 'feeder'), and supports HidGuardian without
+replugging devices (if ran as administrator and supported by hardware).
 
 # What does a profile look like?
 
