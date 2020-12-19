@@ -32,7 +32,11 @@ void init() {
 
 struct OutputDevice::Impl {
   BYTE id;
+#if USE_JOYSTICK_API_VERSION == 3
   JOYSTICK_POSITION_V3 state;
+#elif USE_JOYSTICK_API_VERSION == 2
+  JOYSTICK_POSITION_V2 state;
+#endif
 };
 
 OutputDevice::OutputDevice(uint8_t id): p(new Impl { id, {} }) {
