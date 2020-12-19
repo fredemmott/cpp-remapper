@@ -148,7 +148,7 @@ If you implement additional actions, please consider contributing a pull request
 2. Extract it to the source directory so you have an `SDK/` subdirectory
 3. Copy the `vJoyInterface.dll` from the SDK directory to the repo root directory
 4. Install Visual Studio 2019 or newer
-5. Open visual studio command prompt
+5. Open a terminal
 6. `./build.ps1 example`
 7. Run `example.exe`; run as administrator for HidGuardian support.
    - If you're in powershell: `Start-Process -Verb runas example.exe`

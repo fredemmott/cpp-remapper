@@ -26,4 +26,8 @@ param(
   [string] $Target
 )
 
+$VSPATH=vswhere -property installationPath -version 16
+Import-Module (Join-Path $VSPATH "Common7\Tools\Microsoft.VisualStudio.DevShell.dll")
+Enter-VsDevShell -VsInstallPath $VSPATH -SkipAutomaticLocation
+
 cl "/Fe$Target.exe" /I. /ISDK/inc /Ilib /EHsc /vmg /std:c++17 lib/*.cpp "$Target.cpp"
