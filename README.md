@@ -138,6 +138,8 @@ int main() {
 taking an action, lambda, or vJoy button identifier, for consistency
 and to allow chaining.
 
+If you implement additional actions, please consider contributing a pull request :)
+
 # How do I use this?
 
 1. Download the vJoy SDK - the version must exactly match the version of vJoy
@@ -147,11 +149,74 @@ and to allow chaining.
 3. Copy the `vJoyInterface.dll` from the SDK directory to the repo root directory
 4. Install Visual Studio 2019 or newer
 5. Open visual studio command prompt
-6. `cl /Fetest.exe /EHsc /std:c++17 /vmg *.cpp`
-   - `/Fetest.exe`: create 'test.exe'
-   - `/EHsc`: enable standard C++ exception/stack unwinding, with no exceptions
-     from `extern "C"`
-   - `/std:c++17`: enable C++17
-   - `/vmg`: be pessimistic about member functions pointers to forward-declared
-     classes. Prevents memory corruption in these cases.
-6. Run `test.exe`; run as administrator for HidGuardian support.
+6. `cl /Feexample.exe /I. /Ilib /EHsc /std:c++17 /vmg example.cpp lib/*.cpp`
+7. Run `example.exe`; run as administrator for HidGuardian support.
+   - If you're in powershell: `Start-Process -Verb runas example.exe`
+
+# How do I use this with another device?
+
+Known devices are defined in [lib/devicedb.h](lib/devicedb.h). If your device
+isn't listed there, you'll need it's ID; build `list-devices.exe` like the
+example above:
+
+```
+PS > cl /Felist-devices.exe /I. /Ilib /EHsc /std:c++17 /vmg lib/*.cpp list-devices.cpp
+PS > ./list-devices
+"T-Pendular-Rudder"
+  VIDPID { 0x044f, 0xb68f }
+  HID_ID { "HID\VID_044F&PID_B68F" }
+  Axes: 3
+  Buttons: 0
+  Hats: 0
+"Throttle - HOTAS Warthog"
+  VIDPID { 0x044f, 0x0404 }
+  HID_ID { "HID\VID_044F&PID_0404" }
+  Axes: 5
+  Buttons: 32
+  Hats: 1
+"RIGHT VPC Stick WarBRD"
+  VIDPID { 0x3344, 0x40cc }
+  HID_ID { "HID\VID_3344&PID_40CC&Col01" }
+  Axes: 6
+  Buttons: 31
+  Hats: 0
+"vJoy Device"
+  VIDPID { 0x1234, 0xbead }
+  HID_ID { "HID\HIDCLASS&Col01" }
+  Axes: 9
+  Buttons: 64
+  Hats: 1
+"vJoy Device"
+  VIDPID { 0x1234, 0xbead }
+  HID_ID { "HID\HIDCLASS&Col02" }
+  Axes: 9
+  Buttons: 64
+  Hats: 1
+PS >
+```
+
+The `HID_ID` struct definitions (actually Windows 'hardware IDs', in contrast
+to 'device IDs' and 'instance IDs') are more specific, but most people are more
+familiar with VID and PID.
+
+The remapping will work with either, but the `HidGuardian` support may require
+the `HID_ID` form if it contains additional data, like the HID collection
+number in the VPC WarBRD's ID above.
+
+These can then be added to your code, as shown in `devicedb.h`.
+
+# What support is available?
+
+Please search for existing relevant discussions in the discussions tab on
+GitHub, and create a new one if you don't find a relevant one.
+
+I primarily work on this project to fit my needs, and am sharing in the hope
+other's find it useful; I will not be able to spend large amounts of time
+expanding it or in user support, but would greatly appreciate contributions :)
+
+# LICENSE
+
+The source code for this project is [MIT-licensed](LICENSE).
+
+Because this is my personal repository, the license you receive to my code is
+from me and not from my employer (Facebook).

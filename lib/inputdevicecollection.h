@@ -16,6 +16,7 @@ class InputDeviceCollection {
   ~InputDeviceCollection();
 
   InputDevice* get(const DeviceID& device);
+  std::vector<InputDevice*> getAllDevices();
  private:
   std::vector<InputDevice*> mDevices;
 };

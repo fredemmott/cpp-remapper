@@ -58,6 +58,10 @@ InputDevice* InputDeviceCollection::get(const DeviceID& id) {
   return nullptr;
 }
 
+std::vector<InputDevice*> InputDeviceCollection::getAllDevices() {
+  return mDevices;
+}
+
 InputDeviceCollection::~InputDeviceCollection() {
   for (auto device: mDevices) {
     delete device;
