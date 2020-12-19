@@ -240,7 +240,7 @@ must inject them into the system:
 void MyAction::map(bool value) {
   Mapper::inject(
     std::chrono::milliseconds(100), // how long to wait
-    [=]() { do_something(value);
+    [=]() { do_something(value) };
   });
 }
 ```
