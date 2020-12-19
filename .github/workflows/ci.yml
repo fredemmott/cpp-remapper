@@ -13,7 +13,7 @@ jobs:
             "https://github.com/njz3/vJoy/releases/download/v2.2.1.1/vJoy-2.2.1.1-SDK.zip" `
             -Out vJoy-SDK.zip
       - name: Extract vJoy SDK
-        run: Expand-Archive vJoy-SDK.zip
+        run: Expand-Archive vJoy-SDK.zip .
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build example
         run: .\build.ps1 example
