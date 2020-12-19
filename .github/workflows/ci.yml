@@ -1,0 +1,21 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fetch vJoy SDK
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "njz3/vJoy"
+          version: "v2.2.1.1"
+          file: "vJoy-2.2.1.1-SDK.zip"
+      - name: Extract vJoy SDK
+        run: Extract-Archive vJoy-2.2.1.1-SDK.zip
+      - name: Build example
+        run: .\build.ps1 example
+      - name: Build list-devices
+        run: .\build.ps1 list-devices
