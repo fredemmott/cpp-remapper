@@ -49,6 +49,10 @@ struct OutputDevice::Impl {
 OutputDevice::OutputDevice(uint8_t id): p(new Impl { id, {} }) {
   AcquireVJD(id);
   ResetVJD(id);
+  setHat(1, 0xffff);
+  setHat(2, 0xffff);
+  setHat(3, 0xffff);
+  setHat(4, 0xffff);
 }
 
 OutputDevice::~OutputDevice() {
