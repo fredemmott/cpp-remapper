@@ -81,6 +81,7 @@ class DeviceSpecifier final: public DeviceSpecifierBase {
     Impl p;
 };
 
+[[deprecated("Use `DeviceSpecifier` instead of `DeviceID`")]]
 typedef DeviceSpecifier DeviceID;
 
 [[deprecated("Use `HardwareID` instead of `HID_ID`")]]
