@@ -171,14 +171,15 @@ HardwareID InputDevice::getHardwareID() const {
 
 
 std::optional<VIDPID> InputDevice::getVIDPID() const {
-  // TODO: switch to DIPROP_VIDPID
-  const auto VID_PID_MAGIC = "\0\0PIDVID";
-  const auto& guid = p->device.guidProduct;
-  if (*(uint64_t*) guid.Data4 == *(uint64_t*)(VID_PID_MAGIC)) {
-    const uint16_t vid = guid.Data1 & 0xffff;
-    const uint16_t pid = guid.Data1 >> 16;
-    return {{vid, pid}};
+  DIPROPDWORD buf;
+  buf.diph.dwSize = sizeof(DIPROPDWORD);
+  buf.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+  buf.diph.dwObj = 0;
+  buf.diph.dwHow = DIPH_DEVICE;
+  if (p->getDIDevice()->GetProperty(DIPROP_VIDPID, &buf.diph) == DI_OK) {
+    return { { LOWORD(buf.dwData), HIWORD(buf.dwData) } };
   }
+
   return {};
 }
 
