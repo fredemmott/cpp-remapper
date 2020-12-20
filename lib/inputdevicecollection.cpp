@@ -54,7 +54,7 @@ InputDeviceCollection::InputDeviceCollection() {
   mDevices = state.devices;
 }
 
-InputDevice* InputDeviceCollection::get(const DeviceID& id) {
+InputDevice* InputDeviceCollection::get(const DeviceSpecifier& id) {
   for (auto device: mDevices) {
     if (id.matches(device)) {
       return device;

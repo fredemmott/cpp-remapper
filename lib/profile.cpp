@@ -21,13 +21,13 @@ using namespace fredemmott::gameinput;
 
 namespace fredemmott::inputmapping {
   struct Profile::Impl {
-    std::vector<gameinput::DeviceID> ids;
+    std::vector<gameinput::DeviceSpecifier> ids;
     std::unique_ptr<Mapper> mapper;
     std::unique_ptr<HidGuardian> guardian;
     std::unique_ptr<InputDeviceCollection> deviceCollection;
   };
 
-  Profile::Profile(const std::vector<gameinput::DeviceID>& ids):
+  Profile::Profile(const std::vector<gameinput::DeviceSpecifier>& ids):
     p(new Impl {
       ids,
       std::make_unique<Mapper>(),

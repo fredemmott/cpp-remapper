@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "deviceid.h"
+#include "devicespecifier.h"
 #include "mappabledevices.h"
 
 #include <memory>
@@ -25,7 +25,7 @@ struct VJOY_ID {
 
 class Profile final {
  public:
-   Profile(const std::vector<gameinput::DeviceID>& ids);
+   Profile(const std::vector<gameinput::DeviceSpecifier>& ids);
    Profile(Profile&& other);
   ~Profile();
   void operator=(const Profile&) = delete;
@@ -43,7 +43,7 @@ namespace {
   }
 
   template<typename... Ts>
-  auto get_devices(Profile* p, const gameinput::DeviceID& first, Ts... rest) {
+  auto get_devices(Profile* p, const gameinput::DeviceSpecifier& first, Ts... rest) {
     auto device = p->popInput();
     return std::tuple_cat(
       std::make_tuple(device),
@@ -60,11 +60,11 @@ namespace {
   }
 
 
-  void fill_input_ids(std::vector<gameinput::DeviceID>&) {}
+  void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&) {}
 
   template<typename...Rest>
   void fill_input_ids(
-    std::vector<gameinput::DeviceID>& device_ids,
+    std::vector<gameinput::DeviceSpecifier>& device_ids,
     const VJOY_ID&,
     Rest... rest
   ) {
@@ -73,8 +73,8 @@ namespace {
 
   template<typename...Rest>
   void fill_input_ids(
-    std::vector<gameinput::DeviceID>& device_ids,
-    const gameinput::DeviceID& first, Rest... rest
+    std::vector<gameinput::DeviceSpecifier>& device_ids,
+    const gameinput::DeviceSpecifier& first, Rest... rest
   ) {
     device_ids.push_back(first);
     fill_input_ids(device_ids, rest...);
@@ -99,8 +99,8 @@ namespace {
 }
 
 template<typename... Ts>
-auto create_profile(const gameinput::DeviceID& first, Ts... rest) {
-  std::vector<gameinput::DeviceID> input_ids;
+auto create_profile(const gameinput::DeviceSpecifier& first, Ts... rest) {
+  std::vector<gameinput::DeviceSpecifier> input_ids;
   fill_input_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
   auto devices = get_devices(&p, first, rest...);

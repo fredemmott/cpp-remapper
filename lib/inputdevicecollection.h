@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "deviceid.h"
+#include "devicespecifier.h"
 
 #include <vector>
 
@@ -23,7 +23,7 @@ class InputDeviceCollection {
   InputDeviceCollection();
   ~InputDeviceCollection();
 
-  InputDevice* get(const DeviceID& device);
+  InputDevice* get(const DeviceSpecifier& device);
   std::vector<InputDevice*> getAllDevices();
  private:
   std::vector<InputDevice*> mDevices;

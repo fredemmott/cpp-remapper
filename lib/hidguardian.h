@@ -9,14 +9,14 @@
 
 #include <vector>
 
-#include "deviceid.h"
+#include "devicespecifier.h"
 
 namespace fredemmott::gameinput {
   class InputDevice;
 
   class HidGuardian {
    public:
-     HidGuardian(const std::vector<DeviceID>& devices);
+     HidGuardian(const std::vector<DeviceSpecifier>& devices);
 
      ~HidGuardian();
     private:

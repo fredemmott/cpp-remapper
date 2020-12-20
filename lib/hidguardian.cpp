@@ -24,7 +24,7 @@ namespace fredemmott::gameinput {
 
 namespace {
   std::vector<HardwareID> get_hid_ids_from_device_ids(
-    const std::vector<DeviceID>& device_ids
+    const std::vector<DeviceSpecifier>& device_ids
   ) {
     InputDeviceCollection collection;
     std::vector<HardwareID> hid_ids;
@@ -118,7 +118,7 @@ namespace {
   }
 } // namespace
 
-  HidGuardian::HidGuardian(const std::vector<DeviceID>& ids) {
+  HidGuardian::HidGuardian(const std::vector<DeviceSpecifier>& ids) {
     printf("Configuring HidGuardian...\n");
     whitelist_this_process();
 

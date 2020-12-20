@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 #pragma once
-#include "deviceid.h"
+#include "devicespecifier.h"
 
 #include "inputdevice.h"
 

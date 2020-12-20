@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "deviceid.h"
+#include "devicespecifier.h"
 
 #include <memory>
 #include <optional>
