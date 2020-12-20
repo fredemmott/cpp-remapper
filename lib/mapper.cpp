@@ -69,31 +69,36 @@ namespace fredemmott::inputmapping {
     }
   }
 
-  void Mapper::map(const AxisSource& source, const AxisEventHandler& handler) {
-    if (source.device && source.axis && handler) {
-      mMappings[source.device].axes.insert_or_assign(
-          source.axis - 1,
-          handler
-          );
+  namespace {
+    template<typename A, typename B, typename C>
+    void map_impl(A& collection, const B& id, const C& handler) {
+      if (handler) {
+        collection.insert_or_assign(id - 1, handler);
+        return;
+      }
+      collection.erase(id - 1);
     }
+  } // namespace
+
+  void Mapper::map(const AxisSource& source, const AxisEventHandler& handler) {
+    if (!(source.device && source.axis)) {
+      return;
+    }
+    map_impl(mMappings[source.device].axes, source.axis, handler);
   }
 
   void Mapper::map(const ButtonSource& source, const ButtonEventHandler& handler) {
-    if (source.device && source.button && handler) {
-      mMappings[source.device].buttons.insert_or_assign(
-          source.button - 1,
-          handler
-          );
+    if (!(source.device && source.button)) {
+      return;
     }
+    map_impl(mMappings[source.device].buttons, source.button, handler);
   }
 
   void Mapper::map(const HatSource& source, const HatEventHandler& handler) {
-    if (source.device && source.hat && handler) {
-      mMappings[source.device].hats.insert_or_assign(
-          source.hat - 1,
-          handler
-          );
+    if (!(source.device && source.hat)) {
+      return;
     }
+    map_impl(mMappings[source.device].hats, source.hat, handler);
   }
 
   void Mapper::map(const std::initializer_list<AxisMapping>& rules) {
@@ -339,6 +344,12 @@ void static_test() {
     { i.Button3, [](bool){} },
     { i.Button3, {[](bool){}, [](bool){} } },
   });
+
+  // Remove an existing binding
+  m.map(i.Button1, nullptr);
+  m.map({{i.Button1, nullptr}});
+  m.map(i.Slider, nullptr);
+  m.map({{i.Slider, nullptr}});
 }
 
 } // namespace ( tests)

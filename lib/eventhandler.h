@@ -43,6 +43,8 @@ public:
    return mAction;
  }
 
+ EventHandler(decltype(nullptr)) {}
+
  EventHandler(const Target& target) {
    if (target.device) {
      mAction.reset(new Passthrough { target }) ;
