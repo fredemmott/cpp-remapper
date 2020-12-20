@@ -26,7 +26,7 @@ bool VIDPID::matches(InputDevice* device) const {
 
 std::string VIDPID::getHumanReadable() const {
   char buf[sizeof("VID: 0x1234, PID: 0x5678")];
-  snprintf(buf, sizeof(buf), "VID: 0x%04hX, PID:: 0x%04hX", mVID, mPID);
+  snprintf(buf, sizeof(buf), "VID: 0x%04hX, PID: 0x%04hX", mVID, mPID);
   return buf;
 
 }
