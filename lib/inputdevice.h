@@ -35,7 +35,7 @@ struct DeviceID {
 
   DeviceID(const VIDPID& vidpid): vid(vidpid.vid), pid(vidpid.pid) {
     char buf[MAX_PATH];
-    snprintf(buf, sizeof(buf), "HID\\VID_%04hx&PID_%04hx", vid, pid);
+    snprintf(buf, sizeof(buf), "HID\\VID_%04hX&PID_%04hX", vid, pid);
     id = buf;
   }
 

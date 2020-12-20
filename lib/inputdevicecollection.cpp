@@ -56,8 +56,7 @@ InputDeviceCollection::InputDeviceCollection() {
 
 InputDevice* InputDeviceCollection::get(const DeviceID& id) {
   for (auto device: mDevices) {
-    auto dvp = device->getVIDPID();
-    if (dvp && dvp->vid == id.vid && dvp->pid == id.pid) {
+    if (id.id == device->getHardwareID()) {
       return device;
     }
   }

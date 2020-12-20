@@ -249,7 +249,6 @@ void InputDevice::activate() {
     df,
   };
 
-  p->diDevice->SetCooperativeLevel(NULL, DISCL_EXCLUSIVE | DISCL_BACKGROUND);
   p->diDevice->SetDataFormat(&data);
   delete[] df;
 
