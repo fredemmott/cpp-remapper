@@ -161,12 +161,12 @@ std::string InputDevice::getInstanceID() const {
   return device_id;
 }
 
-std::string InputDevice::getHardwareID() const {
+HID_ID InputDevice::getHardwareID() const {
   auto id = getInstanceID();
   // Totaly legit way to split off the \instanceID suffix
   *strrchr(id.data(), '\\') = 0;
 
-  return id.data();
+  return { id.data() };
 }
 
 

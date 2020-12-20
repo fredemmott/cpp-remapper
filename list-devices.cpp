@@ -14,21 +14,25 @@ int main() {
   fredemmott::gameinput::InputDeviceCollection idc;
   for (const auto& device: idc.getAllDevices()) {
     auto name = device->getProductName();
-    auto vidpid = device->getVIDPID();
-    auto id = device->getHardwareID();
-    printf(
-      "\"%s\"\n  VIDPID { 0x%04x, 0x%04x }\n  HID_ID { \"%s\" }\n",
-      name.data(),
-      vidpid ? vidpid->vid : 0,
-      vidpid ? vidpid->pid : 0,
-      id.data()
-    );
+    printf("\"%s\"\n", name.data());
+
     printf(
       "  Axes: %d\n  Buttons: %d\n  Hats: %d\n", 
       device->getAxisCount(),
       device->getButtonCount(),
       device->getHatCount()
     );
+
+    auto iid = device->getInstanceID();
+    printf("  Instance ID: %s\n", iid.c_str());
+
+    auto vidpid = device->getVIDPID();
+    if (vidpid) {
+      auto buf = vidpid->getHumanReadable();
+      printf("  %s\n", buf.c_str());
+    }
+    auto hid = device->getHardwareID().getHumanReadable();
+    printf("  %s\n", hid.c_str());
   }
   return 0;
 }

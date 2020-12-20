@@ -8,6 +8,7 @@
 #include "profile.h"
 
 #include "hidguardian.h"
+#include "inputdevice.h"
 #include "inputdevicecollection.h"
 #include "mappabledevices.h"
 #include "mapper.h"
@@ -44,14 +45,14 @@ namespace fredemmott::inputmapping {
   }
 
   MappableInput Profile::popInput() {
-    auto id = p->ids.back();
+    const auto id = p->ids.back();
     p->ids.pop_back();
     MappableInput ret(p->deviceCollection->get(id));
     auto device = ret.getDevice();
     auto name = device->getProductName();
     auto instance_id = device->getInstanceID();
-    auto hardware_id = device->getHardwareID();
-    printf("Found \"%s\":\n  Instance ID: %s\n  Hardware ID: %s\n", name.c_str(), instance_id.c_str(), hardware_id.c_str());
+    auto hardware_id = device->getHardwareID().getHumanReadable();
+    printf("Found \"%s\":\n  Instance ID: %s\n  %s\n", name.c_str(), instance_id.c_str(), hardware_id.c_str());
     return ret;
   }
 

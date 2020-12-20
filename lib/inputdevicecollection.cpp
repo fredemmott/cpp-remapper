@@ -56,11 +56,12 @@ InputDeviceCollection::InputDeviceCollection() {
 
 InputDevice* InputDeviceCollection::get(const DeviceID& id) {
   for (auto device: mDevices) {
-    if (id.id == device->getHardwareID()) {
+    if (id.matches(device)) {
       return device;
     }
   }
-  printf("WARNING: Returning nullptr device\n");
+  auto desc = id.getHumanReadable();
+  printf("WARNING: Failed to find device '%s'\n", desc.c_str());
   return nullptr;
 }
 

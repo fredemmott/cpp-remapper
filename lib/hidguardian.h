@@ -9,17 +9,18 @@
 
 #include <vector>
 
-#include "inputdevice.h"
+#include "deviceid.h"
+
 namespace fredemmott::gameinput {
+  class InputDevice;
+
   class HidGuardian {
    public:
      HidGuardian(const std::vector<DeviceID>& devices);
 
      ~HidGuardian();
     private:
-     void whitelistThisProcess();
-     void setDevices(const std::vector<DeviceID>& devices);
-     std::vector<DeviceID> mDevices;
+     std::vector<HID_ID> mDevices;
   };
 
 } // namespace fredemmott::gameinput

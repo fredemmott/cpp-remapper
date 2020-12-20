@@ -7,15 +7,12 @@
  */
 #pragma once
 
+#include "deviceid.h"
 #include "mappabledevices.h"
 
 #include <memory>
 #include <tuple>
 #include <vector>
-
-namespace fredemmott::gameinput {
-  struct DeviceID;
-}
 
 namespace fredemmott::inputmapping {
 

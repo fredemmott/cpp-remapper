@@ -7,24 +7,66 @@
  */
 #include "hidguardian.h"
 
-#include <conio.h>
-#include <winreg.h>
-#pragma comment(lib, "Advapi32.lib")
+#include "inputdevice.h"
+#include "inputdevicecollection.h"
 
 #include <iomanip>
 #include <sstream>
 #include <cstdio>
 
-#include "inputdevicecollection.h"
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <conio.h>
 #include <setupapi.h>
+#pragma comment(lib, "Advapi32.lib")
 
 namespace fredemmott::gameinput {
 
 namespace {
-  // Only works as administrator :'(
-  void restart_devices(const std::vector<DeviceID>& devices) {
-    printf("Restarting devices...\n");
+  std::vector<HID_ID> get_hid_ids_from_device_ids(
+    const std::vector<DeviceID>& device_ids
+  ) {
     InputDeviceCollection collection;
+    std::vector<HID_ID> hid_ids;
+    for (const auto& id: device_ids) {
+      auto device = collection.get(id);
+      if (!device) {
+        continue;
+      }
+      hid_ids.push_back(device->getHardwareID());
+    }
+    return hid_ids;
+  }
+
+  void set_devices(const std::vector<HID_ID>& ids) {
+    std::stringstream ss;
+    ss << std::hex;
+
+    for (const auto& id: ids) {
+      ss << (std::string) id << '\0';
+    }
+    ss << '\0';
+    const auto value = ss.str();
+    HKEY key;
+    RegOpenKeyEx(
+      HKEY_LOCAL_MACHINE, 
+      "SYSTEM\\CurrentControlSet\\Services\\HidGuardian\\Parameters",
+      0,
+      KEY_SET_VALUE,
+      &key
+    );
+    auto res = RegSetValueEx(
+      key,
+      "AffectedDevices",
+      NULL,
+      REG_MULTI_SZ,
+      (const BYTE*) value.data(),
+      value.size()
+    );
+  }
+  // Only works as administrator :'(
+  void restart_devices(const std::vector<HID_ID>& ids) {
+    printf("Restarting devices...\n");
     auto dil = SetupDiCreateDeviceInfoList(
       nullptr,
       NULL
@@ -32,7 +74,8 @@ namespace {
     SP_DEVINFO_DATA did;
     did.cbSize = sizeof(SP_DEVINFO_DATA);
 
-    for (const auto& id: devices) {
+    InputDeviceCollection collection;
+    for (const auto& id: ids) {
       auto device = collection.get(id);
       if (!device) {
         continue;
@@ -53,24 +96,8 @@ namespace {
     snprintf(buf, sizeof(buf), "%s\\Whitelist\\%d", prefix, GetCurrentProcessId());
     return buf;
   }
-}
 
-  HidGuardian::HidGuardian(const std::vector<DeviceID>& devices): mDevices(devices) {
-    printf("Configuring HidGuardian...\n");
-    whitelistThisProcess();
-    setDevices(devices);
-    restart_devices(devices);
-  }
-
-  HidGuardian::~HidGuardian() {
-    printf("Cleaning up HidGuardian configuration...\n");
-    setDevices({});
-    restart_devices(mDevices);
-    auto key = process_whitelist_key();
-    RegDeleteKey(HKEY_LOCAL_MACHINE, key.data());
-  }
-
-  void HidGuardian::whitelistThisProcess() {
+  void whitelist_this_process() {
     auto subkey = process_whitelist_key();
     HKEY regkey;
     auto ret = RegCreateKeyEx(HKEY_LOCAL_MACHINE, subkey.data(), NULL, NULL, REG_OPTION_VOLATILE,
@@ -89,32 +116,24 @@ namespace {
     }
     RegCloseKey(regkey);
   }
+} // namespace
 
-  void HidGuardian::setDevices(const std::vector<DeviceID>& devices) {
-    std::stringstream ss;
-    ss << std::hex;
+  HidGuardian::HidGuardian(const std::vector<DeviceID>& ids) {
+    printf("Configuring HidGuardian...\n");
+    whitelist_this_process();
 
-    for (const auto& device: devices) {
-      ss << device.id << '\0';
-    }
-    ss << '\0';
-    const auto value = ss.str();
-    HKEY key;
-    RegOpenKeyEx(
-      HKEY_LOCAL_MACHINE, 
-      "SYSTEM\\CurrentControlSet\\Services\\HidGuardian\\Parameters",
-      0,
-      KEY_SET_VALUE,
-      &key
-    );
-    auto res = RegSetValueEx(
-      key,
-      "AffectedDevices",
-      NULL,
-      REG_MULTI_SZ,
-      (const BYTE*) value.data(),
-      value.size()
-    );
+    auto hid_ids = get_hid_ids_from_device_ids(ids);
+    mDevices = hid_ids; 
+    set_devices(hid_ids);
+    restart_devices(hid_ids);
+  }
+
+  HidGuardian::~HidGuardian() {
+    printf("Cleaning up HidGuardian configuration...\n");
+    set_devices({});
+    restart_devices(mDevices);
+    auto key = process_whitelist_key();
+    RegDeleteKey(HKEY_LOCAL_MACHINE, key.data());
   }
 
 } // fredemmott::gameinput
