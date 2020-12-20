@@ -23,11 +23,11 @@
 namespace fredemmott::gameinput {
 
 namespace {
-  std::vector<HID_ID> get_hid_ids_from_device_ids(
+  std::vector<HardwareID> get_hid_ids_from_device_ids(
     const std::vector<DeviceID>& device_ids
   ) {
     InputDeviceCollection collection;
-    std::vector<HID_ID> hid_ids;
+    std::vector<HardwareID> hid_ids;
     for (const auto& id: device_ids) {
       auto device = collection.get(id);
       if (!device) {
@@ -38,12 +38,12 @@ namespace {
     return hid_ids;
   }
 
-  void set_devices(const std::vector<HID_ID>& ids) {
+  void set_devices(const std::vector<HardwareID>& ids) {
     std::stringstream ss;
     ss << std::hex;
 
     for (const auto& id: ids) {
-      ss << (std::string) id << '\0';
+      ss << id.toString() << '\0';
     }
     ss << '\0';
     const auto value = ss.str();
@@ -65,7 +65,7 @@ namespace {
     );
   }
   // Only works as administrator :'(
-  void restart_devices(const std::vector<HID_ID>& ids) {
+  void restart_devices(const std::vector<HardwareID>& ids) {
     printf("Restarting devices...\n");
     auto dil = SetupDiCreateDeviceInfoList(
       nullptr,
@@ -80,7 +80,7 @@ namespace {
       if (!device) {
         continue;
       }
-      auto instance_id = device->getInstanceID();
+      auto instance_id = device->getInstanceID().toString();
       SetupDiOpenDeviceInfo(dil, instance_id.data(), NULL, 0, &did);
       SetupDiRestartDevices(dil, &did);
       SetupDiDeleteDeviceInfo(dil, &did);

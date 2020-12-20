@@ -127,7 +127,7 @@ std::string InputDevice::getProductName() const {
   return p->device.tszProductName;
 }
 
-std::string InputDevice::getInstanceID() const {
+InstanceID InputDevice::getInstanceID() const {
   DIPROPGUIDANDPATH buf;
   buf.diph.dwSize = sizeof(DIPROPGUIDANDPATH);
   buf.diph.dwHeaderSize = sizeof(DIPROPHEADER);
@@ -158,11 +158,11 @@ std::string InputDevice::getInstanceID() const {
   );
   char device_id[MAX_PATH];
   snprintf(device_id, sizeof(device_id), "%S", (wchar_t*) id.data());
-  return device_id;
+  return { device_id };
 }
 
-HID_ID InputDevice::getHardwareID() const {
-  auto id = getInstanceID();
+HardwareID InputDevice::getHardwareID() const {
+  auto id = getInstanceID().toString();
   // Totaly legit way to split off the \instanceID suffix
   *strrchr(id.data(), '\\') = 0;
 

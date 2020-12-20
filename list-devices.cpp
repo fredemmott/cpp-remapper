@@ -23,14 +23,15 @@ int main() {
       device->getHatCount()
     );
 
-    auto iid = device->getInstanceID();
-    printf("  Instance ID: %s\n", iid.c_str());
-
     auto vidpid = device->getVIDPID();
     if (vidpid) {
       auto buf = vidpid->getHumanReadable();
       printf("  %s\n", buf.c_str());
     }
+
+    auto iid = device->getInstanceID().getHumanReadable();
+    printf("  %s\n", iid.c_str());
+
     auto hid = device->getHardwareID().getHumanReadable();
     printf("  %s\n", hid.c_str());
   }

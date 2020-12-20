@@ -50,9 +50,9 @@ namespace fredemmott::inputmapping {
     MappableInput ret(p->deviceCollection->get(id));
     auto device = ret.getDevice();
     auto name = device->getProductName();
-    auto instance_id = device->getInstanceID();
+    auto instance_id = device->getInstanceID().getHumanReadable();
     auto hardware_id = device->getHardwareID().getHumanReadable();
-    printf("Found \"%s\":\n  Instance ID: %s\n  %s\n", name.c_str(), instance_id.c_str(), hardware_id.c_str());
+    printf("Found \"%s\":\n  %s\n  %s\n", name.c_str(), instance_id.c_str(), hardware_id.c_str());
     return ret;
   }
 

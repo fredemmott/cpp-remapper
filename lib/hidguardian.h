@@ -20,7 +20,7 @@ namespace fredemmott::gameinput {
 
      ~HidGuardian();
     private:
-     std::vector<HID_ID> mDevices;
+     std::vector<HardwareID> mDevices;
   };
 
 } // namespace fredemmott::gameinput

@@ -31,14 +31,28 @@ std::string VIDPID::getHumanReadable() const {
 
 }
 
-HID_ID::~HID_ID() {}
+StringBasedID::StringBasedID(const std::string& impl) : mID(impl) {}
 
-bool HID_ID::matches(InputDevice* device) const {
+StringBasedID::~StringBasedID() {}
+
+std::string StringBasedID::toString() const {
+  return mID;
+}
+
+bool HardwareID::matches(InputDevice* device) const {
   return mID == device->getHardwareID().mID;
 }
 
-std::string HID_ID::getHumanReadable() const {
-  return "Hardware ID: " + mID;
+std::string HardwareID::getHumanReadable() const {
+  return "HardwareID: " + mID;
+}
+
+bool InstanceID::matches(InputDevice* device) const {
+  return mID == device->getInstanceID().mID;
+}
+
+std::string InstanceID::getHumanReadable() const {
+  return "InstanceID: " + mID;
 }
 
 namespace {

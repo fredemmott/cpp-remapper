@@ -112,46 +112,53 @@ example above:
 ```
 PS > ./build.ps1 list-devices
 PS > ./list-devices
+"vJoy Device"
+  Axes: 9
+  Buttons: 64
+  Hats: 1
+  VID: 0x1234, PID: 0xBEA
+  InstanceID: HID\HIDCLASS&Col01\1&4784345&2&0000
+  HardwareID: HID\HIDCLASS&Col01
 "T-Pendular-Rudder"
-  VIDPID { 0x044f, 0xb68f }
-  HID_ID { "HID\VID_044F&PID_B68F" }
   Axes: 3
   Buttons: 0
   Hats: 0
-"Throttle - HOTAS Warthog"
-  VIDPID { 0x044f, 0x0404 }
-  HID_ID { "HID\VID_044F&PID_0404" }
-  Axes: 5
-  Buttons: 32
-  Hats: 1
+  VID: 0x044F, PID: 0xB68
+  InstanceID: HID\VID_044F&PID_B68F\7&63562dc&0&0000
+  HardwareID: HID\VID_044F&PID_B68F
 "RIGHT VPC Stick WarBRD"
-  VIDPID { 0x3344, 0x40cc }
-  HID_ID { "HID\VID_3344&PID_40CC&Col01" }
   Axes: 6
   Buttons: 31
   Hats: 0
+  VID: 0x3344, PID: 0x40C
+  InstanceID: HID\VID_3344&PID_40CC&Col01\9&ccc01f0&1&0000
+  HardwareID: HID\VID_3344&PID_40CC&Col01
 "vJoy Device"
-  VIDPID { 0x1234, 0xbead }
-  HID_ID { "HID\HIDCLASS&Col01" }
   Axes: 9
   Buttons: 64
   Hats: 1
-"vJoy Device"
-  VIDPID { 0x1234, 0xbead }
-  HID_ID { "HID\HIDCLASS&Col02" }
-  Axes: 9
-  Buttons: 64
+  VID: 0x1234, PID: 0xBEA
+  InstanceID: HID\HIDCLASS&Col02\1&4784345&2&0001
+  HardwareID: HID\HIDCLASS&Col02
+"Throttle - HOTAS Warthog"
+  Axes: 5
+  Buttons: 32
   Hats: 1
+  VID: 0x044F, PID: 0x040
+  InstanceID: HID\VID_044F&PID_0404\9&1e87ca54&1&0000
+  HardwareID: HID\VID_044F&PID_0404
 PS >
 ```
 
-The `HID_ID` struct definitions (actually Windows 'hardware IDs', in contrast
-to 'device IDs' and 'instance IDs') are more specific, but most people are more
-familiar with VID and PID.
-
-The remapping will work with either, but the `HidGuardian` support may require
-the `HID_ID` form if it contains additional data, like the HID collection
-number in the VPC WarBRD's ID above.
+You can specify a device with:
+- `VIDPID { 0x1234, 0x5678 }`: familiar, maybe not be supported by all HID
+  devices, and may be ambiguous. Specifies the make/model of device.
+- `HardwareID { "HID\\VID_1234&PID_5678" }` (using exact text from
+  list-devices): supported by all devices. Usually specifies the make/model of
+  the device, but may not.
+- `InstanceID { "HID\\VID_1234&PID_678\somemorestuff" }`: specifies the specific
+  instance of a device - usually not needed, but useful if you have multiple
+  identical devices, e.g. HOSAS, button boxes, MFDs.
 
 These can then be added to your code, as shown in `devicedb.h`.
 

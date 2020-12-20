@@ -8,8 +8,9 @@
 #include "easymode.h"
 
 int main() {
+  const InstanceID TM_THROTTLE_INSTANCE { "HID\\VID_044F&PID_0404\\9&1e87ca54&1&0000" };
   auto [p, throttle, stick, vj1, vj2] = create_profile(
-    TM_WARTHOG_THROTTLE,
+    TM_THROTTLE_INSTANCE,
     VPC_RIGHT_WARBRD,
     VJOY_1,
     VJOY_2

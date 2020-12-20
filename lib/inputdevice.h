@@ -33,8 +33,8 @@ class InputDevice final {
   std::string getInstanceName() const;
   std::string getProductName() const;
   std::optional<VIDPID> getVIDPID() const;
-  std::string getInstanceID() const;
-  HID_ID getHardwareID() const;
+  InstanceID getInstanceID() const;
+  HardwareID getHardwareID() const;
 
   uint32_t getAxisCount();
   std::vector<AxisInformation> getAxisInformation();

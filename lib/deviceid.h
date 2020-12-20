@@ -41,29 +41,36 @@ class VIDPID final : public DeviceSpecifierBase {
     uint16_t mPID;
 };
 
-class HID_ID final: public DeviceSpecifierBase {
+class StringBasedID: public DeviceSpecifierBase {
   public:
-    HID_ID(const std::string& id): mID(id) {}
-    virtual ~HID_ID();
-    virtual bool matches(InputDevice* device) const;
-    virtual std::string getHumanReadable() const;
+    StringBasedID(const std::string& id);
+    virtual ~StringBasedID();
 
-    operator std::string() const {
-      return mID;
-    }
-
-    bool operator== (const HID_ID& other) const {
-      return mID == other.mID;
-    }
-
-  private:
+    // This is primarily here for HidGuardian; these should be considered
+    // opaque identifiers
+    std::string toString() const;
+  protected:
     std::string mID;
+};
+
+class HardwareID final : public StringBasedID {
+ public:
+  using StringBasedID::StringBasedID;
+  virtual bool matches(InputDevice* device) const;
+  virtual std::string getHumanReadable() const;
+};
+
+class InstanceID final : public StringBasedID {
+ public:
+  using StringBasedID::StringBasedID;
+  virtual bool matches(InputDevice* device) const;
+  virtual std::string getHumanReadable() const;
 };
 
 // Copyable wrapper around a DeviceSpecifierBase
 class DeviceSpecifier final: public DeviceSpecifierBase {
   public:
-    typedef std::variant<VIDPID, HID_ID> Impl;
+    typedef std::variant<VIDPID, HardwareID, InstanceID> Impl;
 
     template<typename T> DeviceSpecifier(const T& val): p(val) {}
 
@@ -75,5 +82,8 @@ class DeviceSpecifier final: public DeviceSpecifierBase {
 };
 
 typedef DeviceSpecifier DeviceID;
+
+[[deprecated("Use `HardwareID` instead of `HID_ID`")]]
+typedef HardwareID HID_ID;
 
 } // namespace fredemmott::gameinput
