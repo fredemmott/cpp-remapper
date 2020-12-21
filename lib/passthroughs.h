@@ -35,7 +35,7 @@ class VJoyButton : public ButtonAction {
 class VJoyHat : public HatAction {
   public:
     VJoyHat(const HatTarget& target);
-    void map(int16_t value);
+    void map(uint16_t value);
   private:
     HatTarget mTarget;
 };

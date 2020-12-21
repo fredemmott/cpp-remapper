@@ -32,7 +32,7 @@ VJoyHat::VJoyHat(
 ): HatAction(), mTarget(target) {
 }
 
-void VJoyHat::map(int16_t value) {
+void VJoyHat::map(uint16_t value) {
   mTarget.set(value);
 }
 

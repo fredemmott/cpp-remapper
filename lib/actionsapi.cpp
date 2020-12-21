@@ -17,7 +17,7 @@ void ButtonTarget::set(bool value) const {
   device->setButton(button, value);
 }
 
-void HatTarget::set(int16_t value) const {
+void HatTarget::set(uint16_t value) const {
   device->setHat(hat, value);
 }
 

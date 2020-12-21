@@ -30,7 +30,7 @@ class OutputDevice final {
   OutputDevice* setDial(long value);
 
   OutputDevice* setButton(uint8_t button, bool value);
-  OutputDevice* setHat(uint8_t hat, int16_t value);
+  OutputDevice* setHat(uint8_t hat, uint16_t value);
 
   void send();
  private:

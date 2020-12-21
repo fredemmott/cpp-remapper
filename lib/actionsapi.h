@@ -42,7 +42,7 @@ class AxisAction: public Action<long> {};
 /// An Action that happens in response to a button movement
 class ButtonAction : public Action<bool> {};
 /// An action that happens in response to a POV hat movement
-class HatAction : public Action<int16_t> {};
+class HatAction : public Action<uint16_t> {};
 
 template<typename TDevice>
 struct MappableButton {
@@ -61,7 +61,7 @@ struct MappableHat {
 };
 typedef MappableHat<fredemmott::gameinput::InputDevice> HatSource;
 struct HatTarget : public MappableHat<fredemmott::vjoypp::OutputDevice> {
-  void set(int16_t value) const;
+  void set(uint16_t value) const;
 };
 
 struct AxisSource {

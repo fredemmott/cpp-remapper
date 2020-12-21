@@ -256,6 +256,17 @@ Do not use `sleep` or similar functions:
 - they will block all mappings, including axis, until they are resolved
 - the vjoy device will not be updated until your handler returns
 
+## Continuous Hats
+
+Continous hats are a `uint16_t`, with:
+- centidegrees (i.e. 0 -> 35999) for actual values
+- 0xffff for center
+
+The Windows 'Game Controller' test page appears to treat them as signed
+`int16_t`; this means that the Windows test page will not show continuous
+hat values greater than 327.67 degrees. When testing your profile, use the
+"Monitor vJoy" application.
+
 # What support is available?
 
 Please search for existing relevant discussions in the discussions tab on
