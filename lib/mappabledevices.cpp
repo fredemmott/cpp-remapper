@@ -27,7 +27,7 @@ MappableOutput::MappableOutput(OutputDevice* dev):
 #undef A
   Slider { dev, "Slider", &OutputDevice::setSlider},
   Dial { dev, "Dial", &OutputDevice::setDial},
-#define B(x) Button ## x({ dev, x })
+#define B(x) Button ## x { dev, x }
   B(1), B(2), B(3), B(4), B(5), B(6), B(7), B(8),
   B(9), B(10), B(11), B(12), B(13), B(14), B(15), B(16),
   B(17), B(18), B(19), B(20), B(21), B(22), B(23), B(24),
@@ -45,7 +45,7 @@ MappableOutput::MappableOutput(OutputDevice* dev):
   B(113), B(114), B(115), B(116), B(117), B(118), B(119), B(120),
   B(121), B(122), B(123), B(124), B(125), B(126), B(127), B(128),
 #undef B
-#define H(x) Hat ## x(hat(x))
+#define H(x) Hat ## x { dev, x }
 	H(1), H(2), H(3), H(4),
 #undef H
   mDevice(dev)
