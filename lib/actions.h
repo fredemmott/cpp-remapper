@@ -8,4 +8,5 @@
 #pragma once
 
 #include "axistobuttons.h"
+#include "axistohat.h"
 #include "shortpresslongpress.h"

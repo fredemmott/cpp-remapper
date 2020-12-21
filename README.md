@@ -164,11 +164,38 @@ These can then be added to your code, as shown in `devicedb.h`.
 
 # What actions are available?
 
-- `AxisToButton`
+- `AxisToButtons`
+- `AxisToHat`
 - `ShortPressLongPress`
 
 There are two ways to do more: defining an action, or using
 a lambda/function.
+
+## AxisToHat
+
+This class is different in that:
+- it operates on two input axis
+- it maintains state
+
+It used like this:
+
+```C++
+AxisToHat myFirstHat(vjoy1.Hat1); // default deadzone
+AxisToHat myHat(vjoy1.Hat1, 90); // custom deadzone, in percent
+p->map(device.XAxis, myHat.XAxis);
+p->map(device.YAxis, myHat.YAxis);
+```
+
+This creates a continuous (360-degree) hat out of the two axis.
+
+The deadzone is calculated relative to a full deflection in a single axis, and
+the deadzone distance-from-center is constant in all directions. This means
+that:
+- if it takes 1 inch of movement to pass the deadzone when moving directly
+  right, it will take 1 inch of movement to pass the deadzone in any direction
+- if the deadzone is 100%, it will require a full deflection for
+  North, East, South, or West, but only a 71% deflection for NE, SE, SW, or SW,
+  as (100%, 100%) is 141% the distance from center of (100%, 0%) or (0%, 100%).
 
 ## Using a lambda or function
 
