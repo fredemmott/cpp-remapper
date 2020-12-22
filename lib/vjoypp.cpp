@@ -134,7 +134,8 @@ OutputDevice* OutputDevice::setButton(uint8_t button, bool value) {
   return this;
 }
 
-OutputDevice* OutputDevice::setHat(uint8_t hat, uint16_t value) {
+OutputDevice* OutputDevice::setHat(uint8_t hat, uint16_t v) {
+  const long value = v == 0xffff ? -1 : v;
   switch (hat) {
     case 1:
       p->state.bHats = value;
