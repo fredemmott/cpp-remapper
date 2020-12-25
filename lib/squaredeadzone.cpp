@@ -24,15 +24,14 @@ void SquareDeadzone::map(long value) {
   // point is now the max
   const long MID = 0x7fff;
   value -= MID;
-  const long live = (MID * mPercent) / 100;
-  if (abs(value) < live) {
+  const long boundary = (MID * mPercent) / 100;
+  if (abs(value) < boundary) {
     mNext->map(MID);
     return;
   }
-  const long new_scale = MID - live;
-  const long scaled = ((value - live) * new_scale) / MID;
-  const long and_back_again = (scaled * MID ) / new_scale;
-  mNext->map(and_back_again + MID);
+  const long new_scale = MID - boundary;
+  const long scaled = ((value > 0 ? value - boundary : value + boundary) * MID) / new_scale;
+  mNext->map(scaled + MID); // re-center to (MID, MID)
 }
 
 } // namespace fredemmott::inputmapping::actions
