@@ -167,6 +167,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `AxisToButtons`
 - `AxisToHat`
 - `ShortPressLongPress`
+- `SquareDeadzone`
 
 There are two ways to do more: defining an action, or using
 a lambda/function.
@@ -295,6 +296,9 @@ hat values greater than 327.67 degrees. When testing your profile, use the
 "Monitor vJoy" application.
 
 # What support is available?
+
+I make this for my own use, and I share this in the hope others find it useful;
+I'm not able to commit to support, bug fixes, or feature development.
 
 Please search for existing relevant discussions in the discussions tab on
 GitHub, and create a new one if you don't find a relevant one.
