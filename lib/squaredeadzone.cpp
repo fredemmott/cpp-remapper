@@ -27,6 +27,7 @@ void SquareDeadzone::map(long value) {
   const long live = (MID * mPercent) / 100;
   if (abs(value) < live) {
     mNext->map(MID);
+    return;
   }
   const long new_scale = MID - live;
   const long scaled = ((value - live) * new_scale) / MID;
