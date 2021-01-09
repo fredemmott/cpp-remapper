@@ -18,3 +18,7 @@ jobs:
         run: .\build.ps1 example
       - name: Build list-devices
         run: .\build.ps1 list-devices
+      - name: Build test
+        run: .\build.ps1 test
+      - name: Run test
+        run: .\test.exe
