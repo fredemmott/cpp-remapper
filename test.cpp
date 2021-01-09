@@ -34,57 +34,74 @@ struct ProgressPrinter{
 };
 #define START_TEST ProgressPrinter pp_ ## __COUNTER__ (__func__)
 
-void test_square_deadzone() {
-  START_TEST;
-  long out = 12345;
+void test_square_deadzone_impl(uint8_t percent) {
+  long out = -1;
 
-  SquareDeadzone small_dz(10, [&out](long value) { out = value; });
-  small_dz.map(0x7fff); // mid point
+  SquareDeadzone dz(percent, [&out](long value) { out = value; });
+  dz.map(0x7fff); // mid point
   // In deadzone
   REQUIRE(out == 0x7fff);
-  small_dz.map(0x8000);
+  dz.map(0x8000);
   REQUIRE(out == 0x7fff);
-  small_dz.map(0x7ffe);
+  dz.map(0x7ffe);
   REQUIRE(out == 0x7fff);
   // Out of deadzone: extremes
-  small_dz.map(0);
+  dz.map(0);
   REQUIRE(out == 0);
-  small_dz.map(0xffff);
+  dz.map(0xffff);
   REQUIRE(out == 0xffff);
   // Return to deadzone
-  small_dz.map(0x80ff);
+  dz.map(0x80ff);
   REQUIRE(out == 0x7fff);
 
-  // Not extreme; as the output should still cover the full range, there's
-  // scaling, so 1 change in input means *at least* one change in output
+  const long dz_size = round(0x8000 * percent / 100.0);
+  // 1 change in input produces this size change in output...
+  const double out_delta = 0x8000 * 1.0 / (0x8000 - dz_size);
+  // ... but as we're using < and > constraints with a input of 1, we always
+  // want the ceil
+  const long delta_ceil = ceil(out_delta);
 
-  // Near max
-  small_dz.map(0xfffe);
-  REQUIRE(out == 0xfffd);
   // Just above center
-  const long small_dz_pos = ceil(0.1 * 0x7fff);
-  small_dz.map(0x7fff + small_dz_pos);
+  dz.map(0x7fff + dz_size);
   REQUIRE(out == 0x7fff);
-  small_dz.map(0x7fff + small_dz_pos + 1);
-  REQUIRE(out == 0x8000);
+  dz.map(0x7fff + dz_size + 1);
+  REQUIRE(out > 0x7fff);
+  REQUIRE(out <= 0x7fff + delta_ceil);
+  // Near max
+  dz.map(0xfffe);
+  REQUIRE(out == 0xffff - delta_ceil);
   // Just below center
-  const long small_dz_neg = floor(0.1 * 0x7fff);
-  small_dz.map(0x7fff - small_dz_neg);
+  dz.map(0x7fff - dz_size + 1);
   REQUIRE(out == 0x7fff);
-  small_dz.map(0x7fff - (small_dz_neg + 1));
-  REQUIRE(out == 0x7ffe);
+  dz.map(0x7fff - dz_size);
+  REQUIRE(out < 0x7fff);
+  REQUIRE(out >= 0x7fff - delta_ceil);
   // Near min
-  small_dz.map(1);
-  REQUIRE(out == 1);
+  dz.map(1);
+  REQUIRE(out >= 1);
+  REQUIRE(out <= delta_ceil);
 
   // Half way points
-  small_dz.map(0x7fff + 0x4000 + (small_dz_pos / 2) + 1);
-  REQUIRE(out == 0x7fff + 0x4000);
-  small_dz.map(0x7fff - 0x4000 - (small_dz_neg / 2));
-  REQUIRE(out == 0x7fff - 0x4000);
+  dz.map(0x7fff + 0x4000 + (dz_size / 2) + 1);
+  REQUIRE(out >= 0x7fff + 0x4000);
+  REQUIRE(out <= 0x7fff + 0x4000 + delta_ceil);
+  dz.map(0x7fff - 0x4000 - (dz_size/ 2));
+  REQUIRE(out <= 0x7fff - 0x4000);
+  REQUIRE(out >= 0x7fff - 0x4000 - delta_ceil);
+}
+
+void test_small_square_deadzone() {
+  START_TEST;
+  test_square_deadzone_impl(10);
+}
+
+void test_large_square_deadzone() {
+  START_TEST;
+  test_square_deadzone_impl(90);
 }
 
 int main() {
-  test_square_deadzone();
+  test_small_square_deadzone();
+  test_large_square_deadzone();
   return 0;
 }
