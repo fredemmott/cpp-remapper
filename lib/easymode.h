@@ -19,3 +19,5 @@ using fredemmott::inputmapping::Profile;
 using fredemmott::gameinput::VIDPID;
 using fredemmott::gameinput::HardwareID;
 using fredemmott::gameinput::InstanceID;
+
+using fredemmott::inputmapping::create_profile;
