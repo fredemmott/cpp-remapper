@@ -103,5 +103,6 @@ void test_large_square_deadzone() {
 int main() {
   test_small_square_deadzone();
   test_large_square_deadzone();
+  printf("All tests passed.\n");
   return 0;
 }
