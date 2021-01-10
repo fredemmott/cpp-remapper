@@ -7,6 +7,10 @@
  */
 
 #include "lib/easymode.h"
+#include "lib/render_axis.h"
+
+using fredemmott::inputmapping::render_axis;
+using fredemmott::inputmapping::AxisEventHandler;
 
 #include <cstdio>
 
@@ -105,6 +109,7 @@ void test_axis_curve() {
   long out = - 1;
 
   AxisCurve linear(0, [&out](long v) { out = v; });
+  render_axis("linear.bmp", [](auto next) { return AxisCurve { 0, next };});
   linear.map(0);
   REQUIRE(out == 0);
   linear.map(0xffff);
@@ -115,6 +120,7 @@ void test_axis_curve() {
   REQUIRE(out == 0x1234);
 
   AxisCurve extreme(0.99, [&out](long v) { out = v; });
+  render_axis("extreme.bmp", [](auto next) { return AxisCurve { 0.99, next }; });
   extreme.map(0);
   REQUIRE(out == 0);
   extreme.map(0xffff);
@@ -127,6 +133,7 @@ void test_axis_curve() {
   REQUIRE(out > 0x7fff && out < (0x7ffff + 0x4000));
 
   AxisCurve gentle(0.5, [&out](long v) { out = v; });
+  render_axis("gentle.bmp", [](auto next) { return AxisCurve { 0.5, next }; });
   extreme.map(0x4000);
   const auto extreme_out = out;
   gentle.map(0x4000);
