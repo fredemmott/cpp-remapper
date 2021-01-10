@@ -100,9 +100,46 @@ void test_large_square_deadzone() {
   test_square_deadzone_impl(90);
 }
 
+void test_axis_curve() {
+  START_TEST;
+  long out = - 1;
+
+  AxisCurve linear(0, [&out](long v) { out = v; });
+  linear.map(0);
+  REQUIRE(out == 0);
+  linear.map(0xffff);
+  REQUIRE(out == 0xffff);
+  linear.map(0x7fff);
+  REQUIRE(out == 0x7fff);
+  linear.map(0x1234);
+  REQUIRE(out == 0x1234);
+
+  AxisCurve extreme(0.99, [&out](long v) { out = v; });
+  extreme.map(0);
+  REQUIRE(out == 0);
+  extreme.map(0xffff);
+  REQUIRE(out == 0xffff);
+  extreme.map(0x7fff);
+  REQUIRE(out == 0x7fff);
+  extreme.map(0x4000);
+  REQUIRE(out > 0x4000  && out < 0x7fff);
+  extreme.map(0x7fff + 0x4000);
+  REQUIRE(out > 0x7fff && out < (0x7ffff + 0x4000));
+
+  AxisCurve gentle(0.5, [&out](long v) { out = v; });
+  extreme.map(0x4000);
+  const auto extreme_out = out;
+  gentle.map(0x4000);
+  REQUIRE(out > 0x4000 && out < 0x7fff);
+  // As 0x4000 is less than the midpoint, the smaller number has the most
+  // deflection
+  REQUIRE(out < extreme_out);
+}
+
 int main() {
   test_small_square_deadzone();
   test_large_square_deadzone();
+  test_axis_curve();
   printf("All tests passed.\n");
   return 0;
 }

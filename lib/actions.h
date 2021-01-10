@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include "axiscurve.h"
 #include "axistobuttons.h"
 #include "axistohat.h"
 #include "shortpresslongpress.h"
