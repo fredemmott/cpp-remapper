@@ -164,6 +164,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 
 # What actions are available?
 
+- `AxisCurve`
 - `AxisToButtons`
 - `AxisToHat`
 - `ShortPressLongPress`
@@ -171,6 +172,25 @@ These can then be added to your code, as shown in `devicedb.h`.
 
 There are two ways to do more: defining an action, or using
 a lambda/function.
+
+## AxisCurve
+
+This applies an S-shaped curve to an axis.
+
+The 'curviness' is tunable (-1 < curviness < 1); values between 0 and 1 make it
+less sensitive near the center (usually what is wanted), while values between
+-1 and 0 make it more sensitive near the center.
+
+A curviness of 0 produces a straight line; as the values approach 1 (or -1), the
+curve approximates a rounded right angled corner. You probably want to start
+around 0.5 and work from there.
+
+It is used like this:
+
+```C++
+p->map(device.XAxis, AxisCurve { 0.5, vjoy1.XAxis });
+p->map(device.YAxis, AxisCurve { 0.5, vjoy1.YAxis });
+```
 
 ## AxisToHat
 
