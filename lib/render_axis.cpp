@@ -78,7 +78,7 @@ void render_axis(
     // The more inputs hit this pixel, the bluer it gets
     p.r -= 0xff / step;
     p.g -= 0xff / step;
-    r.b = 0xff;
+    p.b = 0xff;
   }
 
   // Now to convert raw pixel data to a BMP image
