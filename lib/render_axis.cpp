@@ -53,18 +53,12 @@ void render_axis(
   const std::string& bmp_filename,
   std::function<AxisEventHandler(const AxisEventHandler&)> factory
 ) {
-  // Compute all the values...
   long fx = -1;
   const auto next = [&fx](long value) { fx = value; };
   auto f = factory(next);
   const int step = 128;
   const auto resolution = 0xffff / step;
-  auto values = std::make_unique<uint16_t[]>(resolution);
-  for (int i = 0; i < resolution; ++i) {
-    const auto x = i * step;
-    f->map(x);
-    values[i] = (uint16_t) fx;
-  }
+
   auto data = std::make_unique<Pixel[]>(resolution * resolution);
   // fill with white
   memset(data.get(), 0xff, resolution * resolution * sizeof(Pixel));
@@ -74,10 +68,17 @@ void render_axis(
     data[offset(i, resolution / 2)] = { 0, 0, 0 };
     data[offset(resolution / 2, i)] = { 0, 0, 0 };
   }
+
   // finally, the values :)
-  for (int x = 0; x < resolution; ++x) {
-    const auto y = values[x] / step;
-    data[offset(x, y)] = { 0xff, 0, 0}; // BGR: blue
+  for (int i = 0; i <= 0xffff; ++i) {
+    f->map(i);
+    const auto x = i / step;
+    const auto y = fx / step;
+    Pixel& p = data[offset(x, y)];
+    // The more inputs hit this pixel, the bluer it gets
+    p.r -= 0xff / step;
+    p.g -= 0xff / step;
+    r.b = 0xff;
   }
 
   // Now to convert raw pixel data to a BMP image
