@@ -14,4 +14,5 @@ namespace fredemmott::gameinput::devicedb {
   const VIDPID TM_TPR { 0x044f, 0xb68f };
   const HardwareID VPC_LEFT_WARBRD { "HID\\VID_3344&PID_80CC&Col01" };
   const HardwareID VPC_RIGHT_WARBRD { "HID\\VID_3344&PID_40CC&Col01" };
+  const HardwareID VPC_MT50CM3_THROTTLE { "HID\\VID_3344&PID_0194&Col01" };
 }
