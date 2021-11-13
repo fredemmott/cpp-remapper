@@ -3,7 +3,7 @@
 .vs/
 *.exe
 *.obj
-*.lib:w
+*.lib
 
 SDK/
 profiles/
