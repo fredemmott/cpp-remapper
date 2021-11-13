@@ -62,9 +62,10 @@ namespace fredemmott::gameinput
       return;
     }
 
-    printf("Cleaning up HidHide configuration...\n");
     try {
+      printf("Cleaning up HidHide configuration...\n");
       deinit();
+      printf("HidHide cleanup complete.\n");
     } catch (const std::runtime_error& e) {
       fprintf(
         stderr,
