@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "devicespecifier.h"
@@ -20,7 +21,11 @@ namespace fredemmott::gameinput {
 
      ~HidHide();
     private:
+     bool mInitialized = false;
      std::vector<InstanceID> mInstances;
+
+     void init(const std::vector<DeviceSpecifier>& devices);
+     void deinit();
   };
 
 } // namespace fredemmott::gameinput

@@ -17,13 +17,28 @@
 #include "HidHideCLI/stdafx.h"
 #include "HidHideCLI/FilterDriverProxy.h"
 
-using HidHideHandle = HidHide::FilterDriverProxy;
-
 namespace fredemmott::gameinput
 {
   HidHide::HidHide(const std::vector<DeviceSpecifier> &specifiers)
   {
     printf("Configuring HidHide...\n");
+    try {
+      init(specifiers);
+      mInitialized = true;
+    } catch (const std::runtime_error& e) {
+      fprintf(
+        stderr,
+        "---\n"
+        "!!! WARNING !!!\n"
+        "HidHide failed to initialize: %s\n"
+        "\n"
+        "Close any other programs using HidHide (including the configuration utility) and try again.\n"
+        "---\n",
+        e.what());
+    }
+  }
+
+  void HidHide::init(const std::vector<DeviceSpecifier> &specifiers) {
     InputDeviceCollection collection;
     ::HidHide::FilterDriverProxy hidhide(/* autosave = */ false);
     auto existing = hidhide.GetBlacklist();
@@ -41,9 +56,29 @@ namespace fredemmott::gameinput
     hidhide.ApplyConfigurationChanges();
   }
 
-  HidHide::~HidHide()
-  {
+  HidHide::~HidHide() {
+    if (!mInitialized) {
+      printf("Skipping HidHide cleanup - failed to initialize on startup.\n");
+      return;
+    }
+
     printf("Cleaning up HidHide configuration...\n");
+    try {
+      deinit();
+    } catch (const std::runtime_error& e) {
+      fprintf(
+        stderr,
+        "---\n"
+        "!!! WARNING !!!\n"
+        "Failed to clean up HidHide: %s\n"
+        "\n"
+        "Close any other programs using HidHide (including the configuration utility) and try again.\n"
+        "---\n",
+        e.what());
+    }
+  }
+
+  void HidHide::deinit() {
     ::HidHide::FilterDriverProxy hidhide(/*autosave = */ false);
     for (const auto& instance: mInstances) {
       hidhide.BlacklistDelEntry(instance.toWString());
