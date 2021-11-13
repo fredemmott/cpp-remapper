@@ -54,6 +54,8 @@ Enter-VsDevShell -VsInstallPath $VSPATH -SkipAutomaticLocation
 # Needed by HidHideCli
 $ProjectDirLength=(Get-Location).Path.Length
 
+$CWD = (Get-Item .).FullName
+
 function Rebuild-If-Outdated {
   param (
     [Parameter(Mandatory=$true)]
@@ -93,6 +95,32 @@ function Invoke-Exe-Checked {
   }
 }
 
+function Get-Relative-Directory{
+  param (
+    [Parameter(Mandatory=$true)]
+    [string] $FilePath
+  )
+  $File=(Get-Item $FilePath);
+  $Directory=($File.Directory.FullName);
+  if ($Directory -eq $CWD) {
+    return "";
+  } elseif ($Directory.StartsWith("$CWD\")) {
+     return $Directory.Substring($CWD.Length + 1) + "/";
+  }
+  return $Directory;
+}
+
+function Get-Relative-Name {
+  param (
+    [Parameter(Mandatory=$true)]
+    [string] $FilePath
+  )
+
+  $File=(Get-Item $FilePath)
+  $Directory=(Get-Relative-Directory $File.FullName)
+  return "$Directory$($File.Name)"
+}
+
 function Swap-Extension {
   param (
     [Parameter(Mandatory=$true)]
@@ -100,9 +128,9 @@ function Swap-Extension {
     [Parameter(Mandatory=$true)]
     [string] $NewExtension
   )
-  # Needed for compatibility with older powershell
-  $Basename="$([io.path]::GetFileNameWithoutExtension($Path))"
-  return "$(Split-Path $Path -Parent)\$Basename.$NewExtension"
+  $File = (Get-Item $Path)
+  $Directory = (Get-Relative-Directory $File.FullName)
+  return "$Directory$($File.BaseName).$NewExtension"
 }
 
 function Cpp-Obj-Rule {
@@ -165,11 +193,11 @@ $HidHideHeaders=(Get-Item lib/HidHideCLI/*.h).FullName
 
 Cpp-StaticLib-Rule `
   -Target hidhide.lib `
-  -Sources ((Get-Item lib/HidHideCLI/*.cpp).FullName | Resolve-Path -Relative).Substring(2) `
+  -Sources (Get-Item lib/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers $HidHideHeaders
 Cpp-StaticLib-Rule `
   -Target cpp-remapper.lib `
-  -Sources ((Get-Item lib/*.cpp).FullName | Resolve-Path -Relative).Substring(2) `
+  -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers ($CppRemapperHeaders + $HidHideHeaders)
 
 Cpp-Obj-Rule -Cpp $ProfileSource -Headers $CppRemapperHeaders

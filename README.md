@@ -99,7 +99,7 @@ button.
 3. Copy the `vJoyInterface.dll` from the SDK directory to the repo root directory
 4. Install Visual Studio 2019 or newer
 5. Open a terminal
-6. `./build.ps1 example`
+6. `./build.ps1 example.cpp`
 7. Run `example.exe`; run as administrator for HidHide support.
    - If you're in powershell: `Start-Process -Verb runas example.exe`
 
@@ -110,7 +110,7 @@ isn't listed there, you'll need it's ID; build `list-devices.exe` like the
 example above:
 
 ```
-PS > ./build.ps1 list-devices
+PS > ./build.ps1 list-devices.cpp
 PS > ./list-devices
 "vJoy Device"
   Axes: 9

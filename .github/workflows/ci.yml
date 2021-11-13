@@ -17,10 +17,10 @@ jobs:
           Expand-Archive vJoy-SDK.zip .
           cp SDK\lib\vJoyInterface.dll .
       - name: Build example
-        run: .\build.ps1 example
+        run: .\build.ps1 example.cpp
       - name: Build list-devices
-        run: .\build.ps1 list-devices
+        run: .\build.ps1 list-devices.cpp
       - name: Build test
-        run: .\build.ps1 test
+        run: .\build.ps1 test.cpp
       - name: Run test
         run: .\test.exe
