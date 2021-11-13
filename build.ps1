@@ -29,6 +29,11 @@ param(
   [switch] $ForceRebuild
 )
 
+$CWD = (Get-Item .).FullName
+$IntermediateDir = "$CWD\build\${BuildMode}"
+$ExeSuffix = "-${BuildMode}";
+New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
+
 switch($BuildMode) {
   "Debug" {
     $CLFlags=@("/Zi")
@@ -37,6 +42,7 @@ switch($BuildMode) {
   "Release" {
     $CLFlags=@("/O2")
     $LINKFlags=@()
+    $ExeSuffix=''
   }
 
   default {
@@ -54,8 +60,6 @@ Enter-VsDevShell -VsInstallPath $VSPATH -SkipAutomaticLocation
 # Needed by HidHideCli
 $ProjectDirLength=(Get-Location).Path.Length
 
-$CWD = (Get-Item .).FullName
-
 function Rebuild-If-Outdated {
   param (
     [Parameter(Mandatory=$true)]
@@ -65,6 +69,9 @@ function Rebuild-If-Outdated {
     [Parameter(Mandatory=$true)]
     [scriptblock] $Impl
   )
+  if (Split-Path $Target -Parent) {
+    New-Item -Force -Path (Split-Path $Target -Parent) -ItemType Directory | Out-Null
+  }
 
   $Wrap = {
     Write-Output "[$Target]: Out of date, rebuilding."
@@ -100,14 +107,13 @@ function Get-Relative-Directory{
     [Parameter(Mandatory=$true)]
     [string] $FilePath
   )
-  $File=(Get-Item $FilePath);
-  $Directory=($File.Directory.FullName);
-  if ($Directory -eq $CWD) {
+  $Directory=Split-Path $FilePath -Parent
+  if ($Directory -eq $CWD -or $Directory -eq "") {
     return "";
   } elseif ($Directory.StartsWith("$CWD\")) {
-     return $Directory.Substring($CWD.Length + 1) + "/";
+     return $Directory.Substring($CWD.Length + 1) + "\";
   }
-  return $Directory;
+  return $Directory+"\";
 }
 
 function Get-Relative-Name {
@@ -116,9 +122,8 @@ function Get-Relative-Name {
     [string] $FilePath
   )
 
-  $File=(Get-Item $FilePath)
-  $Directory=(Get-Relative-Directory $File.FullName)
-  return "$Directory$($File.Name)"
+  $Directory=(Get-Relative-Directory $FilePath)
+  return "$Directory$(Split-Path $FilePath -Leaf)"
 }
 
 function Swap-Extension {
@@ -133,15 +138,24 @@ function Swap-Extension {
   return "$Directory$($File.BaseName).$NewExtension"
 }
 
+function Get-Cpp-Obj-Name {
+  param (
+    [Parameter(Mandatory=$true)]
+    [string] $Cpp
+  )
+
+  return Get-Relative-Name "$IntermediateDir\$(Swap-Extension -Path (Get-Relative-Name $Cpp) -NewExtension "obj")"
+}
+
 function Cpp-Obj-Rule {
   param (
+    [Parameter(Mandatory=$true)]
+    [string] $Target,
     [Parameter(Mandatory=$true)]
     [string] $Cpp,
     [Parameter(Mandatory=$true)]
     [string[]] $Headers
   )
-
-  $Target=Swap-Extension -Path $Cpp -NewExtension "obj"
 
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
@@ -160,10 +174,10 @@ function Cpp-StaticLib-Rule {
   )
 
   foreach($Source in $Sources) {
-    Cpp-Obj-Rule -Cpp $Source -Headers $Headers
+    Cpp-Obj-Rule -Target (Get-Cpp-Obj-Name $Source) -Cpp $Source -Headers $Headers
   }
 
-  $Objs=$Sources | ForEach-Object { Swap-Extension -Path $_ -NewExtension "obj" }
+  $Objs=$Sources | ForEach-Object { Get-Cpp-Obj-Name $_ }
 
   Rebuild-If-Outdated -Target $Target -Sources $Objs -Impl {
     Write-Output "  LIB: ${Target}: $Objs "
@@ -180,28 +194,31 @@ function Objs-Exe-Rule {
   )
 
   Rebuild-If-Outdated -Target $Target -Sources $Objects -Impl {
-	  Write-Output "  LINK: ${Target}: $Objects $LINKFlags"
-	  Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" $LINKFlags $Objects }
+    Write-Output "  LINK: ${Target}: $Objects $LINKFlags"
+    Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" $LINKFlags $Objects }
   }
 
 }
 
-$ProfileObj=(Swap-Extension -Path $ProfileSource -NewExtension "obj")
+$ProfileObj=Get-Cpp-Obj-Name $ProfileSource
 
 $CppRemapperHeaders=(Get-Item lib/*.h).FullName
 $HidHideHeaders=(Get-Item lib/HidHideCLI/*.h).FullName
 
+$LibCppRemapper = Get-Relative-Name "$IntermediateDir\cpp-remapper.lib"
+$LibHidHide = Get-Relative-Name "$IntermediateDir\hidhide.lib"
+
 Cpp-StaticLib-Rule `
-  -Target hidhide.lib `
+  -Target $LibHidHide `
   -Sources (Get-Item lib/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers $HidHideHeaders
 Cpp-StaticLib-Rule `
-  -Target cpp-remapper.lib `
+  -Target $LibCppRemapper `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers ($CppRemapperHeaders + $HidHideHeaders)
 
-Cpp-Obj-Rule -Cpp $ProfileSource -Headers $CppRemapperHeaders
+Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
 
 Objs-Exe-Rule `
-  -Target "$((Get-Item $ProfileSource).BaseName).exe" `
-  -Objects @($ProfileObj, "cpp-remapper.lib", "hidhide.lib")
+  -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
+  -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide)
