@@ -46,9 +46,10 @@ class StringBasedID: public DeviceSpecifierBase {
     StringBasedID(const std::string& id);
     virtual ~StringBasedID();
 
-    // This is primarily here for HidGuardian; these should be considered
+    // This is primarily here for HidHide; these should be considered
     // opaque identifiers
     std::string toString() const;
+    std::wstring toWString() const;
   protected:
     std::string mID;
 };

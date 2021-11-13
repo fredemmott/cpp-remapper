@@ -14,13 +14,13 @@
 namespace fredemmott::gameinput {
   class InputDevice;
 
-  class HidGuardian {
+  class HidHide {
    public:
-     HidGuardian(const std::vector<DeviceSpecifier>& devices);
+     HidHide(const std::vector<DeviceSpecifier>& devices);
 
-     ~HidGuardian();
+     ~HidHide();
     private:
-     std::vector<HardwareID> mDevices;
+     std::vector<InstanceID> mInstances;
   };
 
 } // namespace fredemmott::gameinput

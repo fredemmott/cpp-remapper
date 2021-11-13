@@ -150,7 +150,7 @@ namespace fredemmott::inputmapping {
     }
     printf("Launching profile...\n");
     // We want to cleanly exit so that destructors are called - in particular,
-    // we want to reset the HidGuardian configuration.
+    // we want to reset the HidHide configuration.
     gExitEvent = CreateEvent(nullptr, false, false, nullptr);
     SetConsoleCtrlHandler(&exit_event_handler, true);
     std::vector<HANDLE> fixed_events { gExitEvent };
@@ -180,7 +180,7 @@ namespace fredemmott::inputmapping {
         handler->map(state.hats[i]);
       }
     }
-    printf("---\nProfile running, hit Ctrl-C to exit and clean up HidGuardian.\n");
+    printf("---\nProfile running, hit Ctrl-C to exit and clean up HidHide.\n");
     while (true) {
       auto events = fixed_events;
       for (const auto& [event, _]: mInjected) {

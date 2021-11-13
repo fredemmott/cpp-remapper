@@ -7,7 +7,7 @@ It aims to:
 - use modern standard C++ wherever possible
 - have minimum dependencies
 
-It uses vJoy (it is a vJoy 'feeder'), and supports HidGuardian without
+It uses vJoy (it is a vJoy 'feeder'), and supports HidHide without
 replugging devices (if ran as administrator and supported by hardware).
 
 # What does a profile look like?
@@ -100,7 +100,7 @@ button.
 4. Install Visual Studio 2019 or newer
 5. Open a terminal
 6. `./build.ps1 example`
-7. Run `example.exe`; run as administrator for HidGuardian support.
+7. Run `example.exe`; run as administrator for HidHide support.
    - If you're in powershell: `Start-Process -Verb runas example.exe`
 
 # How do I use this with another device?

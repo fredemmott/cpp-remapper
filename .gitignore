@@ -3,7 +3,10 @@
 .vs/
 *.exe
 *.obj
+*.lib:w
+
 SDK/
 profiles/
 vJoyInterface.dll
 *~
+*.bmp

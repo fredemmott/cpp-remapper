@@ -7,7 +7,7 @@
  */
 #include "profile.h"
 
-#include "hidguardian.h"
+#include "hidhide.h"
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
 #include "mappabledevices.h"
@@ -23,7 +23,7 @@ namespace fredemmott::inputmapping {
   struct Profile::Impl {
     std::vector<gameinput::DeviceSpecifier> ids;
     std::unique_ptr<Mapper> mapper;
-    std::unique_ptr<HidGuardian> guardian;
+    std::unique_ptr<HidHide> guardian;
     std::unique_ptr<InputDeviceCollection> deviceCollection;
   };
 
@@ -31,7 +31,7 @@ namespace fredemmott::inputmapping {
     p(new Impl {
       ids,
       std::make_unique<Mapper>(),
-      std::make_unique<HidGuardian>(ids),
+      std::make_unique<HidHide>(ids),
       std::make_unique<InputDeviceCollection>(),
     }) {
     std::reverse(p->ids.begin(), p->ids.end());

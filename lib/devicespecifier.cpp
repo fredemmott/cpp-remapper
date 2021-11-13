@@ -39,6 +39,19 @@ std::string StringBasedID::toString() const {
   return mID;
 }
 
+std::wstring StringBasedID::toWString() const {
+  wchar_t buf[UNICODE_STRING_MAX_CHARS];
+  const auto wchar_count = ::MultiByteToWideChar(
+    1252,
+    0,
+    mID.data(),
+    mID.size(),
+    buf,
+    sizeof(buf)
+  );
+  return std::wstring(buf, wchar_count);
+}
+
 bool HardwareID::matches(InputDevice* device) const {
   return mID == device->getHardwareID().mID;
 }
