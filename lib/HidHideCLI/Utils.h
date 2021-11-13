@@ -19,7 +19,6 @@ namespace HidHide
     std::wstring StringTable(_In_ UINT stringTableResourceId);
     */
     inline std::wstring StringTable(_In_ LPWSTR str) {
-        printf("Str: %ls\n", str);
         return str;
     }
 
