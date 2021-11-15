@@ -159,7 +159,9 @@ function Cpp-Obj-Rule {
 
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
-    Invoke-Exe-Checked { CL.exe /nologo /c "/Fo$Target" /I. /ISDK/inc /Ilib /EHsc /vmg /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp }
+    Invoke-Exe-Checked {
+      CL.exe /nologo /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
+    }
   }
 }
 
@@ -198,6 +200,16 @@ function Objs-Exe-Rule {
     Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" $LINKFlags $Objects }
   }
 
+}
+
+$ViGEmClientSources=(Get-ChildItem -Path ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
+$ViGEmLib="ViGEmClient\lib\$BuildMode\x64\ViGEmClient.lib"
+
+Rebuild-If-Outdated -Target $ViGEmLib -Sources $ViGEmClientSources -Impl {
+  Write-Output "  MSBUILD: ViGEmClient ${BuildMode}_LIB"
+  Push-Location ViGEmClient
+  Invoke-Exe-Checked { msbuild -noLogo "-p:Configuration=${BuildMode}_LIB" }
+  Pop-Location
 }
 
 $ProfileObj=Get-Cpp-Obj-Name $ProfileSource
