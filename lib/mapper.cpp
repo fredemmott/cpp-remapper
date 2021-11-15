@@ -8,8 +8,9 @@
 #include "mapper.h"
 
 #include "inputdevice.h"
-#include "vjoypp.h"
-#include "mappabledevices.h"
+#include "MappableInput.h"
+#include "MappableOutput.h"
+#include "VJoyOutput.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -245,8 +246,8 @@ namespace fredemmott::inputmapping {
   }
 
   void Mapper::flush() {
-    for (const auto& device: mToFlush) {
-      device->send();
+    for (const auto& output: mToFlush) {
+      output->flush();
     }
   }
 

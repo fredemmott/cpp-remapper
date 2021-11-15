@@ -32,7 +32,7 @@ void AxisToButtons::map(long value) {
 // --- Tests ---
 
 #include "comboaction.h"
-#include "mappabledevices.h"
+#include "MappableOutput.h"
 using namespace fredemmott::inputmapping;
 using namespace fredemmott::inputmapping::actions;
 

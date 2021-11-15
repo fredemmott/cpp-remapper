@@ -9,7 +9,7 @@
 
 #include "actionsapi.h"
 
-#include "vjoypp.h"
+#include "VJoyOutput.h"
 
 namespace fredemmott::inputmapping {
 

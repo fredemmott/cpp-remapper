@@ -19,13 +19,10 @@ namespace fredemmott::gameinput {
   class InputDevice;
 }
 
-namespace fredemmott::vjoypp {
-  class OutputDevice;
-}
-
 namespace fredemmott::inputmapping {
   struct MappableInput;
   struct MappableOutput;
+  class OutputDevice;
 
   class Mapper {
     public:
@@ -67,7 +64,7 @@ namespace fredemmott::inputmapping {
         std::map<uint8_t, HatEventHandler> hats;
       };
       std::map<gameinput::InputDevice*, DeviceMappings> mMappings;
-      std::vector<vjoypp::OutputDevice*> mToFlush;
+      std::vector<OutputDevice*> mToFlush;
       std::map<void*, std::function<void()>> mInjected;
 
       void flush();

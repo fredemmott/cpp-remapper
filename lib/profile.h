@@ -8,7 +8,9 @@
 #pragma once
 
 #include "devicespecifier.h"
-#include "mappabledevices.h"
+
+#include "MappableInput.h"
+#include "MappableOutput.h"
 
 #include <memory>
 #include <tuple>

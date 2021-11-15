@@ -10,9 +10,8 @@
 #include "hidhide.h"
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
-#include "mappabledevices.h"
 #include "mapper.h"
-#include "vjoypp.h"
+#include "VJoyOutput.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -35,7 +34,6 @@ namespace fredemmott::inputmapping {
       std::make_unique<InputDeviceCollection>(),
     }) {
     std::reverse(p->ids.begin(), p->ids.end());
-    vjoypp::init();
   }
 
   Profile::Profile(Profile&& moved): p(std::move(moved.p)) {

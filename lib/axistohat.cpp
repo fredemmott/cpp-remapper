@@ -43,7 +43,8 @@ void AxisToHat::update() {
 } // namespace fredemmott::inputmapping::actions
 
 #include "Mapper.h"
-#include "MappableDevices.h"
+#include "MappableInput.h"
+#include "MappableOutput.h"
 
 namespace {
   using namespace fredemmott::inputmapping::actions;
