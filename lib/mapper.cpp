@@ -9,8 +9,8 @@
 
 #include "inputdevice.h"
 #include "MappableInput.h"
-#include "MappableOutput.h"
-#include "VJoyOutput.h"
+#include "MappableVJoyOutput.h"
+#include "VJoyDevice.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -120,7 +120,7 @@ namespace fredemmott::inputmapping {
     }
   }
 
-  void Mapper::passthrough(const MappableInput& s, const MappableOutput& t) {
+  void Mapper::passthrough(const MappableInput& s, const MappableVJoyOutput& t) {
     map({
         { s.XAxis, t.XAxis },
         { s.YAxis, t.YAxis },
@@ -297,7 +297,7 @@ public:
 void static_test() {
   Mapper m;
   MappableInput i(nullptr);
-  MappableOutput o(1);
+  MappableVJoyOutput o(1);
 
   // Basic passthrough
   //   Impl: (Axis|Button|Hat)Target -> VJoy(Axis|Button|Hat)

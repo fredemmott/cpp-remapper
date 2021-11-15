@@ -44,7 +44,7 @@ void AxisToHat::update() {
 
 #include "Mapper.h"
 #include "MappableInput.h"
-#include "MappableOutput.h"
+#include "MappableVJoyOutput.h"
 
 namespace {
   using namespace fredemmott::inputmapping::actions;
@@ -52,7 +52,7 @@ namespace {
   void static_test() {
     Mapper m;
     MappableInput i(nullptr);
-    MappableOutput o(1);
+    MappableVJoyOutput o(1);
 
     AxisToHat ignored(o.Hat1);
     AxisToHat ath(o.Hat2, 20); // custom deadzone percent

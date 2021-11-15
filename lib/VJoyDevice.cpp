@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "VJoyOutput.h"
+#include "VJoyDevice.h"
 
 #include <stdexcept>
 
@@ -52,7 +52,7 @@ namespace fredemmott::inputmapping
     }
   }
 
-  struct VJoyOutput::Impl
+  struct VJoyDevice::Impl
   {
     BYTE id;
 #if USE_JOYSTICK_API_VERSION == 3
@@ -62,7 +62,7 @@ namespace fredemmott::inputmapping
 #endif
   };
 
-  VJoyOutput::VJoyOutput(uint8_t id) : p(new Impl{id, {}})
+  VJoyDevice::VJoyDevice(uint8_t id) : p(new Impl{id, {}})
   {
     init_vjoy();
     AcquireVJD(id);
@@ -73,7 +73,7 @@ namespace fredemmott::inputmapping
     setHat(4, 0xffff);
   }
 
-  VJoyOutput::~VJoyOutput()
+  VJoyDevice::~VJoyDevice()
   {
     RelinquishVJD(p->id);
   }
@@ -89,55 +89,55 @@ namespace fredemmott::inputmapping
     }
   }
 
-  VJoyOutput *VJoyOutput::setXAxis(long value)
+  VJoyDevice *VJoyDevice::setXAxis(long value)
   {
     p->state.wAxisX = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setYAxis(long value)
+  VJoyDevice *VJoyDevice::setYAxis(long value)
   {
     p->state.wAxisY = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setZAxis(long value)
+  VJoyDevice *VJoyDevice::setZAxis(long value)
   {
     p->state.wAxisZ = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setRXAxis(long value)
+  VJoyDevice *VJoyDevice::setRXAxis(long value)
   {
     p->state.wAxisXRot = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setRYAxis(long value)
+  VJoyDevice *VJoyDevice::setRYAxis(long value)
   {
     p->state.wAxisYRot = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setRZAxis(long value)
+  VJoyDevice *VJoyDevice::setRZAxis(long value)
   {
     p->state.wAxisZRot = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setSlider(long value)
+  VJoyDevice *VJoyDevice::setSlider(long value)
   {
     p->state.wSlider = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setDial(long value)
+  VJoyDevice *VJoyDevice::setDial(long value)
   {
     p->state.wSlider = normalize_axis(value);
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setButton(uint8_t button, bool value)
+  VJoyDevice *VJoyDevice::setButton(uint8_t button, bool value)
   {
     button--;
     off_t offset = button % 32;
@@ -174,7 +174,7 @@ namespace fredemmott::inputmapping
     return this;
   }
 
-  VJoyOutput *VJoyOutput::setHat(uint8_t hat, uint16_t v)
+  VJoyDevice *VJoyDevice::setHat(uint8_t hat, uint16_t v)
   {
     const long value = v == 0xffff ? -1 : v;
     switch (hat)
@@ -195,7 +195,7 @@ namespace fredemmott::inputmapping
     return this;
   }
 
-  void VJoyOutput::flush()
+  void VJoyDevice::flush()
   {
     UpdateVJD(p->id, &p->state);
   }

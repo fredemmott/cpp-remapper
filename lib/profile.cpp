@@ -11,7 +11,7 @@
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
 #include "mapper.h"
-#include "VJoyOutput.h"
+#include "VJoyDevice.h"
 
 #include <algorithm>
 #include <cstdio>

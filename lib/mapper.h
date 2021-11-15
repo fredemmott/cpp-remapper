@@ -21,7 +21,8 @@ namespace fredemmott::gameinput {
 
 namespace fredemmott::inputmapping {
   struct MappableInput;
-  struct MappableOutput;
+  class MappableOutput;
+  class MappableVJoyOutput;
   class OutputDevice;
 
   class Mapper {
@@ -31,7 +32,7 @@ namespace fredemmott::inputmapping {
       /// Call setOutputs first
       void run();
 
-      void passthrough(const MappableInput&, const MappableOutput&);
+      void passthrough(const MappableInput&, const MappableVJoyOutput&);
 
       void map(const AxisSource& source, const AxisEventHandler& handler);
       void map(const ButtonSource& source, const ButtonEventHandler& handler);

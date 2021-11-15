@@ -15,24 +15,24 @@
 
 namespace fredemmott::inputmapping {
 
-class VJoyOutput final : public OutputDevice {
+class VJoyDevice final : public OutputDevice {
  public:
-  VJoyOutput(uint8_t id);
-  ~VJoyOutput();
+  VJoyDevice(uint8_t id);
+  ~VJoyDevice();
 
   virtual void flush() override;
 
-  VJoyOutput* setXAxis(long value);
-  VJoyOutput* setYAxis(long value);
-  VJoyOutput* setZAxis(long value);
-  VJoyOutput* setRXAxis(long value);
-  VJoyOutput* setRYAxis(long value);
-  VJoyOutput* setRZAxis(long value);
-  VJoyOutput* setSlider(long value);
-  VJoyOutput* setDial(long value);
+  VJoyDevice* setXAxis(long value);
+  VJoyDevice* setYAxis(long value);
+  VJoyDevice* setZAxis(long value);
+  VJoyDevice* setRXAxis(long value);
+  VJoyDevice* setRYAxis(long value);
+  VJoyDevice* setRZAxis(long value);
+  VJoyDevice* setSlider(long value);
+  VJoyDevice* setDial(long value);
 
-  VJoyOutput* setButton(uint8_t button, bool value);
-  VJoyOutput* setHat(uint8_t hat, uint16_t value);
+  VJoyDevice* setButton(uint8_t button, bool value);
+  VJoyDevice* setHat(uint8_t hat, uint16_t value);
 
  private:
   struct Impl;

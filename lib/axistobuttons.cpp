@@ -32,7 +32,7 @@ void AxisToButtons::map(long value) {
 // --- Tests ---
 
 #include "comboaction.h"
-#include "MappableOutput.h"
+#include "MappableVJoyOutput.h"
 using namespace fredemmott::inputmapping;
 using namespace fredemmott::inputmapping::actions;
 
@@ -40,7 +40,7 @@ namespace {
 
 // Check that the compiler lets us call it as intended
 void static_test() {
-  MappableOutput o(nullptr);
+  MappableVJoyOutput o(nullptr);
   AxisToButtons {
     { 0, 0, o.Button1 },
     { 0, 0, { o.Button1, o.Button2 } },

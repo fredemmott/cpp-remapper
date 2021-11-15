@@ -19,7 +19,7 @@ namespace fredemmott::gameinput {
 }
 
 namespace fredemmott::inputmapping {
-  class VJoyOutput;
+  class VJoyDevice;
 }
 
 namespace fredemmott::inputmapping {
@@ -50,7 +50,7 @@ struct MappableButton {
   uint8_t button;
 };
 typedef MappableButton<fredemmott::gameinput::InputDevice> ButtonSource;
-struct ButtonTarget : public MappableButton<fredemmott::inputmapping::VJoyOutput> {
+struct ButtonTarget : public MappableButton<fredemmott::inputmapping::VJoyDevice> {
   void set(bool) const;
 };
 
@@ -60,7 +60,7 @@ struct MappableHat {
   uint8_t hat;
 };
 typedef MappableHat<fredemmott::gameinput::InputDevice> HatSource;
-struct HatTarget : public MappableHat<fredemmott::inputmapping::VJoyOutput> {
+struct HatTarget : public MappableHat<fredemmott::inputmapping::VJoyDevice> {
   void set(uint16_t value) const;
 };
 
@@ -70,9 +70,9 @@ struct AxisSource {
 };
 
 struct AxisTarget {
-  fredemmott::inputmapping::VJoyOutput* device;
+  fredemmott::inputmapping::VJoyDevice* device;
   const char* label;
-  fredemmott::inputmapping::VJoyOutput* (fredemmott::inputmapping::VJoyOutput::*setter)(long);
+  fredemmott::inputmapping::VJoyDevice* (fredemmott::inputmapping::VJoyDevice::*setter)(long);
 
   void set(long value) const;
 };
