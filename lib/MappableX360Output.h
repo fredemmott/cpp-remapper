@@ -8,6 +8,7 @@
 #pragma once
 
 #include "actionsapi.h"
+#include "eventhandler.h"
 #include "MappableOutput.h"
 #include "X360Device.h"
 
@@ -23,14 +24,11 @@ public:
 
   X360Device* getDevice() const override;
 
-  const SharedAxisAction LXAxis;
-  const SharedAxisAction LYAxis;
-  const SharedAxisAction RXAxis;
-  const SharedAxisAction RYAxis;
-  const SharedAxisAction LTrigger;
-  const SharedAxisAction RTrigger;
+  const AxisEventHandler
+    LXAxis, LYAxis, LTrigger,
+    RXAxis, RYAxis, RTrigger;
 
-  const SharedButtonAction
+  const ButtonEventHandler
     ButtonA, ButtonB, ButtonX, ButtonY,
     ButtonBack, ButtonStart, ButtonGuide,
     DPadUp, DPadDown, DPadLeft, DPadRight,

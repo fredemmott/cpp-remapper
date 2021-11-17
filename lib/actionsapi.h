@@ -41,10 +41,6 @@ class ButtonAction : public Action<bool> {};
 /// An action that happens in response to a POV hat movement
 class HatAction : public Action<uint16_t> {};
 
-typedef std::shared_ptr<AxisAction> SharedAxisAction;
-typedef std::shared_ptr<ButtonAction> SharedButtonAction;
-typedef std::shared_ptr<HatAction> SharedHatAction;
-
 struct ButtonSource {
   fredemmott::gameinput::InputDevice* device;
   uint8_t button;

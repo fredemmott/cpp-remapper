@@ -58,12 +58,12 @@ VJoyDevice* MappableVJoyOutput::getDevice() const {
   return mDevice;
 }
 
-SharedButtonAction&& MappableVJoyOutput::button(uint8_t id) const {
+ButtonEventHandler&& MappableVJoyOutput::button(uint8_t id) const {
   auto device = getDevice();
   return std::move(std::make_shared<ButtonFunctionAction>([device, id](bool value) { device->setButton(id, value); }));
 }
 
-SharedHatAction&& MappableVJoyOutput::hat(uint8_t id) const {
+HatEventHandler&& MappableVJoyOutput::hat(uint8_t id) const {
   auto device = getDevice();
   return std::move(std::make_shared<HatFunctionAction>([device, id](long value) { device->setHat(id, value); }));
 }
