@@ -143,10 +143,21 @@ void test_axis_curve() {
   REQUIRE(out < extreme_out);
 }
 
+void static_test_vjoy() {
+  // Input device is irrelevant, but we currently need one.
+  auto [p, _, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
+}
+
+void static_test_vigem() {
+  // Input device is irrelevant, but we currently need one.
+  auto [p, _, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD_1);
+}
+
 int main() {
   test_small_square_deadzone();
   test_large_square_deadzone();
   test_axis_curve();
+
   printf("All tests passed.\n");
   return 0;
 }

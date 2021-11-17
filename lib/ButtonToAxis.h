@@ -8,21 +8,19 @@
 #pragma once
 
 #include "actionsapi.h"
+#include "eventhandler.h"
 
-#include "VJoyDevice.h"
+#include <vector>
+#include <cstdint>
 
-namespace fredemmott::inputmapping {
+namespace fredemmott::inputmapping::actions {
 
-void ButtonTarget::set(bool value) const {
-  device->setButton(button, value);
-}
-
-void HatTarget::set(uint16_t value) const {
-  device->setHat(hat, value);
-}
-
-void AxisTarget::set(long value) const {
-  (device->*(setter))(value);
-}
+class ButtonToAxis : public ButtonAction {
+ public:
+  ButtonToAxis(AxisEventHandler next);
+  void map(bool value);
+ private:
+  AxisEventHandler mNext;
+};
 
 } // namespace fredemmott::inputmapping

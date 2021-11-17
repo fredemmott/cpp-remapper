@@ -8,6 +8,7 @@
 #include "MappableVJoyOutput.h"
 
 #include "axistypes.h"
+#include "eventhandler.h"
 #include "inputdevice.h"
 #include "VJoyDevice.h"
 
@@ -21,13 +22,14 @@ MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id): MappableVJoyOutput(
     new VJoyDevice(vjoy_id)) {}
 
 MappableVJoyOutput::MappableVJoyOutput(VJoyDevice* dev):
-#define A(x) x ## Axis { dev, #x, &VJoyDevice::set ## x ## Axis }
-  A(X), A(Y), A(Z),
-  A(RX), A(RY), A(RZ),
+#define A(a) a(std::make_shared<AxisFunctionAction>([dev](long value) { dev->set ## a (value); }))
+#define AA(a) A(a ## Axis)
+  AA(X), AA(Y), AA(Z),
+  AA(RX), AA(RY), AA(RZ),
+#undef AA
+  A(Slider), A(Dial),
 #undef A
-  Slider { dev, "Slider", &VJoyDevice::setSlider},
-  Dial { dev, "Dial", &VJoyDevice::setDial},
-#define B(x) Button ## x { dev, x }
+#define B(n) Button ## n(button(n))
   B(1), B(2), B(3), B(4), B(5), B(6), B(7), B(8),
   B(9), B(10), B(11), B(12), B(13), B(14), B(15), B(16),
   B(17), B(18), B(19), B(20), B(21), B(22), B(23), B(24),
@@ -45,7 +47,7 @@ MappableVJoyOutput::MappableVJoyOutput(VJoyDevice* dev):
   B(113), B(114), B(115), B(116), B(117), B(118), B(119), B(120),
   B(121), B(122), B(123), B(124), B(125), B(126), B(127), B(128),
 #undef B
-#define H(x) Hat ## x { dev, x }
+#define H(n) Hat ## n(hat(n))
   H(1), H(2), H(3), H(4),
 #undef H
   mDevice(dev)
@@ -56,12 +58,14 @@ VJoyDevice* MappableVJoyOutput::getDevice() const {
   return mDevice;
 }
 
-ButtonTarget MappableVJoyOutput::button(uint8_t id) const {
-  return { mDevice, id };
+SharedButtonAction&& MappableVJoyOutput::button(uint8_t id) const {
+  auto device = getDevice();
+  return std::move(std::make_shared<ButtonFunctionAction>([device, id](bool value) { device->setButton(id, value); }));
 }
 
-HatTarget MappableVJoyOutput::hat(uint8_t id) const {
-  return { mDevice, id };
+SharedHatAction&& MappableVJoyOutput::hat(uint8_t id) const {
+  auto device = getDevice();
+  return std::move(std::make_shared<HatFunctionAction>([device, id](long value) { device->setHat(id, value); }));
 }
 
 } // namespace fredemmott::inputmapping

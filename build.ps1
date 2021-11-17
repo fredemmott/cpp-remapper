@@ -22,15 +22,25 @@
 
 [cmdletbinding()]
 param(
-  [Parameter(Mandatory=$true)]
   [string] $ProfileSource,
+  [string] $IDEBuildFile,
   [ValidateSet('Release', 'Debug')]
   [string] $BuildMode = 'Release',
+  [ValidateSet('x86', 'x64')]
+  [string] $Platform = 'x64',
   [switch] $ForceRebuild
 )
 
+if ($IDEBuildFile) {
+  if ((Get-Item $IDEBuildFile).FullName.StartsWith((Get-Item profiles).FullName)) {
+    $ProfileSource = $IDEBuildFile
+  } else {
+    $ProfileSource = "test.cpp"
+  }
+}
+
 $CWD = (Get-Item .).FullName
-$IntermediateDir = "$CWD\build\${BuildMode}"
+$IntermediateDir = "$CWD\build\${Platform}-${BuildMode}"
 $ExeSuffix = "-${BuildMode}";
 New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
 
@@ -51,11 +61,44 @@ switch($BuildMode) {
   }
 }
 
-$ErrorActionPreference = "Stop"
+switch($Platform) {
+  "x86" {
+    $VCVarsBat = "vcvars32.bat"
+    $ExeSuffix = "$ExeSuffix-x86"
+    # VJoy SDK
+    $LINKFlags += "/LIBPATH:SDK\lib"
+  }
+  "x64" {
+    $VCVarsBat = "vcvars64.bat"
+    # VJoy SDK
+    $LINKFlags += "/LIBPATH:SDK\lib\amd64"
+  }
 
+  default {
+    Write-Output "Unsupported platform '$Platform'"
+    exit 1
+  }
+}
+$LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
+
+$ErrorActionPreference = "Stop"
+function Invoke-Exe-Checked {
+	param ( [scriptblock] $Block )
+	&$Block
+	if ($LASTEXITCODE -ne 0) {
+		exit $LASTEXITCODE
+	}
+}
+
+
+# Using vcvars[64].bat as Enter-VsDevShell does not reliably get an x64 environment
 $VSPATH=vswhere -property installationPath -version 16
-Import-Module (Join-Path $VSPATH "Common7\Tools\Microsoft.VisualStudio.DevShell.dll")
-Enter-VsDevShell -VsInstallPath $VSPATH -SkipAutomaticLocation
+$VCVars=New-TemporaryFile
+Invoke-Exe-Checked { cmd.exe /c "call `"$VSPATH\VC\Auxiliary\Build\$VCVarsBat`" && set > $VCVars" }
+Get-Content $VCVars | ForEach-Object {
+  $Var, $Value = $_.split("=")
+  Set-Item -Path "Env:$Var" -Value $Value
+}
 
 # Needed by HidHideCli
 $ProjectDirLength=(Get-Location).Path.Length
@@ -92,14 +135,6 @@ function Rebuild-If-Outdated {
   }
 
   Write-Output "[$Target] Up to date."
-}
-
-function Invoke-Exe-Checked {
-  param ( [scriptblock] $Block )
-  &$Block
-  if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
-  }
 }
 
 function Get-Relative-Directory{
@@ -160,7 +195,7 @@ function Cpp-Obj-Rule {
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
     Invoke-Exe-Checked {
-      CL.exe /nologo /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
+      CL.exe /nologo /MT /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /Zc:__cplusplus /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
     }
   }
 }
@@ -197,22 +232,18 @@ function Objs-Exe-Rule {
 
   Rebuild-If-Outdated -Target $Target -Sources $Objects -Impl {
     Write-Output "  LINK: ${Target}: $Objects $LINKFlags"
-    Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" $LINKFlags $Objects }
+    Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" /LTCG $LINKFlags $Objects }
   }
 
 }
-
 $ViGEmClientSources=(Get-ChildItem -Path ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
-$ViGEmLib="ViGEmClient\lib\$BuildMode\x64\ViGEmClient.lib"
 
-Rebuild-If-Outdated -Target $ViGEmLib -Sources $ViGEmClientSources -Impl {
+Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
   Write-Output "  MSBUILD: ViGEmClient ${BuildMode}_LIB"
   Push-Location ViGEmClient
-  Invoke-Exe-Checked { msbuild -noLogo "-p:Configuration=${BuildMode}_LIB" }
+  Invoke-Exe-Checked { msbuild -noLogo "-p:Configuration=${BuildMode}_LIB" "-p:Platform=$Platform" }
   Pop-Location
 }
-
-$ProfileObj=Get-Cpp-Obj-Name $ProfileSource
 
 $CppRemapperHeaders=(Get-Item lib/*.h).FullName
 $HidHideHeaders=(Get-Item lib/HidHideCLI/*.h).FullName
@@ -229,8 +260,16 @@ Cpp-StaticLib-Rule `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers ($CppRemapperHeaders + $HidHideHeaders)
 
+if (!$ProfileSource) {
+  return;
+}
+
+Write-Output "Profile: $ProfileSource"
+$ProfileObj=Get-Cpp-Obj-Name $ProfileSource
+
 Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
 
+(Get-Command cl.exe).Path
 Objs-Exe-Rule `
   -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
-  -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide)
+  -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)

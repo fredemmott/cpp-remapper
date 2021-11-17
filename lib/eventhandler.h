@@ -10,7 +10,6 @@
 #include "actionsapi.h"
 #include "comboaction.h"
 #include "functionaction.h"
-#include "passthroughs.h"
 
 #include <memory>
 
@@ -19,7 +18,6 @@ namespace fredemmott::inputmapping {
 /** A smart pointer to an Action, created from various reasonable things.
  *
  * - Actions are copied.
- * - Targets are converted to Actions by creating a Passthrough.
  * - Callables (e.g. lambdas, function references) are converted to an
  *   std::function<void(Value)>, then to a FunctionAction<Action>.
  *
@@ -28,39 +26,41 @@ namespace fredemmott::inputmapping {
  * conversions, while predominantly using values instead of pointers for the
  * user-facing API.
  */
-template<typename Target, typename Action, typename Passthrough>
+
+template<typename TAction>
 class EventHandler {
 public:
- typedef EventHandler<Target, Action, Passthrough> SelfType;
- typedef FunctionAction<Action> CallbackAction;
+ typedef EventHandler<TAction> SelfType;
+ typedef FunctionAction<TAction> CallbackAction;
  typedef typename CallbackAction::Callback Callback;
 
  operator bool() const {
    return (bool) mAction;
  }
 
- const std::shared_ptr<Action>& operator->() const {
+ const std::shared_ptr<TAction>& operator->() const {
    return mAction;
  }
 
  EventHandler(decltype(nullptr)) {}
 
- EventHandler(const Target& target) {
-   if (target.device) {
-     mAction.reset(new Passthrough { target }) ;
-   }
- }
-
  EventHandler(const std::initializer_list<SelfType>& actions) {
-   mAction = std::make_shared<ComboAction<SelfType, Action>>(actions);
+   mAction = std::make_shared<ComboAction<SelfType, TAction>>(actions);
  }
 
  template<
    typename T,
-   typename std::enable_if<std::is_base_of<Action, T>::value>::type* = nullptr
+   typename std::enable_if<std::is_base_of<TAction, T>::value>::type* = nullptr
  >
  EventHandler(const T& action) {
    mAction = std::make_shared<T>(action);
+ }
+
+ template<
+   typename T,
+   typename std::enable_if<std::is_base_of<TAction, T>::value>::type* = nullptr
+ >
+ EventHandler(const std::shared_ptr<T>& action): mAction(action) {
  }
 
  template<
@@ -72,14 +72,14 @@ public:
  }
 
 private:
- std::shared_ptr<Action> mAction;
+ std::shared_ptr<TAction> mAction;
 };
 
-typedef EventHandler<AxisTarget, AxisAction, VJoyAxis>
+typedef EventHandler<AxisAction>
   AxisEventHandler;
-typedef EventHandler<ButtonTarget, ButtonAction, VJoyButton>
+typedef EventHandler<ButtonAction>
   ButtonEventHandler;
-typedef EventHandler<HatTarget, HatAction, VJoyHat>
+typedef EventHandler<HatAction>
   HatEventHandler;
 
 } // namespace fredemmott::inputmapping

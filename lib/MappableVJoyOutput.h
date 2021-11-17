@@ -21,23 +21,22 @@ public:
   MappableVJoyOutput(VJoyDevice* dev);
   VJoyDevice* getDevice() const override;
 
-  ButtonTarget button(uint8_t id) const;
-  HatTarget hat(uint8_t id) const;
+  SharedButtonAction&& button(uint8_t id) const;
+  SharedHatAction&& hat(uint8_t id) const;
 
-  // VJoy doesn't support arbitrary numbered axes
-  const AxisTarget XAxis;
-  const AxisTarget YAxis;
-  const AxisTarget ZAxis;
-  const AxisTarget RXAxis;
-  const AxisTarget RYAxis;
-  const AxisTarget RZAxis;
-  const AxisTarget Slider;
-  const AxisTarget Dial;
+  const SharedAxisAction XAxis;
+  const SharedAxisAction YAxis;
+  const SharedAxisAction ZAxis;
+  const SharedAxisAction RXAxis;
+  const SharedAxisAction RYAxis;
+  const SharedAxisAction RZAxis;
+  const SharedAxisAction Slider;
+  const SharedAxisAction Dial;
 
   // Convenience :)
 
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
-  const ButtonTarget
+  const SharedButtonAction
     Button1, Button2, Button3, Button4,
     Button5, Button6, Button7, Button8,
     Button9, Button10, Button11, Button12,
@@ -71,7 +70,7 @@ public:
     Button121, Button122, Button123, Button124,
     Button125, Button126, Button127, Button128;
 
-  const HatTarget Hat1, Hat2, Hat3, Hat4;
+  const SharedHatAction Hat1, Hat2, Hat3, Hat4;
   private:
    VJoyDevice* mDevice;
 };

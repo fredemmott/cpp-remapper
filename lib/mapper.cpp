@@ -63,10 +63,10 @@ namespace fredemmott::inputmapping {
     };
   } // namespace
 
-  void Mapper::setOutputs(const std::vector<MappableOutput>& outputs) {
+  void Mapper::setOutputs(const std::vector<OutputDevice*>& outputs) {
     mToFlush.clear();
     for (const auto& output: outputs) {
-      mToFlush.push_back(output.getDevice());
+      mToFlush.push_back(output);
     }
   }
 
@@ -313,9 +313,9 @@ void static_test() {
 
   // Lambdas
   //   Impl: T -> std::function<void(TValue)> -> FunctionAction
-  m.map(i.XAxis, [=](long v) { o.XAxis.set(v); });
-  m.map(i.Button1, [=](bool v) { o.Button1.set(v); });
-  m.map(i.Hat1, [=](uint16_t v) { o.Hat1.set(v); });
+  m.map(i.XAxis, [=](long v) { o.XAxis->map(v); });
+  m.map(i.Button1, [=](bool v) { o.Button1->map(v); });
+  m.map(i.Hat1, [=](uint16_t v) { o.Hat1->map(v); });
 
   // Here onwards, assuming that axis/button/hats are abstracted
   // adequately (tested above), so we don't need to test them all
@@ -333,8 +333,8 @@ void static_test() {
   m.map(
     i.Button1,
     {
-      [=](bool v) { o.Button1.set(v); },
-      [=](bool v) { o.Button2.set(v); },
+      [=](bool v) { o.Button1->map(v); },
+      [=](bool v) { o.Button2->map(v); },
     }
   );
 

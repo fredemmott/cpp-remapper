@@ -11,6 +11,8 @@
 
 #include "MappableInput.h"
 #include "MappableOutput.h"
+#include "MappableX360Output.h"
+#include "MappableVJoyOutput.h"
 
 #include <memory>
 #include <tuple>
@@ -21,7 +23,14 @@ namespace fredemmott::inputmapping {
 class Mapper;
 struct MappableInput;
 
-struct VJOY_ID {
+namespace {
+  struct _OUTPUT_ID_T {};
+  struct _VIGEM_X360_PAD_T : public _OUTPUT_ID_T {};
+} // namespace
+
+struct VJOY_ID : public _OUTPUT_ID_T {
+  VJOY_ID(uint8_t value) : value(value) {}
+
   const uint8_t value;
 };
 
@@ -56,18 +65,25 @@ namespace {
   template<typename... Ts>
   auto get_devices(Profile* p, const VJOY_ID& first, Ts...rest) {
     return std::tuple_cat(
-      std::make_tuple(MappableOutput(first.value)),
+      std::make_tuple(MappableVJoyOutput(first.value)),
       get_devices(p, rest...)
     );
   }
 
+  template<typename... Ts>
+  auto get_devices(Profile* p, const _VIGEM_X360_PAD_T& _first, Ts...rest) {
+    return std::tuple_cat(
+      std::make_tuple(MappableX360Output()),
+      get_devices(p, rest...)
+    );
+  }
 
   void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&) {}
 
   template<typename...Rest>
   void fill_input_ids(
     std::vector<gameinput::DeviceSpecifier>& device_ids,
-    const VJOY_ID&,
+    const _OUTPUT_ID_T&,
     Rest... rest
   ) {
     fill_input_ids(device_ids, rest...);
@@ -82,20 +98,20 @@ namespace {
     fill_input_ids(device_ids, rest...);
   }
 
-  std::vector<MappableOutput> select_outputs() {
+  std::vector<OutputDevice*> select_outputs() {
     return {};
   }
 
   template<typename... Rest>
-  std::vector<MappableOutput> select_outputs(const MappableInput&, Rest... rest) {
+  std::vector<OutputDevice*> select_outputs(const MappableInput&, Rest... rest) {
     return select_outputs(rest...);
   }
 
 
   template<typename... Rest>
-  std::vector<MappableOutput> select_outputs(const MappableOutput& first, Rest... rest) {
+  std::vector<OutputDevice*> select_outputs(const MappableOutput& first, Rest... rest) {
     auto ret = select_outputs(rest...);
-    ret.push_back(first);
+    ret.push_back(first.getDevice());
     return ret;
   }
 }
@@ -119,10 +135,14 @@ auto create_profile(const gameinput::DeviceSpecifier& first, Ts... rest) {
 
 namespace vjoyids {
   const VJOY_ID
-		VJOY_1 { 1 }, VJOY_2 { 2 }, VJOY_3 { 3 }, VJOY_4 { 4 },
-		VJOY_5 { 5 }, VJOY_6 { 6 }, VJOY_7 { 7 }, VJOY_8 { 8 },
-		VJOY_9 { 9 }, VJOY_10 { 10 }, VJOY_11 { 11 }, VJOY_12 { 12 },
-		VJOY_13 { 13 }, VJOY_14 { 14 }, VJOY_15 { 15 }, VJOY_16 { 16 };
+    VJOY_1 { 1 }, VJOY_2 { 2 }, VJOY_3 { 3 }, VJOY_4 { 4 },
+    VJOY_5 { 5 }, VJOY_6 { 6 }, VJOY_7 { 7 }, VJOY_8 { 8 },
+    VJOY_9 { 9 }, VJOY_10 { 10 }, VJOY_11 { 11 }, VJOY_12 { 12 },
+    VJOY_13 { 13 }, VJOY_14 { 14 }, VJOY_15 { 15 }, VJOY_16 { 16 };
+}
+
+namespace vigemids {
+  const _VIGEM_X360_PAD_T VIGEM_X360_PAD_1;
 }
 
 } // namespace fredemmott::inputmapping

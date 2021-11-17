@@ -17,7 +17,7 @@
 #include "SDK/inc/public.h"
 #include "SDK/inc/vjoyinterface.h"
 
-#pragma comment(lib, "SDK/lib/vJoyInterface.lib")
+#pragma comment(lib, "vJoyInterface.lib")
 
 namespace fredemmott::inputmapping
 {

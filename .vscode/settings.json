@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "functional": "cpp",
+    "memory": "cpp",
+    "tuple": "cpp"
+  }
+}

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <set>
 
 /* This file contains definitions you're likely to need to implement
@@ -16,10 +17,6 @@
 
 namespace fredemmott::gameinput {
   class InputDevice;
-}
-
-namespace fredemmott::inputmapping {
-  class VJoyDevice;
 }
 
 namespace fredemmott::inputmapping {
@@ -44,46 +41,23 @@ class ButtonAction : public Action<bool> {};
 /// An action that happens in response to a POV hat movement
 class HatAction : public Action<uint16_t> {};
 
-template<typename TDevice>
-struct MappableButton {
-  TDevice* device;
+typedef std::shared_ptr<AxisAction> SharedAxisAction;
+typedef std::shared_ptr<ButtonAction> SharedButtonAction;
+typedef std::shared_ptr<HatAction> SharedHatAction;
+
+struct ButtonSource {
+  fredemmott::gameinput::InputDevice* device;
   uint8_t button;
 };
-typedef MappableButton<fredemmott::gameinput::InputDevice> ButtonSource;
-struct ButtonTarget : public MappableButton<fredemmott::inputmapping::VJoyDevice> {
-  void set(bool) const;
-};
 
-template<typename TDevice>
-struct MappableHat {
-  TDevice* device;
+struct HatSource {
+  fredemmott::gameinput::InputDevice* device;
   uint8_t hat;
-};
-typedef MappableHat<fredemmott::gameinput::InputDevice> HatSource;
-struct HatTarget : public MappableHat<fredemmott::inputmapping::VJoyDevice> {
-  void set(uint16_t value) const;
 };
 
 struct AxisSource {
   fredemmott::gameinput::InputDevice* device;
   uint8_t axis;
 };
-
-struct AxisTarget {
-  fredemmott::inputmapping::VJoyDevice* device;
-  const char* label;
-  fredemmott::inputmapping::VJoyDevice* (fredemmott::inputmapping::VJoyDevice::*setter)(long);
-
-  void set(long value) const;
-};
-/* This was a few hours of "why is a constructor that just initializes constants
- * overwritting something else on the stack?!"
- */
-static_assert(
-  sizeof(AxisTarget::setter) > sizeof(void*),
-  "Compile with /vmg for correct behavior of member function pointers with "
-  "forward-declared classes. Otherwise, sizeof() varies depending on if you"
-  "have the full declaration or not."
-);
 
 } // namespace fredemmott::inputmapping

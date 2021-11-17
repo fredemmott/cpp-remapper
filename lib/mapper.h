@@ -27,7 +27,7 @@ namespace fredemmott::inputmapping {
 
   class Mapper {
     public:
-      void setOutputs(const std::vector<MappableOutput>& to_flush);
+      void setOutputs(const std::vector<OutputDevice*>& to_flush);
 
       /// Call setOutputs first
       void run();

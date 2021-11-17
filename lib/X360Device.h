@@ -20,7 +20,15 @@
 
 namespace fredemmott::inputmapping {
 
-class XUSBDevice final : public OutputDevice {
+class X360Device final : public OutputDevice {
+  public:
+
+  X360Device();
+  ~X360Device();
+
+  X360Device(const X360Device&) = delete;
+  X360Device& operator=(const X360Device&) = delete;
+
   virtual void flush() override;
 
   enum class Button {
@@ -41,13 +49,13 @@ class XUSBDevice final : public OutputDevice {
     Y = XUSB_GAMEPAD_Y
   };
 
-  XUSBDevice* setButton(Button button, bool value);
-  XUSBDevice* setLX(long value);
-  XUSBDevice* setLY(long value);
-  XUSBDevice* setRX(long value);
-  XUSBDevice* setRY(long value);
-  XUSBDevice* setLeftTrigger(long value);
-  XUSBDevice* setRightTrigger(long value);
+  X360Device* setButton(Button button, bool value);
+  X360Device* setLXAxis(long value);
+  X360Device* setLYAxis(long value);
+  X360Device* setRXAxis(long value);
+  X360Device* setRYAxis(long value);
+  X360Device* setLTrigger(long value);
+  X360Device* setRTrigger(long value);
  private:
   struct Impl;
   std::unique_ptr<Impl> p;
