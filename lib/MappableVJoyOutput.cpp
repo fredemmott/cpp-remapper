@@ -8,7 +8,6 @@
 #include "MappableVJoyOutput.h"
 
 #include "axistypes.h"
-#include "eventhandler.h"
 #include "inputdevice.h"
 #include "VJoyDevice.h"
 
@@ -18,11 +17,11 @@ using fredemmott::inputmapping::VJoyDevice;
 
 namespace fredemmott::inputmapping {
 
-MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id): MappableVJoyOutput(
-    new VJoyDevice(vjoy_id)) {}
+MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id):
+  MappableVJoyOutput(std::make_shared<VJoyDevice>(vjoy_id)) {}
 
-MappableVJoyOutput::MappableVJoyOutput(VJoyDevice* dev):
-#define A(a) a(std::make_shared<AxisFunctionAction>([dev](long value) { dev->set ## a (value); }))
+MappableVJoyOutput::MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev):
+#define A(a) a(AxisOutput([dev](long value) { dev->set ## a (value); }))
 #define AA(a) A(a ## Axis)
   AA(X), AA(Y), AA(Z),
   AA(RX), AA(RY), AA(RZ),
@@ -54,18 +53,18 @@ MappableVJoyOutput::MappableVJoyOutput(VJoyDevice* dev):
 {
 }
 
-VJoyDevice* MappableVJoyOutput::getDevice() const {
+MappableVJoyOutput::~MappableVJoyOutput() {}
+
+std::shared_ptr<OutputDevice> MappableVJoyOutput::getDevice() const {
   return mDevice;
 }
 
-ButtonEventHandler&& MappableVJoyOutput::button(uint8_t id) const {
-  auto device = getDevice();
-  return std::move(std::make_shared<ButtonFunctionAction>([device, id](bool value) { device->setButton(id, value); }));
+ButtonOutput MappableVJoyOutput::button(uint8_t id) const {
+  return ButtonOutput([device = mDevice, id](bool value) { device->setButton(id, value); });
 }
 
-HatEventHandler&& MappableVJoyOutput::hat(uint8_t id) const {
-  auto device = getDevice();
-  return std::move(std::make_shared<HatFunctionAction>([device, id](long value) { device->setHat(id, value); }));
+HatOutput MappableVJoyOutput::hat(uint8_t id) const {
+  return HatOutput([device = mDevice, id](bool value) { device->setHat(id, value); });
 }
 
 } // namespace fredemmott::inputmapping

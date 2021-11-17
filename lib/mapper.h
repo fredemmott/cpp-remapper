@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 
 #include <chrono>
 #include <functional>
@@ -27,45 +26,23 @@ namespace fredemmott::inputmapping {
 
   class Mapper {
     public:
-      void setOutputs(const std::vector<OutputDevice*>& to_flush);
+      void setDevices(
+        const std::vector<MappableInput>& inputs,
+        const std::vector<std::shared_ptr<OutputDevice>>& outputs
+      );
 
-      /// Call setOutputs first
+      /// Call setDevices first
       void run();
 
-      void passthrough(const MappableInput&, const MappableVJoyOutput&);
-
-      void map(const AxisSource& source, const AxisEventHandler& handler);
-      void map(const ButtonSource& source, const ButtonEventHandler& handler);
-      void map(const HatSource& source, const HatEventHandler& handler);
-
-      struct ButtonMapping {
-        ButtonSource source;
-        ButtonEventHandler action;
-      };
-      struct HatMapping {
-        HatSource source;
-        HatEventHandler action;
-      };
-      struct AxisMapping {
-        AxisSource source;
-        AxisEventHandler action;
-      };
-      void map(const std::initializer_list<AxisMapping>& rules);
-      void map(const std::initializer_list<ButtonMapping>& rules);
-      void map(const std::initializer_list<HatMapping>& rules);
+      void passthrough(MappableInput&, const MappableVJoyOutput&);
 
       static void inject(
         const std::chrono::steady_clock::duration& delay,
         const std::function<void()>& handler
       );
     private:
-      struct DeviceMappings {
-        std::map<uint8_t, AxisEventHandler> axes;
-        std::map<uint8_t, ButtonEventHandler> buttons;
-        std::map<uint8_t, HatEventHandler> hats;
-      };
-      std::map<gameinput::InputDevice*, DeviceMappings> mMappings;
-      std::vector<OutputDevice*> mToFlush;
+      std::vector<MappableInput> mInputs;
+      std::vector<std::shared_ptr<OutputDevice>> mOutputs;
       std::map<void*, std::function<void()>> mInjected;
 
       void flush();

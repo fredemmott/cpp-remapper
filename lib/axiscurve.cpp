@@ -12,9 +12,8 @@
 namespace fredemmott::inputmapping::actions {
 
 AxisCurve::AxisCurve(
-  float curviness,
-  const AxisEventHandler& next
-): mCurviness(curviness), mNext(next) {}
+  float curviness
+): mCurviness(curviness) {}
 
 AxisCurve::~AxisCurve() {}
 
@@ -37,7 +36,7 @@ void AxisCurve::map(long value) {
 
   const auto clamped = fx > 1.0 ? 1.0 : (fx < -1.0 ? -1.0 : fx);
 
-  mNext->map((clamped * scale) + 0x7fff);
+  emit((clamped * scale) + 0x7fff);
 }
 
 } // namespace fredemmott::inputmapping::actions

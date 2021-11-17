@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 #include "MappableOutput.h"
 #include "VJoyDevice.h"
 
@@ -19,13 +18,14 @@ namespace fredemmott::inputmapping {
 class MappableVJoyOutput final : public MappableOutput {
 public:
   explicit MappableVJoyOutput(uint8_t vjoy_id);
-  MappableVJoyOutput(VJoyDevice* dev);
-  VJoyDevice* getDevice() const override;
+  MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev);
+  ~MappableVJoyOutput();
+  std::shared_ptr<OutputDevice> getDevice() const override;
 
-  ButtonEventHandler&& button(uint8_t id) const;
-  HatEventHandler&& hat(uint8_t id) const;
+  ButtonOutput button(uint8_t id) const;
+  HatOutput hat(uint8_t id) const;
 
-  const AxisEventHandler
+  AxisOutput
     XAxis, YAxis, ZAxis,
     RXAxis, RYAxis, RZAxis,
     Slider, Dial;
@@ -33,7 +33,7 @@ public:
   // Convenience :)
 
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
-  const ButtonEventHandler
+  ButtonOutput
     Button1, Button2, Button3, Button4,
     Button5, Button6, Button7, Button8,
     Button9, Button10, Button11, Button12,
@@ -67,9 +67,9 @@ public:
     Button121, Button122, Button123, Button124,
     Button125, Button126, Button127, Button128;
 
-  const HatEventHandler Hat1, Hat2, Hat3, Hat4;
+  HatOutput Hat1, Hat2, Hat3, Hat4;
   private:
-   VJoyDevice* mDevice;
+   std::shared_ptr<VJoyDevice> mDevice;
 };
 
 } // namespace fredemmott::inputmapping

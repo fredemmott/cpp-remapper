@@ -51,17 +51,20 @@ namespace fredemmott::inputmapping {
 
 void render_axis(
   const std::string& bmp_filename,
-  std::function<AxisEventHandler(const AxisEventHandler&)> factory
+  AxisOutput& transform_in,
+  AxisInput& transform_out
 ) {
   long fx = -1;
-  const auto next = [&fx](long value) { fx = value; };
-  auto f = factory(next);
+  transform_out >> AxisOutput([&fx](long value) { fx = value; });
+  transform_out >> [&fx](long value) { fx = value; };
   const int step = 128;
-  const auto resolution = 0xffff / step;
+  // + 1 for 'max value' vs 'number of distinct values'
+  const auto resolution = (0xffff + 1) / step;
 
   auto data = std::make_unique<Pixel[]>(resolution * resolution);
   // fill with white
   memset(data.get(), 0xff, resolution * resolution * sizeof(Pixel));
+
   // draw axis in black
   auto offset = [&](int x, int y) { return (x + (y * resolution)); };
   for (int i = 0; i < resolution; ++i) {
@@ -71,7 +74,7 @@ void render_axis(
 
   // finally, the values :)
   for (int i = 0; i <= 0xffff; ++i) {
-    f->map(i);
+    transform_in.map(i);
     const auto x = i / step;
     const auto y = fx / step;
     Pixel& p = data[offset(x, y)];

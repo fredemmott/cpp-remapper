@@ -20,6 +20,8 @@
 
 namespace fredemmott::inputmapping {
 
+using fredemmott::gameinput::InputDevice;
+
 class Mapper;
 struct MappableInput;
 
@@ -98,20 +100,39 @@ namespace {
     fill_input_ids(device_ids, rest...);
   }
 
-  std::vector<OutputDevice*> select_outputs() {
+  using OutputPtr = std::shared_ptr<OutputDevice>;
+
+  std::vector<OutputPtr> select_outputs() {
     return {};
   }
 
   template<typename... Rest>
-  std::vector<OutputDevice*> select_outputs(const MappableInput&, Rest... rest) {
+  std::vector<OutputPtr> select_outputs(const MappableInput& _not_an_output, Rest... rest) {
     return select_outputs(rest...);
   }
 
 
   template<typename... Rest>
-  std::vector<OutputDevice*> select_outputs(const MappableOutput& first, Rest... rest) {
+  std::vector<OutputPtr> select_outputs(const MappableOutput& first, Rest... rest) {
     auto ret = select_outputs(rest...);
     ret.push_back(first.getDevice());
+    return ret;
+  }
+
+  std::vector<MappableInput> select_inputs() {
+    return {};
+  }
+
+  template<typename... Rest>
+  std::vector<MappableInput> select_inputs(const MappableOutput& _not_an_input, Rest... rest) {
+    return select_inputs(rest...);
+  }
+
+
+  template<typename... Rest>
+  std::vector<MappableInput> select_inputs(const MappableInput& first, Rest... rest) {
+    auto ret = select_inputs(rest...);
+    ret.push_back(first);
     return ret;
   }
 }
@@ -124,7 +145,11 @@ auto create_profile(const gameinput::DeviceSpecifier& first, Ts... rest) {
   auto devices = get_devices(&p, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
   // an `std::function`, and we can't take a reference to a template function
-  p->setOutputs(
+  p->setDevices(
+    std::apply(
+      [](auto&&... args){ return select_inputs(args...); },
+      devices
+    ),
     std::apply(
       [](auto&&... args){ return select_outputs(args...); },
       devices

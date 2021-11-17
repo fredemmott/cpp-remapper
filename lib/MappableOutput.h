@@ -7,14 +7,18 @@
  */
 #pragma once
 
+#include <memory>
+
 namespace fredemmott::inputmapping {
 
 class OutputDevice;
 
 class MappableOutput {
+  protected:
+    MappableOutput();
   public:
-	  virtual ~MappableOutput();
-		virtual OutputDevice* getDevice() const = 0;
+    virtual ~MappableOutput();
+    virtual std::shared_ptr<OutputDevice> getDevice() const = 0;
 };
 
 } // namespace fredemmott::inputmapping

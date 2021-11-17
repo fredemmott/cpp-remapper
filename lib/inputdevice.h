@@ -24,7 +24,7 @@ struct AxisInformation;
 
 class InputDevice final {
  public:
-  InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device);
+  InputDevice(IDirectInput8A* di, LPCDIDEVICEINSTANCEA device);
   InputDevice() = delete;
   InputDevice(const InputDevice&) = delete;
   void operator=(const InputDevice&) = delete;
@@ -43,13 +43,32 @@ class InputDevice final {
 
   HANDLE getEvent();
 
-  std::vector<uint8_t> getState();
+  struct StateOffsets {
+    off_t firstAxis;
+    off_t firstButton;
+    off_t firstHat;
+  };
+
+  class State {
+    private:
+      StateOffsets offsets;
+      std::vector<uint8_t> buffer;
+    public:
+
+    State(const StateOffsets& offsets, const std::vector<uint8_t>& buffer);
+
+    long* getAxes() const;
+    bool* getButtons() const;
+    uint16_t* getHats() const;
+  };
+  State getState();
  private:
   struct Impl;
   std::unique_ptr<Impl> p;
   HANDLE mEventHandle = nullptr;
   bool mActivated = false;
   size_t mDataSize = 0;
+  StateOffsets mOffsets {};
   void activate();
 
 };

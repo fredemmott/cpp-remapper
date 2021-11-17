@@ -16,8 +16,8 @@ DeviceSpecifierBase::~DeviceSpecifierBase() {}
 
 VIDPID::~VIDPID() {}
 
-bool VIDPID::matches(InputDevice* device) const {
-  auto dev_vidpid = device->getVIDPID();
+bool VIDPID::matches(const InputDevice& device) const {
+  auto dev_vidpid = device.getVIDPID();
   if (!dev_vidpid) {
     return false;
   }
@@ -52,16 +52,16 @@ std::wstring StringBasedID::toWString() const {
   return std::wstring(buf, wchar_count);
 }
 
-bool HardwareID::matches(InputDevice* device) const {
-  return mID == device->getHardwareID().mID;
+bool HardwareID::matches(const InputDevice& device) const {
+  return mID == device.getHardwareID().mID;
 }
 
 std::string HardwareID::getHumanReadable() const {
   return "HardwareID: " + mID;
 }
 
-bool InstanceID::matches(InputDevice* device) const {
-  return mID == device->getInstanceID().mID;
+bool InstanceID::matches(const InputDevice& device) const {
+  return mID == device.getInstanceID().mID;
 }
 
 std::string InstanceID::getHumanReadable() const {
@@ -80,7 +80,7 @@ namespace {
 } // namespace
 
 DeviceSpecifier::~DeviceSpecifier() {}
-bool DeviceSpecifier::matches(InputDevice* device) const {
+bool DeviceSpecifier::matches(const InputDevice& device) const {
   return unwrap_impl(p).matches(device);
 }
 std::string DeviceSpecifier::getHumanReadable() const {

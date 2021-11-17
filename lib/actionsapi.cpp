@@ -5,18 +5,12 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#pragma once
 
+// Check for syntax errors in this file without getting anything else involved.
 #include "actionsapi.h"
 
-#include <vector>
-#include <cstdint>
+namespace fredemmott::inputmapping {
 
-namespace fredemmott::inputmapping::actions {
-
-class ButtonToAxis final : public ButtonSink, public AxisSource {
- public:
-  void map(bool value);
-};
+SourceBase::~SourceBase() {}
 
 } // namespace fredemmott::inputmapping

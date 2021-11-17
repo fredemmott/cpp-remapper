@@ -11,10 +11,8 @@
 namespace fredemmott::inputmapping::actions {
 
 SquareDeadzone::SquareDeadzone(
-  uint8_t percent,
-  const AxisEventHandler&
-  next
-): mPercent(percent), mNext(next) {}
+  uint8_t percent
+): mPercent(percent) {}
 
 SquareDeadzone::~SquareDeadzone() {}
 
@@ -26,7 +24,7 @@ void SquareDeadzone::map(long value) {
   const uint32_t MID = MAX / 2;
   const uint32_t DEAD = (mPercent * MID) / 100;
   if (value > (MID - DEAD) && value < (MID + DEAD)) {
-    mNext->map(MID / 100);
+    emit(MID / 100);
     return;
   }
   const uint32_t NEW_MAX = MAX - (2 * DEAD);
@@ -34,7 +32,7 @@ void SquareDeadzone::map(long value) {
   // We end up with a temporary where the value is multiplied by 100 * MAX
   // * NEW_MAX; if the percentage is large, this overflows the uint32
   const uint32_t scaled = (without_deadzone * (uint64_t) MAX) / NEW_MAX;
-  mNext->map(scaled / 100);
+  emit(scaled / 100);
 }
 
 } // namespace fredemmott::inputmapping::actions

@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 
 #include <cstdint>
 
@@ -30,14 +29,13 @@ namespace fredemmott::inputmapping::actions {
  * While this deadzone action only operates on a single axis at a time, if you
  * apply to both the X and Y axis, you end up with a square dead zone :)
  */
-class SquareDeadzone : public AxisAction {
+class SquareDeadzone : public AxisSink, public AxisSource {
   public:
-    SquareDeadzone(uint8_t percent, const AxisEventHandler& next);
+    SquareDeadzone(uint8_t percent);
     virtual ~SquareDeadzone();
-    void map(long value);
+    virtual void map(long value) override;
   private:
     uint8_t mPercent;
-    AxisEventHandler mNext;
 };
 
 } // namespace fredemmott::inputmapping::actions

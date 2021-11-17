@@ -21,9 +21,9 @@ AxisToButtons::AxisToButtons(std::initializer_list<Range> ranges) {
 }
 
 void AxisToButtons::map(long value) {
-  for (const auto& range: mRanges) {
+  for (auto& range: mRanges) {
     bool active = range.min <= value && range.max >= value;
-    range.next->map(active);
+    range.next.map(active);
   }
 }
 
@@ -31,7 +31,6 @@ void AxisToButtons::map(long value) {
 
 // --- Tests ---
 
-#include "comboaction.h"
 #include "MappableVJoyOutput.h"
 using namespace fredemmott::inputmapping;
 using namespace fredemmott::inputmapping::actions;
@@ -41,10 +40,11 @@ namespace {
 // Check that the compiler lets us call it as intended
 void static_test() {
   MappableVJoyOutput o(nullptr);
-  AxisToButtons {
+  ButtonOutput x([](bool) {});
+  AxisToButtons foo {
     { 0, 0, o.Button1 },
     { 0, 0, { o.Button1, o.Button2 } },
-    { 100, 100, [](bool) {} },
+    { 100, 100, [](bool) {} }
   };
 }
 

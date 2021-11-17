@@ -10,3 +10,4 @@ profiles/
 vJoyInterface.dll
 *~
 *.bmp
+*.exp

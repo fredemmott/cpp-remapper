@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 
 #include <cstdint>
 
@@ -22,18 +21,18 @@ namespace fredemmott::inputmapping::actions {
 class AxisToHat {
   public:
     static const uint8_t DEFAULT_DEADZONE_PERCENT = 90;
-    const AxisEventHandler XAxis =
+    const AxisOutput XAxis =
       [this](long x) { mX = x; update(); };
-    const AxisEventHandler YAxis =
+    const AxisOutput YAxis =
       [this](long y) { mY = y; update(); };
 
     AxisToHat(
-      const HatEventHandler& next,
+      const HatOutput& next,
       uint8_t deadzone_percent = DEFAULT_DEADZONE_PERCENT
     );
     ~AxisToHat();
   private:
-    HatEventHandler mNext;
+    HatOutput mNext;
     uint8_t mDeadzone = DEFAULT_DEADZONE_PERCENT;
     long mX = 0;
     long mY = 0;

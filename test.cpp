@@ -10,52 +10,135 @@
 #include "lib/render_axis.h"
 
 using fredemmott::inputmapping::render_axis;
-using fredemmott::inputmapping::AxisEventHandler;
 
 #include <cstdio>
 
-#define REQUIRE(x) \
-  if (!(x)) { \
+#define REQUIRE(x)                                                                  \
+  if (!(x))                                                                         \
+  {                                                                                 \
     printf("Expectation '%s' failed in %s() at line %d\n", #x, __func__, __LINE__); \
-    exit(1); \
+    __debugbreak();                                                                 \
+    exit(1);                                                                        \
   }
 
-struct ProgressPrinter{
-  ProgressPrinter(const char* name): mName(name) {
+struct ProgressPrinter
+{
+  ProgressPrinter(const char *name) : mName(name)
+  {
     printf("Starting test %s()...\n", name);
   }
 
-  ~ProgressPrinter() {
-    if (std::uncaught_exception()) {
+  ~ProgressPrinter()
+  {
+    if (std::uncaught_exception())
+    {
       printf("FAILED: %s()\n", mName);
-    } else {
+    }
+    else
+    {
       printf("OK: %s()\n", mName);
     }
   }
 
-  private:
-    const char* mName;
+private:
+  const char *mName;
 };
-#define START_TEST ProgressPrinter pp_ ## __COUNTER__ (__func__)
+#define START_TEST ProgressPrinter pp_##__COUNTER__(__func__)
 
-void test_square_deadzone_impl(uint8_t percent) {
+template <typename TBase>
+class Emitable : public TBase
+{
+public:
+  using TBase::emit;
+};
+template<class Input>
+class TestInput : public Input {
+  private:
+   Emitable<typename Input::Tail> mSource;
+  public:
+   TestInput(): Input(&mSource) {}
+   void emit(typename Input::Tail::Value v) { mSource.emit(v); }
+};
+class TestAxis final : public TestInput<::fredemmott::inputmapping::AxisInput>
+{
+};
+class TestButton final : public TestInput<::fredemmott::inputmapping::ButtonInput>
+{
+};
+class TestHat final : public TestInput<::fredemmott::inputmapping::HatInput>
+{
+};
+
+using fredemmott::inputmapping::Axis;
+using fredemmott::inputmapping::Button;
+using fredemmott::inputmapping::Hat;
+
+void test_ptr()
+{
+  START_TEST;
   long out = -1;
+  TestAxis axis;
+  axis >> &out;
+  axis.emit(123);
+  REQUIRE(out == 123);
+}
 
-  SquareDeadzone dz(percent, [&out](long value) { out = value; });
-  dz.map(0x7fff); // mid point
+void test_lambdas()
+{
+  START_TEST;
+  long out = -1;
+  TestAxis axis;
+  axis.bind([&out](long value)
+            { out = value; });
+  axis.emit(1337);
+  REQUIRE(out == 1337);
+  axis >> [](long value) { return Axis::MAX - value; } >> &out;
+  axis.emit(123);
+  REQUIRE(out == Axis::MAX - 123);
+  axis.emit(Axis::MAX - 456);
+  REQUIRE(out == 456);
+}
+
+void test_source_sink_transform() {
+  START_TEST;
+  // Testing the plumbing of >>, not the specific transform
+  long out = -1;
+  TestAxis axis;
+  SquareDeadzone dz(10);
+  axis >> &dz >> &out;
+  axis.emit(0);
+  REQUIRE(out == 0);
+  axis.emit(Axis::MAX);
+  REQUIRE(out == Axis::MAX);
+  axis.emit(100);
+  REQUIRE(out > 100);
+  axis.emit(Axis::MAX - 100);
+  REQUIRE(out < Axis::MAX - 100);
+
+  axis.bind(SquareDeadzone { 10 }).bind(&out);
+  axis >> SquareDeadzone { 10 } >> &out;
+}
+
+void test_square_deadzone_impl(uint8_t percent)
+{
+  long out = -1;
+  TestAxis axis;
+  axis >> SquareDeadzone(percent) >> &out;
+
+  axis.emit(0x7fff); // mid point
   // In deadzone
   REQUIRE(out == 0x7fff);
-  dz.map(0x8000);
+  axis.emit(0x8000);
   REQUIRE(out == 0x7fff);
-  dz.map(0x7ffe);
+  axis.emit(0x7ffe);
   REQUIRE(out == 0x7fff);
   // Out of deadzone: extremes
-  dz.map(0);
+  axis.emit(0);
   REQUIRE(out == 0);
-  dz.map(0xffff);
+  axis.emit(0xffff);
   REQUIRE(out == 0xffff);
   // Return to deadzone
-  dz.map(0x80ff);
+  axis.emit(0x80ff);
   REQUIRE(out == 0x7fff);
 
   const long dz_size = round(0x8000 * percent / 100.0);
@@ -66,94 +149,109 @@ void test_square_deadzone_impl(uint8_t percent) {
   const long delta_ceil = ceil(out_delta);
 
   // Just above center
-  dz.map(0x7fff + dz_size);
+  axis.emit(0x7fff + dz_size);
   REQUIRE(out == 0x7fff);
-  dz.map(0x7fff + dz_size + 1);
+  axis.emit(0x7fff + dz_size + 1);
   REQUIRE(out > 0x7fff);
   REQUIRE(out <= 0x7fff + delta_ceil);
   // Near max
-  dz.map(0xfffe);
+  axis.emit(0xfffe);
   REQUIRE(out == 0xffff - delta_ceil);
   // Just below center
-  dz.map(0x7fff - dz_size + 1);
+  axis.emit(0x7fff - dz_size + 1);
   REQUIRE(out == 0x7fff);
-  dz.map(0x7fff - dz_size);
+  axis.emit(0x7fff - dz_size);
   REQUIRE(out < 0x7fff);
   REQUIRE(out >= 0x7fff - delta_ceil);
   // Near min
-  dz.map(1);
+  axis.emit(1);
   REQUIRE(out >= 1);
   REQUIRE(out <= delta_ceil);
 
   // Half way points
-  dz.map(0x7fff + 0x4000 + (dz_size / 2) + 1);
+  axis.emit(0x7fff + 0x4000 + (dz_size / 2) + 1);
   REQUIRE(out >= 0x7fff + 0x4000);
   REQUIRE(out <= 0x7fff + 0x4000 + delta_ceil);
-  dz.map(0x7fff - 0x4000 - (dz_size/ 2));
+  axis.emit(0x7fff - 0x4000 - (dz_size / 2));
   REQUIRE(out <= 0x7fff - 0x4000);
   REQUIRE(out >= 0x7fff - 0x4000 - delta_ceil);
 }
 
-void test_small_square_deadzone() {
+void test_small_square_deadzone()
+{
   START_TEST;
   test_square_deadzone_impl(10);
 }
 
-void test_large_square_deadzone() {
+void test_large_square_deadzone()
+{
   START_TEST;
   test_square_deadzone_impl(90);
 }
 
-void test_axis_curve() {
+void test_axis_curve()
+{
   START_TEST;
-  long out = - 1;
+  long out = -1;
 
-  AxisCurve linear(0, [&out](long v) { out = v; });
-  render_axis("linear.bmp", [](auto next) { return AxisCurve { 0, next };});
-  linear.map(0);
+  render_axis("linear.bmp", AxisCurve { 0 });
+  TestAxis linear;
+  linear >> AxisCurve { 0 } >> &out;
+
+  linear.emit(0);
   REQUIRE(out == 0);
-  linear.map(0xffff);
+  linear.emit(0xffff);
   REQUIRE(out == 0xffff);
-  linear.map(0x7fff);
+  linear.emit(0x7fff);
   REQUIRE(out == 0x7fff);
-  linear.map(0x1234);
+  linear.emit(0x1234);
   REQUIRE(out == 0x1234);
 
-  AxisCurve extreme(0.99, [&out](long v) { out = v; });
-  render_axis("extreme.bmp", [](auto next) { return AxisCurve { 0.99, next }; });
-  extreme.map(0);
+  render_axis("extreme.bmp", AxisCurve { 0.99 });
+  TestAxis extreme;
+  extreme >> AxisCurve { 0.99 } >> &out;
+
+  extreme.emit(0);
   REQUIRE(out == 0);
-  extreme.map(0xffff);
+  extreme.emit(0xffff);
   REQUIRE(out == 0xffff);
-  extreme.map(0x7fff);
+  extreme.emit(0x7fff);
   REQUIRE(out == 0x7fff);
-  extreme.map(0x4000);
-  REQUIRE(out > 0x4000  && out < 0x7fff);
-  extreme.map(0x7fff + 0x4000);
+  extreme.emit(0x4000);
+  REQUIRE(out > 0x4000 && out < 0x7fff);
+  extreme.emit(0x7fff + 0x4000);
   REQUIRE(out > 0x7fff && out < (0x7ffff + 0x4000));
 
-  AxisCurve gentle(0.5, [&out](long v) { out = v; });
-  render_axis("gentle.bmp", [](auto next) { return AxisCurve { 0.5, next }; });
-  extreme.map(0x4000);
+  render_axis("gentle.bmp", AxisCurve { 0.5 });
+  TestAxis gentle;
+  gentle >> AxisCurve { 0.5 } >> &out;
+  extreme.emit(0x4000);
   const auto extreme_out = out;
-  gentle.map(0x4000);
+  gentle.emit(0x4000);
   REQUIRE(out > 0x4000 && out < 0x7fff);
   // As 0x4000 is less than the midpoint, the smaller number has the most
   // deflection
   REQUIRE(out < extreme_out);
 }
 
-void static_test_vjoy() {
+void static_test_vjoy()
+{
   // Input device is irrelevant, but we currently need one.
   auto [p, _, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
 }
 
-void static_test_vigem() {
+void static_test_vigem()
+{
   // Input device is irrelevant, but we currently need one.
   auto [p, _, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD_1);
 }
 
-int main() {
+int main()
+{
+  printf("----- Starting Test Run -----\n");
+  test_ptr();
+  test_lambdas();
+  test_source_sink_transform();
   test_small_square_deadzone();
   test_large_square_deadzone();
   test_axis_curve();

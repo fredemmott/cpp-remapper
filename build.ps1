@@ -46,11 +46,11 @@ New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
 
 switch($BuildMode) {
   "Debug" {
-    $CLFlags=@("/Zi")
+    $CLFlags=@("/Zi", "/MTd", "/fsanitize=address")
     $LINKFlags=@("/DEBUG:FULL")
   }
   "Release" {
-    $CLFlags=@("/O2")
+    $CLFlags=@("/O2", "/MT")
     $LINKFlags=@()
     $ExeSuffix=''
   }
@@ -195,7 +195,7 @@ function Cpp-Obj-Rule {
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
     Invoke-Exe-Checked {
-      CL.exe /nologo /MT /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /Zc:__cplusplus /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
+      CL.exe /nologo /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /Zc:__cplusplus /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
     }
   }
 }

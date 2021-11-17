@@ -9,6 +9,7 @@
 
 #include "devicespecifier.h"
 
+#include <memory>
 #include <vector>
 
 #define DIRECTINPUT_VERSION 0x0800
@@ -23,10 +24,10 @@ class InputDeviceCollection {
   InputDeviceCollection();
   ~InputDeviceCollection();
 
-  InputDevice* get(const DeviceSpecifier& device);
-  std::vector<InputDevice*> getAllDevices();
+  std::shared_ptr<InputDevice> get(const DeviceSpecifier& device);
+  std::vector<std::shared_ptr<InputDevice>> getAllDevices();
  private:
-  std::vector<InputDevice*> mDevices;
+  std::vector<std::shared_ptr<InputDevice>> mDevices;
 };
 
 } // namespace fredemmott::gameinput

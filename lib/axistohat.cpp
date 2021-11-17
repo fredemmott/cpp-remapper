@@ -14,7 +14,7 @@
 namespace fredemmott::inputmapping::actions {
 
 AxisToHat::AxisToHat(
-  const HatEventHandler& next,
+  const HatOutput& next,
   uint8_t deadzone_percent
 ): mNext(next), mDeadzone(deadzone_percent) {
 }
@@ -31,32 +31,13 @@ void AxisToHat::update() {
   // needed for corners.
   const auto distance = sqrt((x*x) + (y*y));
   if ((distance * 100) / 0xffff < mDeadzone / 2) {
-    mNext->map(0xffff); // center
+    mNext.map(0xffff); // center
     return;
   }
   const auto radians = atan2(y, x);
   const auto raw_degrees = ((180 / M_PI) * radians) + 90;
   const auto degrees = (raw_degrees < 0) ? raw_degrees + 360 : raw_degrees;
-  mNext->map((long) degrees * 100);
+  mNext.map((long) degrees * 100);
 }
 
 } // namespace fredemmott::inputmapping::actions
-
-#include "Mapper.h"
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-
-namespace {
-  using namespace fredemmott::inputmapping::actions;
-  using namespace fredemmott::inputmapping;
-  void static_test() {
-    Mapper m;
-    MappableInput i(nullptr);
-    MappableVJoyOutput o(1);
-
-    AxisToHat ignored(o.Hat1);
-    AxisToHat ath(o.Hat2, 20); // custom deadzone percent
-    m.map(i.XAxis, ath.XAxis);
-    m.map(i.YAxis, ath.YAxis);
-  }
-} // namespace

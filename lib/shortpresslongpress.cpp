@@ -16,9 +16,9 @@ namespace {
 }
 
 ShortPressLongPress::ShortPressLongPress(
-  const ButtonEventHandler& s,
-  const ButtonEventHandler& l,
-  std::chrono::steady_clock::duration long_duration 
+  ButtonOutput s,
+  ButtonOutput l,
+  std::chrono::steady_clock::duration long_duration
 ) : mShortPress(s), mLongPress(l), mLongDuration(long_duration) {}
 
 void ShortPressLongPress::map(bool pressed) {
@@ -32,14 +32,13 @@ void ShortPressLongPress::map(bool pressed) {
   }
 
   if (std::chrono::steady_clock::now() - mStart < mLongDuration) {
-    mShortPress->map(true);
-    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mShortPress->map(false); });
+    mShortPress.map(true);
+    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mShortPress.map(false); });
   } else {
-    mLongPress->map(true);
-    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
+    mLongPress.map(true);
+    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mLongPress.map(false); });
   }
 }
-
 namespace {
   void static_test() {
     ShortPressLongPress { [](bool) {}, [](bool) {} };

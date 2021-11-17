@@ -16,7 +16,7 @@ namespace fredemmott::gameinput {
 namespace {
   struct DeviceEnumeratorState {
     IDirectInput8* di8;
-    std::vector<InputDevice*> devices;
+    std::vector<std::shared_ptr<InputDevice>> devices;
   };
 
   BOOL CALLBACK enum_device_callback(
@@ -24,7 +24,7 @@ namespace {
     LPVOID vpRef
   ) {
     auto state = reinterpret_cast<DeviceEnumeratorState*>(vpRef);
-    auto device = new InputDevice(state->di8, didevinst);
+    auto device = std::make_shared<InputDevice>(state->di8, didevinst);
     state->devices.push_back(device);
 
     return DIENUM_CONTINUE;
@@ -54,9 +54,9 @@ InputDeviceCollection::InputDeviceCollection() {
   mDevices = state.devices;
 }
 
-InputDevice* InputDeviceCollection::get(const DeviceSpecifier& id) {
+std::shared_ptr<InputDevice> InputDeviceCollection::get(const DeviceSpecifier& id) {
   for (auto device: mDevices) {
-    if (id.matches(device)) {
+    if (id.matches(*device)) {
       return device;
     }
   }
@@ -65,14 +65,11 @@ InputDevice* InputDeviceCollection::get(const DeviceSpecifier& id) {
   return nullptr;
 }
 
-std::vector<InputDevice*> InputDeviceCollection::getAllDevices() {
+std::vector<std::shared_ptr<InputDevice>> InputDeviceCollection::getAllDevices() {
   return mDevices;
 }
 
 InputDeviceCollection::~InputDeviceCollection() {
-  for (auto device: mDevices) {
-    delete device;
-  }
 }
 
 } // namespace fredemmott::gameinput

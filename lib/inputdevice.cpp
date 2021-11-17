@@ -28,7 +28,7 @@ namespace {
   };
 
   static BOOL CALLBACK enum_controls_callback(
-    LPCDIDEVICEOBJECTINSTANCE obj,
+    LPCDIDEVICEOBJECTINSTANCEA obj,
     LPVOID pvRef
   ) {
     auto data = reinterpret_cast<ControlInfo*>(pvRef);
@@ -77,10 +77,11 @@ namespace {
 
 struct InputDevice::Impl {
   ControlInfo controlsData;
-  IDirectInput8* di8 = nullptr;
-  DIDEVICEINSTANCE device;
-  LPDIRECTINPUTDEVICE8 diDevice = nullptr;
+  IDirectInput8A* di8 = nullptr;
+  DIDEVICEINSTANCEA device;
+  LPDIRECTINPUTDEVICE8A diDevice = nullptr;
   bool enumerated = false;
+
   Impl() = default;
   Impl(const Impl& other) = delete;
   void operator=(const Impl& other) = delete;
@@ -88,7 +89,7 @@ struct InputDevice::Impl {
   ~Impl() {
   }
 
-  LPDIRECTINPUTDEVICE8 getDIDevice() {
+  LPDIRECTINPUTDEVICE8A getDIDevice() {
     if (diDevice) {
       return diDevice;
     }
@@ -108,7 +109,7 @@ struct InputDevice::Impl {
   }
 };
 
-InputDevice::InputDevice(IDirectInput8* di, LPCDIDEVICEINSTANCE device): p(new Impl { {}, di, *device, nullptr, false}) {
+InputDevice::InputDevice(IDirectInput8A* di, LPCDIDEVICEINSTANCEA device): p(new Impl { {}, di, *device, nullptr, false}) {
 }
 
 InputDevice::~InputDevice() {
@@ -200,7 +201,14 @@ uint32_t InputDevice::getHatCount() {
 }
 
 HANDLE InputDevice::getEvent() {
+  if (mEventHandle) {
+    return mEventHandle;
+  }
+
   activate();
+  mEventHandle = CreateEvent(nullptr, false, false, nullptr);
+  p->diDevice->SetEventNotification(mEventHandle);
+  p->diDevice->Acquire();
   return mEventHandle;
 }
 
@@ -213,6 +221,7 @@ void InputDevice::activate() {
   off_t offset = 0;
   off_t i = 0;
   const auto& controls = p->controls();
+  const off_t firstAxis = offset;
   for (const auto& axis: controls.axes) {
     df[i++] = {
       NULL,
@@ -222,6 +231,7 @@ void InputDevice::activate() {
     };
     offset += sizeof(LONG);
   }
+  const off_t firstHat = offset;
   for (size_t j = 0; j < controls.hats; j++) {
     df[i++] = {
       NULL,
@@ -231,15 +241,18 @@ void InputDevice::activate() {
     };
     offset += sizeof(int32_t);
   }
-  for (size_t j = 0; j < controls.buttons; j++) {
-    df[i++] = {
-      NULL,
-      (DWORD) offset,
-      DIDFT_BUTTON | DIDFT_ANYINSTANCE,
-      NULL,
-    };
-    offset += 1;
-  }
+	const off_t firstButton = offset;
+	for (size_t j = 0; j < controls.buttons; j++) {
+		df[i++] = {
+			NULL,
+			(DWORD) offset,
+			DIDFT_BUTTON | DIDFT_ANYINSTANCE,
+			NULL,
+		};
+		offset += 1;
+	}
+
+
   mDataSize = offset + (offset % 4 == 0 ? 0 : 4 - (offset % 4));
   DIDATAFORMAT data {
     sizeof(DIDATAFORMAT),
@@ -251,18 +264,31 @@ void InputDevice::activate() {
   };
 
   p->diDevice->SetDataFormat(&data);
+  mOffsets = { firstAxis, firstButton, firstHat };
   delete[] df;
-
-  mEventHandle = CreateEvent(nullptr, false, false, nullptr);
-  p->diDevice->SetEventNotification(mEventHandle);
-  p->diDevice->Acquire();
 }
 
-std::vector<uint8_t> InputDevice::getState() {
+InputDevice::State InputDevice::getState() {
+  activate();
   p->diDevice->Poll();
   std::vector<uint8_t> buf(mDataSize);
   p->diDevice->GetDeviceState(mDataSize, buf.data());
-  return buf;
+  return State(mOffsets, buf);
 }
 
+InputDevice::State::State(
+  const StateOffsets& offsets,
+  const std::vector<uint8_t>& buf
+): offsets(offsets), buffer(buf) {}
+
+long* InputDevice::State::getAxes() const {
+  return (long*) (buffer.data() + offsets.firstAxis);
+}
+bool* InputDevice::State::getButtons() const {
+  return (bool*) (buffer.data() + offsets.firstButton);
+}
+
+uint16_t* InputDevice::State::getHats() const {
+  return (uint16_t*) (buffer.data() + offsets.firstHat);
+}
 } // namespace fredemmott::gameinput

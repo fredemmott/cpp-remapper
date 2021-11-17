@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 #include "MappableOutput.h"
 #include "X360Device.h"
 
@@ -21,14 +20,15 @@ class MappableX360Output final : public MappableOutput {
 public:
   explicit MappableX360Output();
   MappableX360Output(std::shared_ptr<X360Device> dev);
+  ~MappableX360Output();
 
-  X360Device* getDevice() const override;
+  std::shared_ptr<OutputDevice> getDevice() const override;
 
-  const AxisEventHandler
+  const AxisOutput
     LXAxis, LYAxis, LTrigger,
     RXAxis, RYAxis, RTrigger;
 
-  const ButtonEventHandler
+  const ButtonOutput
     ButtonA, ButtonB, ButtonX, ButtonY,
     ButtonBack, ButtonStart, ButtonGuide,
     DPadUp, DPadDown, DPadLeft, DPadRight,

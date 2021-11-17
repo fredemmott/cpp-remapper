@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 
 #include <functional>
 
@@ -16,7 +15,17 @@ namespace fredemmott::inputmapping {
 
 void render_axis(
   const std::string& bmp_filename,
-  std::function<AxisEventHandler(const AxisEventHandler&)> factory
+  AxisOutput& transform_in,
+  AxisInput& transform_out
 );
+
+template<typename T>
+void render_axis(
+  const std::string& bmp_filename,
+  T& transform
+) {
+  render_axis(bmp_filename, AxisOutput(&transform), AxisInput(&transform));
+}
+
 
 } // namespace fredemmott::inputmapping

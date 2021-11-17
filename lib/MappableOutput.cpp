@@ -10,6 +10,8 @@
 
 namespace fredemmott::inputmapping {
 
+MappableOutput::MappableOutput() {}
+
 MappableOutput::~MappableOutput() {}
 
 } // namespace fredemmott::inputmapping

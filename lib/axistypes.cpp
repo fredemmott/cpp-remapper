@@ -5,12 +5,6 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "ButtonToAxis.h"
 
-namespace fredemmott::inputmapping::actions {
-
-void ButtonToAxis::map(bool value) {
-  emit(value ? 65535 : 0);
-}
-
-} // namespace fredemmott::inputmapping
+// This file exists just to give clear compile errors
+#include "axistypes.h"

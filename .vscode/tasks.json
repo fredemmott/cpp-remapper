@@ -1,11 +1,44 @@
 {
   "version": "2.0.0",
-  "label": "Build current profile",
-  "command": ".\\build.ps1",
-  "args": ["-IDEBuildFile", "${file}"],
-  "type": "shell",
-  "options": {
-    "cwd": "${workspaceFolder}",
-  },
-  "problemMatcher": "$msCompile"
+  "tasks": [
+    {
+      "label": "Build (Release)",
+      "command": ".\\build.ps1",
+      "args": [
+        "-IDEBuildFile",
+        "${file}"
+      ],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe"
+        }
+      },
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build (Debug)",
+      "command": ".\\build.ps1",
+      "args": [
+        "-IDEBuildFile",
+        "${file}",
+        "-BuildMode",
+        "Debug"
+      ],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe"
+        }
+      },
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    }
+  ],
 }

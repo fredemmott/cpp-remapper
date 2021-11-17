@@ -8,7 +8,6 @@
 #include "MappableX360Output.h"
 
 #include "axistypes.h"
-#include "eventhandler.h"
 #include "inputdevice.h"
 #include "X360Device.h"
 
@@ -21,18 +20,16 @@ namespace fredemmott::inputmapping {
 MappableX360Output::MappableX360Output(): MappableX360Output(std::make_shared<X360Device>()) {}
 
 MappableX360Output::MappableX360Output(std::shared_ptr<X360Device> dev):
-#define A(a) a(std::make_shared<AxisFunctionAction>(\
-  [dev](long value) { dev->set ## a (value); }\
-))
+#define A(a) a([dev](long value) { dev->set ## a (value); })
 #define AA(a) A(a ## Axis)
   AA(LX), AA(LY),
   AA(RX), AA(RY),
 #undef AA
   A(LTrigger), A(RTrigger),
 #undef A
-#define B(name, enum) name (std::make_shared<ButtonFunctionAction>(\
+#define B(name, enum) name( \
   [dev](bool value) { dev->setButton(X360Device::Button:: ## enum, value); }\
-))
+)
 #define BB(x) B(Button ## x, x)
   BB(A), BB(B), BB(X), BB(Y),
 #undef BB
@@ -48,8 +45,10 @@ MappableX360Output::MappableX360Output(std::shared_ptr<X360Device> dev):
 {
 }
 
-X360Device* MappableX360Output::getDevice() const {
-  return mDevice.get();
+MappableX360Output::~MappableX360Output() {}
+
+std::shared_ptr<OutputDevice> MappableX360Output::getDevice() const {
+  return mDevice;
 }
 
 } // namespace fredemmott::inputmapping

@@ -13,13 +13,3 @@
 #include "ButtonToAxis.h"
 #include "shortpresslongpress.h"
 #include "squaredeadzone.h"
-
-namespace fredemmott::inputmapping::actions {
-  AxisEventHandler invert(AxisEventHandler next) {
-    return [next](long value) { next->map(65535 - value); };
-  }
-
-  ButtonEventHandler invert(ButtonEventHandler next) {
-    return [next](bool value) { next->map(!value); };
-  }
-}

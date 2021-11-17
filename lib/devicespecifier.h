@@ -20,7 +20,7 @@ class InputDevice;
 class DeviceSpecifierBase {
   public:
     virtual ~DeviceSpecifierBase();
-    virtual bool matches(InputDevice* device) const = 0;
+    virtual bool matches(const InputDevice& device) const = 0;
     virtual std::string getHumanReadable() const = 0;
 };
 
@@ -29,8 +29,8 @@ class VIDPID final : public DeviceSpecifierBase {
     VIDPID(uint16_t vid, uint16_t pid): mVID(vid), mPID(pid) {}
 
     virtual ~VIDPID();
-    virtual bool matches(InputDevice* device) const;
-    virtual std::string getHumanReadable() const;
+    virtual bool matches(const InputDevice& device) const override;
+    virtual std::string getHumanReadable() const override;
 
     // allow `auto [vid, pid] = my_vidpid;`
     operator std::tuple<uint16_t, uint16_t>() const {
@@ -57,15 +57,15 @@ class StringBasedID: public DeviceSpecifierBase {
 class HardwareID final : public StringBasedID {
  public:
   using StringBasedID::StringBasedID;
-  virtual bool matches(InputDevice* device) const;
-  virtual std::string getHumanReadable() const;
+  virtual bool matches(const InputDevice& device) const override;
+  virtual std::string getHumanReadable() const override;
 };
 
 class InstanceID final : public StringBasedID {
  public:
   using StringBasedID::StringBasedID;
-  virtual bool matches(InputDevice* device) const;
-  virtual std::string getHumanReadable() const;
+  virtual bool matches(const InputDevice& device) const override;
+  virtual std::string getHumanReadable() const override;
 };
 
 // Copyable wrapper around a DeviceSpecifierBase
@@ -76,8 +76,8 @@ class DeviceSpecifier final: public DeviceSpecifierBase {
     template<typename T> DeviceSpecifier(const T& val): p(val) {}
 
     virtual ~DeviceSpecifier();
-    virtual bool matches(InputDevice* device) const;
-    virtual std::string getHumanReadable() const;
+    virtual bool matches(const InputDevice& device) const override;
+    virtual std::string getHumanReadable() const override;
   private:
     Impl p;
 };

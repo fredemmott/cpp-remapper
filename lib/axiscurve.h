@@ -8,7 +8,6 @@
 #pragma once
 
 #include "actionsapi.h"
-#include "eventhandler.h"
 
 namespace fredemmott::inputmapping::actions {
 
@@ -21,14 +20,13 @@ namespace fredemmott::inputmapping::actions {
  *   This makes the axis less sensitive near center, more sensitive when fully
  *   deflective. A negative curviness gives you the opposite.
  */
-class AxisCurve : public AxisAction {
+class AxisCurve final : public AxisSource, public AxisSink {
   public:
-    AxisCurve(float curviness, const AxisEventHandler& next);
+    AxisCurve(float curviness);
     virtual ~AxisCurve();
     void map(long value);
   private:
     float mCurviness;
-    AxisEventHandler mNext;
 };
 
 } // namespace fredemmott::inputmapping::actions
