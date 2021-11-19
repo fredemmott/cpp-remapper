@@ -45,8 +45,13 @@ namespace fredemmott::inputmapping {
   MappableInput Profile::popInput() {
     const auto id = p->ids.back();
     p->ids.pop_back();
-    MappableInput ret(p->deviceCollection->get(id));
-    auto device = ret.getDevice();
+    auto device = p->deviceCollection->get(id);
+    if (!device) {
+      auto desc = id.getHumanReadable();
+      printf("ERROR: Failed to find device '%s'\n", desc.c_str());
+      exit(0);
+    }
+    MappableInput ret(device);
     auto name = device->getProductName();
     auto instance_id = device->getInstanceID().getHumanReadable();
     auto hardware_id = device->getHardwareID().getHumanReadable();

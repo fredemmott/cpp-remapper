@@ -32,7 +32,9 @@ param(
 )
 
 if ($IDEBuildFile) {
-  if ((Get-Item $IDEBuildFile).FullName.StartsWith((Get-Item profiles).FullName)) {
+  if ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item profiles).FullName) {
+    $ProfileSource = $IDEBuildFile
+  } elseif ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEBuildFile.endsWith('.cpp')) {
     $ProfileSource = $IDEBuildFile
   } else {
     $ProfileSource = "test.cpp"

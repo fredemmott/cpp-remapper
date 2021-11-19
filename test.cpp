@@ -234,6 +234,28 @@ void test_axis_curve()
   REQUIRE(out < extreme_out);
 }
 
+void test_bind_to_sink() {
+  START_TEST;
+  bool b1 = false, b2 = false;
+  TestAxis axis;
+  axis >> AxisToButtons {
+    {0, 10, [&b1](bool value) { b1 = value; }},
+    {90, 100, [&b2](bool value) { b2 = value; }}
+  };
+  axis.emit(0);
+  REQUIRE(b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX / 10);
+  REQUIRE(b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX / 2);
+  REQUIRE(!b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX);
+  REQUIRE(!b1);
+  REQUIRE(b2);
+}
+
 void static_test_vjoy()
 {
   // Input device is irrelevant, but we currently need one.
@@ -251,6 +273,7 @@ int main()
   printf("----- Starting Test Run -----\n");
   test_ptr();
   test_lambdas();
+  test_bind_to_sink();
   test_source_sink_transform();
   test_small_square_deadzone();
   test_large_square_deadzone();

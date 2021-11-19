@@ -300,6 +300,7 @@ namespace fredemmott::inputmapping
       std::enable_if_t<std::is_base_of_v<Tail, Tailish>, bool> = true
     >
     PipelineHead(const std::shared_ptr<Tailish>& tail) : mHead(tail), mTail(tail) {}
+
     template<
       typename Output,
       std::enable_if_t<!std::is_reference_v<Output>, bool> = true,
@@ -310,6 +311,18 @@ namespace fredemmott::inputmapping
     >
     Pipeline bind(const Output& next) {
       mTail->setNext(TOutput(next).getHead());
+      return Pipeline(mHead);
+    }
+
+    template<
+      typename Sink,
+      std::enable_if_t<!std::is_reference_v<Sink>, bool> = true,
+      std::enable_if_t<std::is_base_of_v<typename TOutput::Sink, Sink>, bool> = true,
+      std::enable_if_t<!std::is_base_of_v<SourceBase, Sink>, bool> = true
+    >
+    Pipeline bind(Sink&& next) {
+      auto ref = UnsafeRef(std::make_shared<Sink>(std::move(next)));
+      mTail->setNext(ref);
       return Pipeline(mHead);
     }
 

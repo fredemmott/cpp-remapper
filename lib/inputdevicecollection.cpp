@@ -60,8 +60,6 @@ std::shared_ptr<InputDevice> InputDeviceCollection::get(const DeviceSpecifier& i
       return device;
     }
   }
-  auto desc = id.getHumanReadable();
-  printf("WARNING: Failed to find device '%s'\n", desc.c_str());
   return nullptr;
 }
 
