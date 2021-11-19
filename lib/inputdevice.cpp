@@ -6,12 +6,13 @@
  * in the root directory of this source tree.
  */
 #include "inputdevice.h"
-#include "axistypes.h"
 
 #include <Cfgmgr32.h>
-#include <initguid.h> // needed for devpkey to actually define the devpkeys :)
 #include <devpkey.h>
+#include <initguid.h>// needed for devpkey to actually define the devpkeys :)
 #include <setupapi.h>
+
+#include "axistypes.h"
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -21,59 +22,57 @@
 namespace fredemmott::gameinput {
 
 namespace {
-  struct ControlInfo {
-    uint32_t buttons = 0;
-    uint32_t hats = 0;
-    std::vector<AxisInformation> axes {};
-  };
+struct ControlInfo {
+  uint32_t buttons = 0;
+  uint32_t hats = 0;
+  std::vector<AxisInformation> axes {};
+};
 
-  static BOOL CALLBACK enum_controls_callback(
-    LPCDIDEVICEOBJECTINSTANCEA obj,
-    LPVOID pvRef
-  ) {
-    auto data = reinterpret_cast<ControlInfo*>(pvRef);
-    if (obj->guidType == GUID_POV) {
-      data->hats++;
-      return DIENUM_CONTINUE;
-    }
-    if (obj->guidType == GUID_Button) {
-      data->buttons++;
-      return DIENUM_CONTINUE;
-    }
-
-    if (obj->guidType == GUID_XAxis) {
-      data->axes.push_back({AxisType::X, obj->tszName});
-        return DIENUM_CONTINUE;
-    }
-    if (obj->guidType == GUID_YAxis) {
-      data->axes.push_back({AxisType::Y, obj->tszName});
-        return DIENUM_CONTINUE;
-    }
-    if (obj->guidType == GUID_ZAxis) {
-      data->axes.push_back({AxisType::Z, obj->tszName});
-      return DIENUM_CONTINUE;
-    }
-
-    if (obj->guidType == GUID_RxAxis) {
-      data->axes.push_back({AxisType::RX, obj->tszName});
-        return DIENUM_CONTINUE;
-    }
-    if (obj->guidType == GUID_RyAxis) {
-      data->axes.push_back({AxisType::RY, obj->tszName});
-      return DIENUM_CONTINUE;
-    }
-    if (obj->guidType == GUID_RzAxis) {
-      data->axes.push_back({AxisType::RZ, obj->tszName});
-      return DIENUM_CONTINUE;
-    }
-
-    if (obj->guidType == GUID_Slider) {
-      data->axes.push_back({AxisType::SLIDER, obj->tszName});
-      return DIENUM_CONTINUE;
-    }
+static BOOL CALLBACK
+enum_controls_callback(LPCDIDEVICEOBJECTINSTANCEA obj, LPVOID pvRef) {
+  auto data = reinterpret_cast<ControlInfo*>(pvRef);
+  if (obj->guidType == GUID_POV) {
+    data->hats++;
     return DIENUM_CONTINUE;
   }
-} // namespace
+  if (obj->guidType == GUID_Button) {
+    data->buttons++;
+    return DIENUM_CONTINUE;
+  }
+
+  if (obj->guidType == GUID_XAxis) {
+    data->axes.push_back({AxisType::X, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+  if (obj->guidType == GUID_YAxis) {
+    data->axes.push_back({AxisType::Y, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+  if (obj->guidType == GUID_ZAxis) {
+    data->axes.push_back({AxisType::Z, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+
+  if (obj->guidType == GUID_RxAxis) {
+    data->axes.push_back({AxisType::RX, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+  if (obj->guidType == GUID_RyAxis) {
+    data->axes.push_back({AxisType::RY, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+  if (obj->guidType == GUID_RzAxis) {
+    data->axes.push_back({AxisType::RZ, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+
+  if (obj->guidType == GUID_Slider) {
+    data->axes.push_back({AxisType::SLIDER, obj->tszName});
+    return DIENUM_CONTINUE;
+  }
+  return DIENUM_CONTINUE;
+}
+}// namespace
 
 struct InputDevice::Impl {
   ControlInfo controlsData;
@@ -103,13 +102,17 @@ struct InputDevice::Impl {
       return controlsData;
     }
     getDIDevice()->Acquire();
-    getDIDevice()->EnumObjects(&enum_controls_callback, &controlsData, DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV);
+    getDIDevice()->EnumObjects(
+      &enum_controls_callback,
+      &controlsData,
+      DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV);
     enumerated = true;
     return controlsData;
   }
 };
 
-InputDevice::InputDevice(IDirectInput8A* di, LPCDIDEVICEINSTANCEA device): p(new Impl { {}, di, *device, nullptr, false}) {
+InputDevice::InputDevice(IDirectInput8A* di, LPCDIDEVICEINSTANCEA device)
+  : p(new Impl {{}, di, *device, nullptr, false}) {
 }
 
 InputDevice::~InputDevice() {
@@ -134,32 +137,17 @@ InstanceID InputDevice::getInstanceID() const {
   buf.diph.dwHeaderSize = sizeof(DIPROPHEADER);
   buf.diph.dwObj = 0;
   buf.diph.dwHow = DIPH_DEVICE;
-  p->getDIDevice()->GetProperty(
-    DIPROP_GUIDANDPATH,
-    &buf.diph
-  );
+  p->getDIDevice()->GetProperty(DIPROP_GUIDANDPATH, &buf.diph);
   ULONG id_size = 0;
   DEVPROPTYPE type;
   CM_Get_Device_Interface_PropertyW(
-    buf.wszPath,
-    &DEVPKEY_Device_InstanceId,
-    &type,
-    nullptr,
-    &id_size,
-    0
-  );
+    buf.wszPath, &DEVPKEY_Device_InstanceId, &type, nullptr, &id_size, 0);
   std::vector<BYTE> id(id_size);
   CM_Get_Device_Interface_PropertyW(
-    buf.wszPath,
-    &DEVPKEY_Device_InstanceId,
-    &type,
-    id.data(),
-    &id_size,
-    0
-  );
+    buf.wszPath, &DEVPKEY_Device_InstanceId, &type, id.data(), &id_size, 0);
   char device_id[MAX_PATH];
-  snprintf(device_id, sizeof(device_id), "%S", (wchar_t*) id.data());
-  return { device_id };
+  snprintf(device_id, sizeof(device_id), "%S", (wchar_t*)id.data());
+  return {device_id};
 }
 
 HardwareID InputDevice::getHardwareID() const {
@@ -167,9 +155,8 @@ HardwareID InputDevice::getHardwareID() const {
   // Totaly legit way to split off the \instanceID suffix
   *strrchr(id.data(), '\\') = 0;
 
-  return { id.data() };
+  return {id.data()};
 }
-
 
 std::optional<VIDPID> InputDevice::getVIDPID() const {
   DIPROPDWORD buf;
@@ -178,7 +165,7 @@ std::optional<VIDPID> InputDevice::getVIDPID() const {
   buf.diph.dwObj = 0;
   buf.diph.dwHow = DIPH_DEVICE;
   if (p->getDIDevice()->GetProperty(DIPROP_VIDPID, &buf.diph) == DI_OK) {
-    return { { LOWORD(buf.dwData), HIWORD(buf.dwData) } };
+    return {{LOWORD(buf.dwData), HIWORD(buf.dwData)}};
   }
 
   return {};
@@ -225,7 +212,7 @@ void InputDevice::activate() {
   for (const auto& axis: controls.axes) {
     df[i++] = {
       NULL,
-      (DWORD) offset,
+      (DWORD)offset,
       DIDFT_AXIS | DIDFT_ANYINSTANCE,
       NULL,
     };
@@ -235,36 +222,35 @@ void InputDevice::activate() {
   for (size_t j = 0; j < controls.hats; j++) {
     df[i++] = {
       NULL,
-      (DWORD) offset,
+      (DWORD)offset,
       DIDFT_POV | DIDFT_ANYINSTANCE,
       NULL,
     };
     offset += sizeof(int32_t);
   }
-	const off_t firstButton = offset;
-	for (size_t j = 0; j < controls.buttons; j++) {
-		df[i++] = {
-			NULL,
-			(DWORD) offset,
-			DIDFT_BUTTON | DIDFT_ANYINSTANCE,
-			NULL,
-		};
-		offset += 1;
-	}
-
+  const off_t firstButton = offset;
+  for (size_t j = 0; j < controls.buttons; j++) {
+    df[i++] = {
+      NULL,
+      (DWORD)offset,
+      DIDFT_BUTTON | DIDFT_ANYINSTANCE,
+      NULL,
+    };
+    offset += 1;
+  }
 
   mDataSize = offset + (offset % 4 == 0 ? 0 : 4 - (offset % 4));
   DIDATAFORMAT data {
     sizeof(DIDATAFORMAT),
     sizeof(DIOBJECTDATAFORMAT),
     DIDF_ABSAXIS,
-    (DWORD) mDataSize,
-    (DWORD) i,
+    (DWORD)mDataSize,
+    (DWORD)i,
     df,
   };
 
   p->diDevice->SetDataFormat(&data);
-  mOffsets = { firstAxis, firstButton, firstHat };
+  mOffsets = {firstAxis, firstButton, firstHat};
   delete[] df;
 }
 
@@ -278,17 +264,18 @@ InputDevice::State InputDevice::getState() {
 
 InputDevice::State::State(
   const StateOffsets& offsets,
-  const std::vector<uint8_t>& buf
-): offsets(offsets), buffer(buf) {}
+  const std::vector<uint8_t>& buf)
+  : offsets(offsets), buffer(buf) {
+}
 
 long* InputDevice::State::getAxes() const {
-  return (long*) (buffer.data() + offsets.firstAxis);
+  return (long*)(buffer.data() + offsets.firstAxis);
 }
 bool* InputDevice::State::getButtons() const {
-  return (bool*) (buffer.data() + offsets.firstButton);
+  return (bool*)(buffer.data() + offsets.firstButton);
 }
 
 uint16_t* InputDevice::State::getHats() const {
-  return (uint16_t*) (buffer.data() + offsets.firstHat);
+  return (uint16_t*)(buffer.data() + offsets.firstHat);
 }
-} // namespace fredemmott::gameinput
+}// namespace fredemmott::gameinput

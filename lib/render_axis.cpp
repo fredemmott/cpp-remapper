@@ -10,41 +10,41 @@
 
 #include <fstream>
 
-using std::ofstream;
 using std::ios;
+using std::ofstream;
 
 #pragma pack(push)
 #pragma pack(1)
 namespace {
-  struct Pixel {
-    uint8_t b;
-    uint8_t g;
-    uint8_t r;
-    // We don't use alpha, but it means we don't need to deal with 4-byte
-    // padding at the end of each line
-    uint8_t a = 0xff;
-  };
-  struct DIBHeader {
-    uint32_t size = sizeof(DIBHeader);
-    uint32_t width;
-    uint32_t height;
-    uint16_t color_planes = 1;
-    uint16_t bits_per_pixel = 32;
-    uint32_t format = 0; // BI_BITFIELD
-    uint32_t data_size;
-    uint32_t x_dpi = 72;
-    uint32_t y_dpi = 72;
-    uint32_t palette_colors = 0;
-    uint32_t important_colors = 0; // all
-  };
-  struct BMPHeader {
-    char magic[2] = { 'B', 'M' };
-    uint32_t file_size;
-    uint16_t app_defined_1 = 0;
-    uint16_t app_defined_2 = 0;
-    uint32_t data_offset;
-  };
-} // namespace
+struct Pixel {
+  uint8_t b;
+  uint8_t g;
+  uint8_t r;
+  // We don't use alpha, but it means we don't need to deal with 4-byte
+  // padding at the end of each line
+  uint8_t a = 0xff;
+};
+struct DIBHeader {
+  uint32_t size = sizeof(DIBHeader);
+  uint32_t width;
+  uint32_t height;
+  uint16_t color_planes = 1;
+  uint16_t bits_per_pixel = 32;
+  uint32_t format = 0;// BI_BITFIELD
+  uint32_t data_size;
+  uint32_t x_dpi = 72;
+  uint32_t y_dpi = 72;
+  uint32_t palette_colors = 0;
+  uint32_t important_colors = 0;// all
+};
+struct BMPHeader {
+  char magic[2] = {'B', 'M'};
+  uint32_t file_size;
+  uint16_t app_defined_1 = 0;
+  uint16_t app_defined_2 = 0;
+  uint32_t data_offset;
+};
+}// namespace
 #pragma pack(pop)
 
 namespace fredemmott::inputmapping {
@@ -52,8 +52,7 @@ namespace fredemmott::inputmapping {
 void render_axis(
   const std::string& bmp_filename,
   AxisOutput& transform_in,
-  AxisInput& transform_out
-) {
+  AxisInput& transform_out) {
   long fx = -1;
   transform_out >> AxisOutput([&fx](long value) { fx = value; });
   transform_out >> [&fx](long value) { fx = value; };
@@ -68,8 +67,8 @@ void render_axis(
   // draw axis in black
   auto offset = [&](int x, int y) { return (x + (y * resolution)); };
   for (int i = 0; i < resolution; ++i) {
-    data[offset(i, resolution / 2)] = { 0, 0, 0 };
-    data[offset(resolution / 2, i)] = { 0, 0, 0 };
+    data[offset(i, resolution / 2)] = {0, 0, 0};
+    data[offset(resolution / 2, i)] = {0, 0, 0};
   }
 
   // finally, the values :)
@@ -94,11 +93,11 @@ void render_axis(
 
   ofstream file;
   file.open(bmp_filename, ios::out | ios::trunc | ios::binary);
-  file.write((const char*) &bmp, sizeof(bmp));
-  file.write((const char*) &dib, sizeof(dib));
-  file.write((const char*) data.get(), dib.data_size);
+  file.write((const char*)&bmp, sizeof(bmp));
+  file.write((const char*)&dib, sizeof(dib));
+  file.write((const char*)data.get(), dib.data_size);
   file.close();
   printf("Wrote to %s\n", bmp_filename.data());
 }
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

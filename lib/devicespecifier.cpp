@@ -12,9 +12,11 @@
 
 namespace fredemmott::gameinput {
 
-DeviceSpecifierBase::~DeviceSpecifierBase() {}
+DeviceSpecifierBase::~DeviceSpecifierBase() {
+}
 
-VIDPID::~VIDPID() {}
+VIDPID::~VIDPID() {
+}
 
 bool VIDPID::matches(const InputDevice& device) const {
   auto dev_vidpid = device.getVIDPID();
@@ -28,12 +30,13 @@ std::string VIDPID::getHumanReadable() const {
   char buf[sizeof("VID: 0x1234, PID: 0x5678")];
   snprintf(buf, sizeof(buf), "VID: 0x%04hX, PID: 0x%04hX", mVID, mPID);
   return buf;
-
 }
 
-StringBasedID::StringBasedID(const std::string& impl) : mID(impl) {}
+StringBasedID::StringBasedID(const std::string& impl) : mID(impl) {
+}
 
-StringBasedID::~StringBasedID() {}
+StringBasedID::~StringBasedID() {
+}
 
 std::string StringBasedID::toString() const {
   return mID;
@@ -41,14 +44,8 @@ std::string StringBasedID::toString() const {
 
 std::wstring StringBasedID::toWString() const {
   wchar_t buf[UNICODE_STRING_MAX_CHARS];
-  const auto wchar_count = ::MultiByteToWideChar(
-    1252,
-    0,
-    mID.data(),
-    mID.size(),
-    buf,
-    sizeof(buf)
-  );
+  const auto wchar_count
+    = ::MultiByteToWideChar(1252, 0, mID.data(), mID.size(), buf, sizeof(buf));
   return std::wstring(buf, wchar_count);
 }
 
@@ -69,17 +66,17 @@ std::string InstanceID::getHumanReadable() const {
 }
 
 namespace {
-  const DeviceSpecifierBase& unwrap_impl(const DeviceSpecifier::Impl& impl) {
-    return std::visit(
-      [&](const DeviceSpecifierBase& base) -> const DeviceSpecifierBase& {
-        return base;
-      },
-      impl
-    );
-  }
-} // namespace
+const DeviceSpecifierBase& unwrap_impl(const DeviceSpecifier::Impl& impl) {
+  return std::visit(
+    [&](const DeviceSpecifierBase& base) -> const DeviceSpecifierBase& {
+      return base;
+    },
+    impl);
+}
+}// namespace
 
-DeviceSpecifier::~DeviceSpecifier() {}
+DeviceSpecifier::~DeviceSpecifier() {
+}
 bool DeviceSpecifier::matches(const InputDevice& device) const {
   return unwrap_impl(p).matches(device);
 }
@@ -87,4 +84,4 @@ std::string DeviceSpecifier::getHumanReadable() const {
   return unwrap_impl(p).getHumanReadable();
 }
 
-} // namespace fredemmott::gameinput
+}// namespace fredemmott::gameinput

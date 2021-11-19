@@ -21,12 +21,13 @@ namespace fredemmott::inputmapping::actions {
  *   deflective. A negative curviness gives you the opposite.
  */
 class AxisCurve final : public AxisSource, public AxisSink {
-  public:
-    AxisCurve(float curviness);
-    virtual ~AxisCurve();
-    void map(long value);
-  private:
-    float mCurviness;
+ public:
+  AxisCurve(float curviness);
+  virtual ~AxisCurve();
+  void map(long value);
+
+ private:
+  float mCurviness;
 };
 
-} // namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping::actions

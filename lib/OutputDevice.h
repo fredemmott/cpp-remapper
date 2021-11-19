@@ -7,14 +7,12 @@
  */
 #pragma once
 
-namespace fredemmott::inputmapping
-{
+namespace fredemmott::inputmapping {
 
-  class OutputDevice
-  {
-  public:
-    virtual ~OutputDevice();
-    virtual void flush() = 0;
-  };
+class OutputDevice {
+ public:
+  virtual ~OutputDevice();
+  virtual void flush() = 0;
+};
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

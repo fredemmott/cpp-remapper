@@ -7,9 +7,9 @@
  */
 #pragma once
 
+#include "ButtonToAxis.h"
 #include "axiscurve.h"
 #include "axistobuttons.h"
 #include "axistohat.h"
-#include "ButtonToAxis.h"
 #include "shortpresslongpress.h"
 #include "squaredeadzone.h"

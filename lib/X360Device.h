@@ -7,22 +7,22 @@
  */
 #pragma once
 
-#include "OutputDevice.h"
-
+#include <cstdint>
 #include <memory>
 
-#include <cstdint>
+#include "OutputDevice.h"
 
+// clang-format off
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 #include <ViGEm/Client.h>
+// clang-format on
+
 
 namespace fredemmott::inputmapping {
 
 class X360Device final : public OutputDevice {
-  public:
-
+ public:
   X360Device();
   ~X360Device();
 
@@ -56,9 +56,10 @@ class X360Device final : public OutputDevice {
   X360Device* setRYAxis(long value);
   X360Device* setLTrigger(long value);
   X360Device* setRTrigger(long value);
+
  private:
   struct Impl;
   std::unique_ptr<Impl> p;
 };
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

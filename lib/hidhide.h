@@ -13,19 +13,20 @@
 #include "devicespecifier.h"
 
 namespace fredemmott::gameinput {
-  class InputDevice;
+class InputDevice;
 
-  class HidHide {
-   public:
-     HidHide(const std::vector<DeviceSpecifier>& devices);
+class HidHide {
+ public:
+  HidHide(const std::vector<DeviceSpecifier>& devices);
 
-     ~HidHide();
-    private:
-     bool mInitialized = false;
-     std::vector<InstanceID> mInstances;
+  ~HidHide();
 
-     void init(const std::vector<DeviceSpecifier>& devices);
-     void deinit();
-  };
+ private:
+  bool mInitialized = false;
+  std::vector<InstanceID> mInstances;
 
-} // namespace fredemmott::gameinput
+  void init(const std::vector<DeviceSpecifier>& devices);
+  void deinit();
+};
+
+}// namespace fredemmott::gameinput

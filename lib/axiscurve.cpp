@@ -11,11 +11,11 @@
 
 namespace fredemmott::inputmapping::actions {
 
-AxisCurve::AxisCurve(
-  float curviness
-): mCurviness(curviness) {}
+AxisCurve::AxisCurve(float curviness) : mCurviness(curviness) {
+}
 
-AxisCurve::~AxisCurve() {}
+AxisCurve::~AxisCurve() {
+}
 
 void AxisCurve::map(long value) {
   // Normalize between -1 to 1
@@ -28,7 +28,7 @@ void AxisCurve::map(long value) {
   // about actually reaching min and max values
   const auto scale = value > 0x7fff ? 0x8000 : 0x7fff;
 
-  const double x = (value - 0x7fff) / (double) scale;
+  const double x = (value - 0x7fff) / (double)scale;
   const double k = mCurviness;
   // This is based on
   // https://dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
@@ -39,4 +39,4 @@ void AxisCurve::map(long value) {
   emit((clamped * scale) + 0x7fff);
 }
 
-} // namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping::actions

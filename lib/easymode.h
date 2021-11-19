@@ -16,12 +16,12 @@ using namespace fredemmott::gameinput::devicedb;
 using namespace fredemmott::inputmapping::actions;
 using namespace fredemmott::inputmapping::vigemids;
 using namespace fredemmott::inputmapping::vjoyids;
+using fredemmott::gameinput::HardwareID;
+using fredemmott::gameinput::InstanceID;
+using fredemmott::gameinput::VIDPID;
 using fredemmott::inputmapping::Axis;
 using fredemmott::inputmapping::Button;
 using fredemmott::inputmapping::Hat;
 using fredemmott::inputmapping::Profile;
-using fredemmott::gameinput::VIDPID;
-using fredemmott::gameinput::HardwareID;
-using fredemmott::gameinput::InstanceID;
 
 using fredemmott::inputmapping::create_profile;

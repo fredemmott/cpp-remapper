@@ -12,14 +12,15 @@
 namespace fredemmott::inputmapping::actions {
 
 namespace {
-  const std::chrono::milliseconds INJECTED_PRESS_DURATION(100);
+const std::chrono::milliseconds INJECTED_PRESS_DURATION(100);
 }
 
 ShortPressLongPress::ShortPressLongPress(
   ButtonOutput s,
   ButtonOutput l,
-  std::chrono::steady_clock::duration long_duration
-) : mShortPress(s), mLongPress(l), mLongDuration(long_duration) {}
+  std::chrono::steady_clock::duration long_duration)
+  : mShortPress(s), mLongPress(l), mLongDuration(long_duration) {
+}
 
 void ShortPressLongPress::map(bool pressed) {
   if (pressed) {
@@ -40,10 +41,10 @@ void ShortPressLongPress::map(bool pressed) {
   }
 }
 namespace {
-  void static_test() {
-    ShortPressLongPress { [](bool) {}, [](bool) {} };
-    ShortPressLongPress { [](bool) {}, [](bool) {}, std::chrono::seconds(2) };
-  }
+void static_test() {
+  ShortPressLongPress {[](bool) {}, [](bool) {}};
+  ShortPressLongPress {[](bool) {}, [](bool) {}, std::chrono::seconds(2)};
 }
+}// namespace
 
-}
+}// namespace fredemmott::inputmapping::actions

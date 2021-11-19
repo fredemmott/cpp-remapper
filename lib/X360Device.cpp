@@ -12,94 +12,101 @@
 namespace fredemmott::inputmapping {
 
 namespace {
-  class ViGEmClient {
-    public:
-      ViGEmClient() {}
-      ~ViGEmClient() {
-        if (!p) {
-          return;
-        }
-        std::cout << "Disconnecting from ViGEm bus..." << std::endl;
-        vigem_disconnect(p);
-        vigem_free(p);
-        std::cout << "...disconnected." << std::endl;
-      }
+class ViGEmClient {
+ public:
+  ViGEmClient() {
+  }
+  ~ViGEmClient() {
+    if (!p) {
+      return;
+    }
+    std::cout << "Disconnecting from ViGEm bus..." << std::endl;
+    vigem_disconnect(p);
+    vigem_free(p);
+    std::cout << "...disconnected." << std::endl;
+  }
 
-      operator PVIGEM_CLIENT () {
-        if (p) {
-          return p;
-        }
-        p = vigem_alloc();
+  operator PVIGEM_CLIENT() {
+    if (p) {
+      return p;
+    }
+    p = vigem_alloc();
 
-				if (!p) {
-					std::cerr << "Failed to allocate ViGEmClient" << std::endl;
-					return nullptr;
-				}
-
-				auto ret = vigem_connect(p);
-				if (!VIGEM_SUCCESS(ret)) {
-					std::cerr << "ViGEm Bus connection failed with error code: 0x" << std::hex << ret << std::endl;
-					vigem_free(p);
-					p = nullptr;
-					return nullptr;
-				}
-
-        return p;
-      }
-
-      operator bool () {
-        return this->operator PVIGEM_CLIENT();
-      }
-
-      ViGEmClient(const ViGEmClient&) = delete;
-      ViGEmClient& operator=(const ViGEmClient&) = delete;
-    private:
-      PVIGEM_CLIENT p = nullptr;
-  };
-
-  ViGEmClient g_client;
-} // namespace
-
-class X360Device::Impl {
-  public:
-    XUSB_REPORT state;
-    PVIGEM_TARGET pad = nullptr;
-
-    Impl() {
-      XUSB_REPORT_INIT(&state);
-      if (!g_client) {
-        return;
-      }
-      pad = vigem_target_x360_alloc();
-      auto ret = vigem_target_add(g_client, pad);
-      if (!VIGEM_SUCCESS(ret)) {
-        vigem_target_free(pad);
-        pad = nullptr;
-        std::cerr << "Failed to plug ViGEm pad: 0x" << std::hex << ret << std::endl;
-      }
+    if (!p) {
+      std::cerr << "Failed to allocate ViGEmClient" << std::endl;
+      return nullptr;
     }
 
-    ~Impl() {
-      if (!pad) {
-        return;
-      }
-      std::cout << "Unplugging ViGEm X360 pad..." << std::endl;
-      vigem_target_remove(g_client, pad);
-      vigem_target_free(pad);
-      std::cout << "...unplugged." << std::endl;
+    auto ret = vigem_connect(p);
+    if (!VIGEM_SUCCESS(ret)) {
+      std::cerr << "ViGEm Bus connection failed with error code: 0x" << std::hex
+                << ret << std::endl;
+      vigem_free(p);
+      p = nullptr;
+      return nullptr;
     }
+
+    return p;
+  }
+
+  operator bool() {
+    return this->operator PVIGEM_CLIENT();
+  }
+
+  ViGEmClient(const ViGEmClient&) = delete;
+  ViGEmClient& operator=(const ViGEmClient&) = delete;
+
+ private:
+  PVIGEM_CLIENT p = nullptr;
 };
 
-X360Device::X360Device(): p(new Impl()) {
+ViGEmClient g_client;
+}// namespace
+
+class X360Device::Impl {
+ public:
+  XUSB_REPORT state;
+  PVIGEM_TARGET pad = nullptr;
+
+  Impl() {
+    XUSB_REPORT_INIT(&state);
+    if (!g_client) {
+      return;
+    }
+    pad = vigem_target_x360_alloc();
+    auto ret = vigem_target_add(g_client, pad);
+    if (!VIGEM_SUCCESS(ret)) {
+      vigem_target_free(pad);
+      pad = nullptr;
+      std::cerr << "Failed to plug ViGEm pad: 0x" << std::hex << ret
+                << std::endl;
+    }
+  }
+
+  ~Impl() {
+    if (!pad) {
+      return;
+    }
+    std::cout << "Unplugging ViGEm X360 pad..." << std::endl;
+    vigem_target_remove(g_client, pad);
+    vigem_target_free(pad);
+    std::cout << "...unplugged." << std::endl;
+  }
+};
+
+X360Device::X360Device() : p(new Impl()) {
   if (p) {
     std::cout << "Attached ViGEm X360 pad." << std::endl;
     return;
   }
 
-  std::cerr << "---\nERROR\n---\nFailed to initialize ViGEm X360 pad, output device will be missing.\n---" << std::endl;
+  std::cerr << "---\nERROR\n---\nFailed to initialize ViGEm X360 pad, output "
+               "device will be missing.\n---"
+            << std::endl;
 }
 
-X360Device::~X360Device() {}
+X360Device::~X360Device() {
+}
 
 void X360Device::flush() {
   if (!g_client) {
@@ -110,9 +117,9 @@ void X360Device::flush() {
 
 X360Device* X360Device::setButton(Button button, bool value) {
   if (value) {
-    p->state.wButtons |= (USHORT) button;
+    p->state.wButtons |= (USHORT)button;
   } else {
-    p->state.wButtons &= ~(USHORT) button;
+    p->state.wButtons &= ~(USHORT)button;
   }
   return this;
 }
@@ -143,4 +150,4 @@ X360Device* X360Device::setRTrigger(long value) {
   return this;
 }
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

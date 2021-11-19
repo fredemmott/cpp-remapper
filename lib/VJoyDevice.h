@@ -7,11 +7,10 @@
  */
 #pragma once
 
-#include "OutputDevice.h"
-
+#include <cstdint>
 #include <memory>
 
-#include <cstdint>
+#include "OutputDevice.h"
 
 namespace fredemmott::inputmapping {
 
@@ -39,4 +38,4 @@ class VJoyDevice final : public OutputDevice {
   std::unique_ptr<Impl> p;
 };
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

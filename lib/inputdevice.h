@@ -7,16 +7,15 @@
  */
 #pragma once
 
-#include "devicespecifier.h"
-
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
+#include "devicespecifier.h"
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
-
 
 namespace fredemmott::gameinput {
 
@@ -50,11 +49,11 @@ class InputDevice final {
   };
 
   class State {
-    private:
-      StateOffsets offsets;
-      std::vector<uint8_t> buffer;
-    public:
+   private:
+    StateOffsets offsets;
+    std::vector<uint8_t> buffer;
 
+   public:
     State(const StateOffsets& offsets, const std::vector<uint8_t>& buffer);
 
     long* getAxes() const;
@@ -62,6 +61,7 @@ class InputDevice final {
     uint16_t* getHats() const;
   };
   State getState();
+
  private:
   struct Impl;
   std::unique_ptr<Impl> p;
@@ -70,6 +70,5 @@ class InputDevice final {
   size_t mDataSize = 0;
   StateOffsets mOffsets {};
   void activate();
-
 };
-} // namespace fredemmott::gameinput
+}// namespace fredemmott::gameinput

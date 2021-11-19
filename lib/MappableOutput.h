@@ -14,11 +14,12 @@ namespace fredemmott::inputmapping {
 class OutputDevice;
 
 class MappableOutput {
-  protected:
-    MappableOutput();
-  public:
-    virtual ~MappableOutput();
-    virtual std::shared_ptr<OutputDevice> getDevice() const = 0;
+ protected:
+  MappableOutput();
+
+ public:
+  virtual ~MappableOutput();
+  virtual std::shared_ptr<OutputDevice> getDevice() const = 0;
 };
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

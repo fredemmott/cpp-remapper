@@ -11,6 +11,7 @@
 
 namespace fredemmott::inputmapping {
 
-SourceBase::~SourceBase() {}
+SourceBase::~SourceBase() {
+}
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

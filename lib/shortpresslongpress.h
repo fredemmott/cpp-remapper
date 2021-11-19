@@ -7,21 +7,22 @@
  */
 #pragma once
 
-#include "actionsapi.h"
-
 #include <chrono>
+
+#include "actionsapi.h"
 
 namespace fredemmott::inputmapping::actions {
 
 /// Different actions for if a button is short-pressed or long-pressed
-class ShortPressLongPress: public ButtonSink {
+class ShortPressLongPress : public ButtonSink {
  public:
   ShortPressLongPress(
     ButtonOutput short_handler,
     ButtonOutput long_handle,
-    const std::chrono::steady_clock::duration duration = std::chrono::milliseconds(300)
-  );
+    const std::chrono::steady_clock::duration duration
+    = std::chrono::milliseconds(300));
   virtual void map(bool state);
+
  private:
   ButtonOutput mShortPress;
   ButtonOutput mLongPress;
@@ -30,4 +31,4 @@ class ShortPressLongPress: public ButtonSink {
   std::chrono::time_point<std::chrono::steady_clock> mStart;
 };
 
-} // namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping::actions

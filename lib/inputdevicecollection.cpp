@@ -9,52 +9,46 @@
 
 #include "axistypes.h"
 #include "inputdevice.h"
-#pragma comment(lib, "Ole32.lib") // GUID
+#pragma comment(lib, "Ole32.lib")// GUID
 
 namespace fredemmott::gameinput {
 
 namespace {
-  struct DeviceEnumeratorState {
-    IDirectInput8* di8;
-    std::vector<std::shared_ptr<InputDevice>> devices;
-  };
+struct DeviceEnumeratorState {
+  IDirectInput8* di8;
+  std::vector<std::shared_ptr<InputDevice>> devices;
+};
 
-  BOOL CALLBACK enum_device_callback(
-    LPCDIDEVICEINSTANCE didevinst,
-    LPVOID vpRef
-  ) {
-    auto state = reinterpret_cast<DeviceEnumeratorState*>(vpRef);
-    auto device = std::make_shared<InputDevice>(state->di8, didevinst);
-    state->devices.push_back(device);
+BOOL CALLBACK
+enum_device_callback(LPCDIDEVICEINSTANCE didevinst, LPVOID vpRef) {
+  auto state = reinterpret_cast<DeviceEnumeratorState*>(vpRef);
+  auto device = std::make_shared<InputDevice>(state->di8, didevinst);
+  state->devices.push_back(device);
 
-    return DIENUM_CONTINUE;
-  }
+  return DIENUM_CONTINUE;
+}
 
-  IDirectInput8* gDI8 = nullptr;
-} // namespace
+IDirectInput8* gDI8 = nullptr;
+}// namespace
 
 InputDeviceCollection::InputDeviceCollection() {
   if (!gDI8) {
     DirectInput8Create(
-        GetModuleHandle(nullptr),
-        DIRECTINPUT_VERSION,
-        IID_IDirectInput8,
-        (LPVOID*) &gDI8,
-        nullptr
-    );
+      GetModuleHandle(nullptr),
+      DIRECTINPUT_VERSION,
+      IID_IDirectInput8,
+      (LPVOID*)&gDI8,
+      nullptr);
   }
   auto di8 = gDI8;
-  DeviceEnumeratorState state { di8, {} };
+  DeviceEnumeratorState state {di8, {}};
   di8->EnumDevices(
-      DI8DEVCLASS_GAMECTRL,
-      &enum_device_callback,
-      &state,
-      DIEDFL_ATTACHEDONLY
-  );
+    DI8DEVCLASS_GAMECTRL, &enum_device_callback, &state, DIEDFL_ATTACHEDONLY);
   mDevices = state.devices;
 }
 
-std::shared_ptr<InputDevice> InputDeviceCollection::get(const DeviceSpecifier& id) {
+std::shared_ptr<InputDevice> InputDeviceCollection::get(
+  const DeviceSpecifier& id) {
   for (auto device: mDevices) {
     if (id.matches(*device)) {
       return device;
@@ -63,11 +57,12 @@ std::shared_ptr<InputDevice> InputDeviceCollection::get(const DeviceSpecifier& i
   return nullptr;
 }
 
-std::vector<std::shared_ptr<InputDevice>> InputDeviceCollection::getAllDevices() {
+std::vector<std::shared_ptr<InputDevice>>
+InputDeviceCollection::getAllDevices() {
   return mDevices;
 }
 
 InputDeviceCollection::~InputDeviceCollection() {
 }
 
-} // namespace fredemmott::gameinput
+}// namespace fredemmott::gameinput

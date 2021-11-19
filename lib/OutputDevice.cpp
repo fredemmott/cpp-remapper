@@ -7,9 +7,9 @@
  */
 #include "OutputDevice.h"
 
-namespace fredemmott::inputmapping
-{
+namespace fredemmott::inputmapping {
 
-  OutputDevice::~OutputDevice() {}
+OutputDevice::~OutputDevice() {
+}
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping

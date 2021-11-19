@@ -5,10 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
+#include <cstdio>
+
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
-
-#include <cstdio>
 
 int main() {
   fredemmott::gameinput::InputDeviceCollection idc;
@@ -17,11 +17,10 @@ int main() {
     printf("\"%s\"\n", name.data());
 
     printf(
-      "  Axes: %d\n  Buttons: %d\n  Hats: %d\n", 
+      "  Axes: %d\n  Buttons: %d\n  Hats: %d\n",
       device->getAxisCount(),
       device->getButtonCount(),
-      device->getHatCount()
-    );
+      device->getHatCount());
 
     auto vidpid = device->getVIDPID();
     if (vidpid) {

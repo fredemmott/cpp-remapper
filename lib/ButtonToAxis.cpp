@@ -13,4 +13,4 @@ void ButtonToAxis::map(bool value) {
   emit(value ? 65535 : 0);
 }
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping::actions

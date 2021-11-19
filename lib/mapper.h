@@ -7,44 +7,43 @@
  */
 #pragma once
 
-#include "actionsapi.h"
-
 #include <chrono>
 #include <functional>
-#include <ratio>
 #include <map>
+#include <ratio>
+
+#include "actionsapi.h"
 
 namespace fredemmott::gameinput {
-  class InputDevice;
+class InputDevice;
 }
 
 namespace fredemmott::inputmapping {
-  struct MappableInput;
-  class MappableOutput;
-  class MappableVJoyOutput;
-  class OutputDevice;
+struct MappableInput;
+class MappableOutput;
+class MappableVJoyOutput;
+class OutputDevice;
 
-  class Mapper {
-    public:
-      void setDevices(
-        const std::vector<MappableInput>& inputs,
-        const std::vector<std::shared_ptr<OutputDevice>>& outputs
-      );
+class Mapper {
+ public:
+  void setDevices(
+    const std::vector<MappableInput>& inputs,
+    const std::vector<std::shared_ptr<OutputDevice>>& outputs);
 
-      /// Call setDevices first
-      void run();
+  /// Call setDevices first
+  void run();
 
-      void passthrough(MappableInput&, const MappableVJoyOutput&);
+  void passthrough(MappableInput&, const MappableVJoyOutput&);
 
-      static void inject(
-        const std::chrono::steady_clock::duration& delay,
-        const std::function<void()>& handler
-      );
-    private:
-      std::vector<MappableInput> mInputs;
-      std::vector<std::shared_ptr<OutputDevice>> mOutputs;
-      std::map<void*, std::function<void()>> mInjected;
+  static void inject(
+    const std::chrono::steady_clock::duration& delay,
+    const std::function<void()>& handler);
 
-      void flush();
-  };
-} // namespace fredemmott::inputmapping
+ private:
+  std::vector<MappableInput> mInputs;
+  std::vector<std::shared_ptr<OutputDevice>> mOutputs;
+  std::map<void*, std::function<void()>> mInjected;
+
+  void flush();
+};
+}// namespace fredemmott::inputmapping

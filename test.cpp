@@ -13,68 +13,60 @@ using fredemmott::inputmapping::render_axis;
 
 #include <cstdio>
 
-#define REQUIRE(x)                                                                  \
-  if (!(x))                                                                         \
-  {                                                                                 \
-    printf("Expectation '%s' failed in %s() at line %d\n", #x, __func__, __LINE__); \
-    __debugbreak();                                                                 \
-    exit(1);                                                                        \
+#define REQUIRE(x) \
+  if (!(x)) { \
+    printf( \
+      "Expectation '%s' failed in %s() at line %d\n", #x, __func__, __LINE__); \
+    __debugbreak(); \
+    exit(1); \
   }
 
-struct ProgressPrinter
-{
-  ProgressPrinter(const char *name) : mName(name)
-  {
+struct ProgressPrinter {
+  ProgressPrinter(const char *name) : mName(name) {
     printf("Starting test %s()...\n", name);
   }
 
-  ~ProgressPrinter()
-  {
-    if (std::uncaught_exception())
-    {
+  ~ProgressPrinter() {
+    if (std::uncaught_exception()) {
       printf("FAILED: %s()\n", mName);
-    }
-    else
-    {
+    } else {
       printf("OK: %s()\n", mName);
     }
   }
 
-private:
+ private:
   const char *mName;
 };
 #define START_TEST ProgressPrinter pp_##__COUNTER__(__func__)
 
 template <typename TBase>
-class Emitable : public TBase
-{
-public:
+class Emitable : public TBase {
+ public:
   using TBase::emit;
 };
-template<class Input>
+template <class Input>
 class TestInput : public Input {
-  private:
-   Emitable<typename Input::Tail> mSource;
-  public:
-   TestInput(): Input(&mSource) {}
-   void emit(typename Input::Tail::Value v) { mSource.emit(v); }
+ private:
+  Emitable<typename Input::Tail> mSource;
+
+ public:
+  TestInput() : Input(&mSource) {
+  }
+  void emit(typename Input::Tail::Value v) {
+    mSource.emit(v);
+  }
 };
-class TestAxis final : public TestInput<::fredemmott::inputmapping::AxisInput>
-{
+class TestAxis final : public TestInput<::fredemmott::inputmapping::AxisInput> {
 };
-class TestButton final : public TestInput<::fredemmott::inputmapping::ButtonInput>
-{
-};
-class TestHat final : public TestInput<::fredemmott::inputmapping::HatInput>
-{
-};
+class TestButton final
+  : public TestInput<::fredemmott::inputmapping::ButtonInput> {};
+class TestHat final : public TestInput<::fredemmott::inputmapping::HatInput> {};
 
 using fredemmott::inputmapping::Axis;
 using fredemmott::inputmapping::Button;
 using fredemmott::inputmapping::Hat;
 
-void test_ptr()
-{
+void test_ptr() {
   START_TEST;
   long out = -1;
   TestAxis axis;
@@ -83,13 +75,11 @@ void test_ptr()
   REQUIRE(out == 123);
 }
 
-void test_lambdas()
-{
+void test_lambdas() {
   START_TEST;
   long out = -1;
   TestAxis axis;
-  axis.bind([&out](long value)
-            { out = value; });
+  axis.bind([&out](long value) { out = value; });
   axis.emit(1337);
   REQUIRE(out == 1337);
   axis >> [](long value) { return Axis::MAX - value; } >> &out;
@@ -115,17 +105,16 @@ void test_source_sink_transform() {
   axis.emit(Axis::MAX - 100);
   REQUIRE(out < Axis::MAX - 100);
 
-  axis.bind(SquareDeadzone { 10 }).bind(&out);
-  axis >> SquareDeadzone { 10 } >> &out;
+  axis.bind(SquareDeadzone {10}).bind(&out);
+  axis >> SquareDeadzone {10} >> &out;
 }
 
-void test_square_deadzone_impl(uint8_t percent)
-{
+void test_square_deadzone_impl(uint8_t percent) {
   long out = -1;
   TestAxis axis;
   axis >> SquareDeadzone(percent) >> &out;
 
-  axis.emit(0x7fff); // mid point
+  axis.emit(0x7fff);// mid point
   // In deadzone
   REQUIRE(out == 0x7fff);
   axis.emit(0x8000);
@@ -177,26 +166,23 @@ void test_square_deadzone_impl(uint8_t percent)
   REQUIRE(out >= 0x7fff - 0x4000 - delta_ceil);
 }
 
-void test_small_square_deadzone()
-{
+void test_small_square_deadzone() {
   START_TEST;
   test_square_deadzone_impl(10);
 }
 
-void test_large_square_deadzone()
-{
+void test_large_square_deadzone() {
   START_TEST;
   test_square_deadzone_impl(90);
 }
 
-void test_axis_curve()
-{
+void test_axis_curve() {
   START_TEST;
   long out = -1;
 
-  render_axis("linear.bmp", AxisCurve { 0 });
+  render_axis("linear.bmp", AxisCurve {0});
   TestAxis linear;
-  linear >> AxisCurve { 0 } >> &out;
+  linear >> AxisCurve {0} >> &out;
 
   linear.emit(0);
   REQUIRE(out == 0);
@@ -207,9 +193,9 @@ void test_axis_curve()
   linear.emit(0x1234);
   REQUIRE(out == 0x1234);
 
-  render_axis("extreme.bmp", AxisCurve { 0.99 });
+  render_axis("extreme.bmp", AxisCurve {0.99});
   TestAxis extreme;
-  extreme >> AxisCurve { 0.99 } >> &out;
+  extreme >> AxisCurve {0.99} >> &out;
 
   extreme.emit(0);
   REQUIRE(out == 0);
@@ -222,9 +208,9 @@ void test_axis_curve()
   extreme.emit(0x7fff + 0x4000);
   REQUIRE(out > 0x7fff && out < (0x7ffff + 0x4000));
 
-  render_axis("gentle.bmp", AxisCurve { 0.5 });
+  render_axis("gentle.bmp", AxisCurve {0.5});
   TestAxis gentle;
-  gentle >> AxisCurve { 0.5 } >> &out;
+  gentle >> AxisCurve {0.5} >> &out;
   extreme.emit(0x4000);
   const auto extreme_out = out;
   gentle.emit(0x4000);
@@ -240,8 +226,7 @@ void test_bind_to_sink() {
   TestAxis axis;
   axis >> AxisToButtons {
     {0, 10, [&b1](bool value) { b1 = value; }},
-    {90, 100, [&b2](bool value) { b2 = value; }}
-  };
+    {90, 100, [&b2](bool value) { b2 = value; }}};
   axis.emit(0);
   REQUIRE(b1);
   REQUIRE(!b2);
@@ -256,20 +241,17 @@ void test_bind_to_sink() {
   REQUIRE(b2);
 }
 
-void static_test_vjoy()
-{
+void static_test_vjoy() {
   // Input device is irrelevant, but we currently need one.
   auto [p, _, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
 }
 
-void static_test_vigem()
-{
+void static_test_vigem() {
   // Input device is irrelevant, but we currently need one.
   auto [p, _, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD_1);
 }
 
-int main()
-{
+int main() {
   printf("----- Starting Test Run -----\n");
   test_ptr();
   test_lambdas();

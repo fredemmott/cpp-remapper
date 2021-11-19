@@ -7,35 +7,31 @@
  */
 #pragma once
 
-#include "actionsapi.h"
-#include "MappableOutput.h"
-#include "X360Device.h"
-
 #include <cstdint>
 #include <memory>
+
+#include "MappableOutput.h"
+#include "X360Device.h"
+#include "actionsapi.h"
 
 namespace fredemmott::inputmapping {
 
 class MappableX360Output final : public MappableOutput {
-public:
+ public:
   explicit MappableX360Output();
   MappableX360Output(std::shared_ptr<X360Device> dev);
   ~MappableX360Output();
 
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  const AxisOutput
-    LXAxis, LYAxis, LTrigger,
-    RXAxis, RYAxis, RTrigger;
+  const AxisOutput LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
 
-  const ButtonOutput
-    ButtonA, ButtonB, ButtonX, ButtonY,
-    ButtonBack, ButtonStart, ButtonGuide,
-    DPadUp, DPadDown, DPadLeft, DPadRight,
-    ButtonLStick, ButtonRStick,
-    ButtonLShoulder, ButtonRShoulder;
-  private:
-   std::shared_ptr<X360Device> mDevice;
+  const ButtonOutput ButtonA, ButtonB, ButtonX, ButtonY, ButtonBack,
+    ButtonStart, ButtonGuide, DPadUp, DPadDown, DPadLeft, DPadRight,
+    ButtonLStick, ButtonRStick, ButtonLShoulder, ButtonRShoulder;
+
+ private:
+  std::shared_ptr<X360Device> mDevice;
 };
 
-} // namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping
