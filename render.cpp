@@ -11,28 +11,19 @@
 
 #include "lib/easymode.h"
 #include "lib/render_axis.h"
+#include "lib/axiscurve.h"
 
-using fredemmott::inputmapping::AxisEventHandler;
 using fredemmott::inputmapping::render_axis;
 
 int main() {
   render_axis("linear.bmp", [](auto next) { return next; });
-  render_axis("curve_0.bmp", [](auto next) { return AxixCurve {0, next}; });
-  render_axis("curve_0.5.bmp", [](auto next) { return AxixCurve {0.5, next}; });
-  render_axis("curve_neg0.5.bmp", [](auto next) {
-    return AxixCurve {-0.5, next};
-  });
-  render_axis("curve_0.99.bmp", [](auto next) {
-    return AxixCurve {0.99, next};
-  });
-  render_axis("dead_10.bmp", [](auto next) {
-    return SquareDeadzone {10, next};
-  });
-  render_axis("dead_curve.bmp", [](auto next) {
-    return SquareDeadzone {50, AxisCurve {0.5, next}};
-  });
-  render_axis("curve_dead.bmp", [](auto next) {
-    return AxisCurve {0.5, SquareDeadzone {50, next}};
-  });
+  render_axis("curve_0.bmp", AxisCurve(0));
+  render_axis("curve_0.5.bmp", AxisCurve(0.5));
+  render_axis("curve_neg0.5.bmp",AxisCurve(-0.5));
+  render_axis("curve_0.99.bmp", AxisCurve(0.99));
+  render_axis("dead_10.bmp", SquareDeadzone(10));
+  // FIXME: can't pipe directly from sources
+  // render_axis("dead_curve.bmp", SquareDeadzone(50) >> AxisCurve(0.5));
+  // render_axis("curve_dead.bmp", AxisCurve(0.5) >> SquareDeadzone(50));
   return 0;
 }

@@ -16,10 +16,7 @@
         }
       },
       "problemMatcher": "$msCompile",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
+      "group": "build"
     },
     {
       "label": "Build (Debug)",
@@ -38,7 +35,7 @@
         }
       },
       "problemMatcher": "$msCompile",
-      "group": "build"
+      "group": { "kind": "build", "isDefault": true }
     }
   ],
 }

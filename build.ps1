@@ -33,11 +33,11 @@ param(
 
 if ($IDEBuildFile) {
   if ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item profiles).FullName) {
-    $ProfileSource = $IDEBuildFile
+    $Profiles = @($IDEBuildFile)
   } elseif ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEBuildFile.endsWith('.cpp')) {
-    $ProfileSource = $IDEBuildFile
+    $Profiles = $($IDEBuildFile)
   } else {
-    $ProfileSource = "test.cpp"
+    $Profiles = @("test.cpp", "example.cpp", "render.cpp")
   }
 }
 
@@ -85,11 +85,11 @@ $LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
 
 $ErrorActionPreference = "Stop"
 function Invoke-Exe-Checked {
-	param ( [scriptblock] $Block )
-	&$Block
-	if ($LASTEXITCODE -ne 0) {
-		exit $LASTEXITCODE
-	}
+  param ( [scriptblock] $Block )
+  &$Block
+  if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+  }
 }
 
 
@@ -262,16 +262,18 @@ Cpp-StaticLib-Rule `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
   -Headers ($CppRemapperHeaders + $HidHideHeaders)
 
-if (!$ProfileSource) {
+if (!$Profiles) {
   return;
 }
 
-Write-Output "Profile: $ProfileSource"
-$ProfileObj=Get-Cpp-Obj-Name $ProfileSource
+foreach ($ProfileSource in $Profiles) {
+  Write-Output "Profile: $ProfileSource"
+  $ProfileObj=Get-Cpp-Obj-Name $ProfileSource
 
-Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
+  Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
 
-(Get-Command cl.exe).Path
-Objs-Exe-Rule `
-  -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
-  -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)
+  (Get-Command cl.exe).Path
+  Objs-Exe-Rule `
+    -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
+    -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)
+}
