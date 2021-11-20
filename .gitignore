@@ -11,3 +11,4 @@ vJoyInterface.dll
 *~
 *.bmp
 *.exp
+build/

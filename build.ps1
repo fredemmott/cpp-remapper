@@ -46,13 +46,27 @@ $IntermediateDir = "$CWD\build\${Platform}-${BuildMode}"
 $ExeSuffix = "-${BuildMode}";
 New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
 
+# Needed by HidHideCli
+$CLFlags = @(
+  "/nologo",
+  "/I.",
+  "/IViGEmClient\include",
+  "/ISDK/inc",
+  "/Ilib",
+  "/EHsc",
+  "/vmg",
+  "/Zc:__cplusplus",
+  "/std:c++17",
+  "/DProjectDirLength=$((Get-Location).Path.Length)" # Needed by HidHideCli
+)
+
 switch($BuildMode) {
   "Debug" {
-    $CLFlags=@("/Zi", "/MTd", "/fsanitize=address")
+    $CLFlags += @("/Zi", "/MTd", "/fsanitize=address")
     $LINKFlags=@("/DEBUG:FULL")
   }
   "Release" {
-    $CLFlags=@("/O2", "/MT")
+    $CLFlags += @("/O2", "/MT")
     $LINKFlags=@()
     $ExeSuffix=''
   }
@@ -92,7 +106,6 @@ function Invoke-Exe-Checked {
   }
 }
 
-
 # Using vcvars[64].bat as Enter-VsDevShell does not reliably get an x64 environment
 $VSPATH=vswhere -property installationPath -version 16
 $VCVars=New-TemporaryFile
@@ -101,9 +114,6 @@ Get-Content $VCVars | ForEach-Object {
   $Var, $Value = $_.split("=")
   Set-Item -Path "Env:$Var" -Value $Value
 }
-
-# Needed by HidHideCli
-$ProjectDirLength=(Get-Location).Path.Length
 
 function Rebuild-If-Outdated {
   param (
@@ -194,10 +204,17 @@ function Cpp-Obj-Rule {
     [string[]] $Headers
   )
 
+  $Headers = @()
+
+  $DepsPath = "$IntermediateDir\$Cpp.deps.json"
+  if (Test-Path $DepsPath) {
+    $Headers = Get-Content $DepsPath | Out-String | ConvertFrom-Json | % { $_.Data.Includes }
+  }
+
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
     Invoke-Exe-Checked {
-      CL.exe /nologo /c "/Fo$Target" /I. /IViGEmClient\include /ISDK/inc /Ilib /EHsc /vmg /Zc:__cplusplus /std:c++17 /DProjectDirLength=$ProjectDirLength $CLFlags $Cpp
+      CL.exe $CLFlags /sourceDependencies $DepsPath /c "/Fo$Target" $Cpp
     }
   }
 }
@@ -267,7 +284,6 @@ if (!$Profiles) {
 }
 
 foreach ($ProfileSource in $Profiles) {
-  Write-Output "Profile: $ProfileSource"
   $ProfileObj=Get-Cpp-Obj-Name $ProfileSource
 
   Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
