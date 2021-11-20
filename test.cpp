@@ -52,7 +52,7 @@ class TestInput : public Input {
  public:
   TestInput() : Input(&mSource) {
   }
-  void emit(typename Input::Tail::Value v) {
+  void emit(typename Input::Out v) {
     mSource.emit(v);
   }
 };

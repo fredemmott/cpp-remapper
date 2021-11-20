@@ -204,7 +204,7 @@ function Cpp-Obj-Rule {
 
   $Headers = @()
 
-  $DepsPath = "$IntermediateDir\$Cpp.deps.json"
+  $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps.json")
   if (Test-Path $DepsPath) {
     $Headers = Get-Content $DepsPath | Out-String | ConvertFrom-Json | % { $_.Data.Includes }
   }

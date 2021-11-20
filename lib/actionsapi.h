@@ -37,27 +37,28 @@ class AxisInput;
 class ButtonInput;
 class HatInput;
 
+class SinkBase {};
+
 template <typename TValue>
-class Sink {
+class Sink : public SinkBase {
  protected:
   Sink() = default;
 
  public:
-  using Value = TValue;
+  using In = TValue;
   virtual void map(TValue value) = 0;
 };
-class AxisSink : public Sink<Axis::Value> {};
-class ButtonSink : public Sink<Button::Value> {};
-class HatSink : public Sink<Hat::Value> {};
+using AxisSink = Sink<Axis::Value>;
+using ButtonSink = Sink<Button::Value>;
+using HatSink  = Sink<Hat::Value>;
 
 template <typename TSink>
 class FunctionSink : public TSink {
  public:
-  using Value = typename TSink::Value;
-  using Impl = std::function<void(Value)>;
+  using Impl = std::function<void(typename TSink::In)>;
   FunctionSink() = delete;
   FunctionSink(const Impl& impl) : impl(impl) {};
-  virtual void map(Value value) override {
+  virtual void map(typename TSink::In value) override {
     impl(value);
   };
 
@@ -68,8 +69,8 @@ class FunctionSink : public TSink {
 template <typename TSink, typename TSource>
 class FunctionTransform : public TSink, public TSource {
  public:
-  using In = typename TSink::Value;
-  using Out = typename TSource::Value;
+  using In = typename TSink::In;
+  using Out = typename TSource::Out;
   using Impl = std::function<Out(In)>;
 
   FunctionTransform() = delete;
@@ -135,20 +136,16 @@ class SourceBase {
   virtual ~SourceBase();
 };
 
-template <typename TSink>
+template <typename TOut>
 class Source : public SourceBase {
-  static_assert(std::is_base_of_v<Sink<typename TSink::Value>, TSink>);
-
  public:
-  using Sink = TSink;
-  using Value = typename TSink::Value;
+  using Out = TOut;
 
-  void setNext(const UnsafeRef<TSink>& next) {
+  void setNext(const UnsafeRef<Sink<TOut>>& next) {
     mNext = next;
   }
-
  protected:
-  void emit(Value value) {
+  void emit(TOut value) {
     if (!mNext) {
       return;
     }
@@ -156,16 +153,16 @@ class Source : public SourceBase {
   }
 
  private:
-  UnsafeRef<TSink> mNext;
+  UnsafeRef<Sink<TOut>> mNext;
 };
 
-class AxisSource : public Source<AxisSink> {};
-class ButtonSource : public Source<ButtonSink> {};
-class HatSource : public Source<HatSink> {};
+using AxisSource = Source<Axis::Value>;
+using ButtonSource = Source<Button::Value>;
+using HatSource  = Source<Hat::Value>;
 
 template <typename THead, typename TDerived>
 class PipelineTail {
-  static_assert(std::is_base_of_v<Sink<typename THead::Value>, THead>);
+  static_assert(std::is_base_of_v<Sink<typename THead::In>, THead>);
 
  public:
   using Sink = THead;
@@ -175,7 +172,7 @@ class PipelineTail {
     typename TCallable,
     std::enable_if_t<
       std::
-        is_convertible_v<TCallable, std::function<void(typename THead::Value)>>,
+        is_convertible_v<TCallable, std::function<void(typename THead::In)>>,
       bool> = true>
   PipelineTail(TCallable impl)
     : mHead(std::make_shared<FunctionSink<Sink>>(impl)) {
@@ -194,14 +191,14 @@ class PipelineTail {
   PipelineTail(TDerived first, TRest... rest) {
     std::vector<TDerived> inners {first, rest...};
     mHead = std::make_shared<FunctionSink<Sink>>(
-      [inners](typename THead::Value value) {
+      [inners](typename THead::In value) {
         for (auto inner: inners) {
           inner.map(value);
         }
       });
   }
 
-  void map(typename THead::Value value) const {
+  void map(typename THead::In value) const {
     mHead->map(value);
   };
 
@@ -212,6 +209,7 @@ class PipelineTail {
  private:
   UnsafeRef<THead> mHead;
 };
+
 class AxisOutput final : public PipelineTail<AxisSink, AxisOutput> {
  public:
   using PipelineTail::PipelineTail;
@@ -242,9 +240,10 @@ class Pipeline final {
 
 template <typename TTail, typename TOutput>
 class PipelineHead {
-  static_assert(std::is_base_of_v<Source<typename TTail::Sink>, TTail>);
+  static_assert(std::is_base_of_v<Source<typename TTail::Out>, TTail>);
 
  public:
+  using Out = typename TTail::Out;
   using HeadPtr = UnsafeRef<SourceBase>;
   using Tail = TTail;
   using TailPtr = UnsafeRef<TTail>;
@@ -281,7 +280,7 @@ class PipelineHead {
     std::enable_if_t<
       !std::is_convertible_v<
         Output,
-        std::function<std::any(typename TTail::Sink::Value)>>,
+        std::function<std::any(typename TTail::Out)>>,
       bool> = true>
   Pipeline bind(const Output& next) {
     mTail->setNext(TOutput(next).getHead());
@@ -306,16 +305,16 @@ class PipelineHead {
     std::enable_if_t< \
       std::is_convertible_v< \
         Transform, \
-        std::function<ValueType(typename TTail::Sink::Value)>>, \
+        std::function<ValueType(typename TTail::Out)>>, \
       bool> = true, \
     std::enable_if_t< \
       std::is_same_v< \
         ValueType, \
-        std::result_of_t<Transform(typename TTail::Sink::Value)>>, \
+        std::result_of_t<Transform(typename TTail::Out)>>, \
       bool> = true> \
   Input bind(Transform next) { \
     auto ref = UnsafeRef( \
-      std::make_shared<FunctionTransform<typename TTail::Sink, Source>>( \
+      std::make_shared<FunctionTransform<Sink<typename Input::Out>, Source>>( \
         next)); \
     mTail->setNext(ref); \
     return Input(mHead, ref); \
@@ -361,8 +360,8 @@ class PipelineHead {
 #undef DEFINE_SOURCE_SINK_TRANSFORM_TO
 
   // Handy for tests
-  Pipeline bind(typename TTail::Source::Value* ptr) {
-    return bind([ptr](typename TTail::Source::Value value) { *ptr = value; });
+  Pipeline bind(typename TTail::Out* ptr) {
+    return bind([ptr](typename TTail::Out value) { *ptr = value; });
   }
 
   template <typename T>
