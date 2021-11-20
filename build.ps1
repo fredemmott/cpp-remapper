@@ -98,7 +98,7 @@ switch($Platform) {
 $LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
 
 $ErrorActionPreference = "Stop"
-function Invoke-Exe-Checked {
+function Invoke-Exe-Checked-Raw{
   param ( [scriptblock] $Block )
   &$Block
   if ($LASTEXITCODE -ne 0) {
@@ -109,10 +109,25 @@ function Invoke-Exe-Checked {
 # Using vcvars[64].bat as Enter-VsDevShell does not reliably get an x64 environment
 $VSPATH=vswhere -property installationPath -version 16
 $VCVars=New-TemporaryFile
-Invoke-Exe-Checked { cmd.exe /c "call `"$VSPATH\VC\Auxiliary\Build\$VCVarsBat`" && set > $VCVars" }
-Get-Content $VCVars | ForEach-Object {
-  $Var, $Value = $_.split("=")
-  Set-Item -Path "Env:$Var" -Value $Value
+Invoke-Exe-Checked-Raw { cmd.exe /c "call `"$VSPATH\VC\Auxiliary\Build\$VCVarsBat`" && set > $VCVars" }
+
+# With MSVC Env
+function Invoke-Exe-Checked {
+  param ( [scriptblock] $Block )
+
+  $SavedEnv = Get-Item -Path 'Env:'
+  Get-Content $VCVars | ForEach-Object {
+    $Var, $Value = $_.split("=")
+    Set-Item -Path "Env:$Var" -Value $Value
+  }
+
+  &$Block
+  foreach ($Item in $SavedEnv.GetEnumerator()) {
+    Set-Item -Path "Env:$($Item.Key)" -Value $Item.Value
+  }
+  if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+  }
 }
 
 function Rebuild-If-Outdated {
