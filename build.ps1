@@ -199,9 +199,7 @@ function Cpp-Obj-Rule {
     [Parameter(Mandatory=$true)]
     [string] $Target,
     [Parameter(Mandatory=$true)]
-    [string] $Cpp,
-    [Parameter(Mandatory=$true)]
-    [string[]] $Headers
+    [string] $Cpp
   )
 
   $Headers = @()
@@ -224,13 +222,11 @@ function Cpp-StaticLib-Rule {
     [Parameter(Mandatory=$true)]
     [string] $Target,
     [Parameter(Mandatory=$true)]
-    [string[]] $Sources,
-    [Parameter(Mandatory=$true)]
-    [string[]] $Headers
+    [string[]] $Sources
   )
 
   foreach($Source in $Sources) {
-    Cpp-Obj-Rule -Target (Get-Cpp-Obj-Name $Source) -Cpp $Source -Headers $Headers
+    Cpp-Obj-Rule -Target (Get-Cpp-Obj-Name $Source) -Cpp $Source
   }
 
   $Objs=$Sources | ForEach-Object { Get-Cpp-Obj-Name $_ }
@@ -264,20 +260,15 @@ Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
   Pop-Location
 }
 
-$CppRemapperHeaders=(Get-Item lib/*.h).FullName
-$HidHideHeaders=(Get-Item lib/HidHideCLI/*.h).FullName
-
 $LibCppRemapper = Get-Relative-Name "$IntermediateDir\cpp-remapper.lib"
 $LibHidHide = Get-Relative-Name "$IntermediateDir\hidhide.lib"
 
 Cpp-StaticLib-Rule `
   -Target $LibHidHide `
-  -Sources (Get-Item lib/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
-  -Headers $HidHideHeaders
+  -Sources (Get-Item lib/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
 Cpp-StaticLib-Rule `
   -Target $LibCppRemapper `
-  -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName }) `
-  -Headers ($CppRemapperHeaders + $HidHideHeaders)
+  -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
 
 if (!$Profiles) {
   return;
@@ -286,7 +277,7 @@ if (!$Profiles) {
 foreach ($ProfileSource in $Profiles) {
   $ProfileObj=Get-Cpp-Obj-Name $ProfileSource
 
-  Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource -Headers $CppRemapperHeaders
+  Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource
 
   (Get-Command cl.exe).Path
   Objs-Exe-Rule `
