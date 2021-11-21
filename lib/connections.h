@@ -9,50 +9,38 @@
 
 #include "actionsapi.h"
 
+#include <concepts>
+
 namespace fredemmott::inputmapping {
 
-// TODO: use C++20 concepts instead
-template <typename T, typename = void>
-struct is_transform : std::false_type {};
+template<typename T>
+concept is_source =
+  std::derived_from<T, AnySource> &&
+  (!std::derived_from<T, AnySink>);
 
-template <typename T>
-struct is_transform<
-  T,
-  std::enable_if_t<
-    std::is_base_of_v<AnySink, T> && std::is_base_of_v<AnySource, T>>>
-  : std::true_type {};
+template<typename T>
+concept is_sink =
+  (!std::derived_from<T, AnySource>) &&
+  std::derived_from<T, AnySink>;
 
-template <typename T>
-constexpr typename is_transform<T>::value_type is_transform_v
-  = is_transform<T>::value;
+template<typename T>
+concept is_transform =
+  std::derived_from<T, AnySource> &&
+  std::derived_from<T, AnySink>;
 
-template <typename T, typename = void>
-struct is_sink : std::false_type {};
-template <typename T>
-struct is_sink<
-  T,
-  std::enable_if_t<std::is_base_of_v<AnySink, T> && !is_transform_v<T>>>
-  : std::true_type {};
+template<typename T>
+concept is_sink_ref = is_sink<typename T::element_type> && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
-template <typename T>
-constexpr typename is_sink<T>::value_type is_sink_v = is_sink<T>::value;
+template<typename T>
+concept is_source_ref = is_source<typename T::element_type> && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
-template <typename T, typename = void>
-struct is_source : std::false_type {};
-template <typename T>
-struct is_source<
-  T,
-  std::enable_if_t<std::is_base_of_v<AnySource, T> && !is_transform_v<T>>>
-  : std::true_type {};
-
-template <typename T>
-constexpr typename is_source<T>::value_type is_source_v = is_source<T>::value;
+template<typename T>
+concept is_transform_ref = is_transform<typename T::element_type> && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
 template <
-  typename SourceRef,
-  typename SinkRef,
-  std::enable_if_t<is_source_v<typename SourceRef::element_type>, bool> = true,
-  std::enable_if_t<is_sink_v<typename SinkRef::element_type>, bool> = true>
+  is_source_ref SourceRef,
+  is_sink_ref SinkRef
+>
 Pipeline operator>>(SourceRef left, SinkRef right) {
   left.setNext(right);
   return Pipeline(UnsafeRef<typename SourceRef::element_type>(left));
