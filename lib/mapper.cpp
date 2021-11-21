@@ -69,18 +69,18 @@ void Mapper::setDevices(
 }
 
 void Mapper::passthrough(MappableInput &s, const MappableVJoyOutput &t) {
-  s.XAxis.bind(t.XAxis);
-  s.YAxis.bind(t.YAxis);
-  s.ZAxis.bind(t.ZAxis);
-  s.RXAxis.bind(t.RXAxis);
-  s.RYAxis.bind(t.RYAxis);
-  s.RZAxis.bind(t.RZAxis);
-  s.Slider.bind(t.RZAxis);
+  s.XAxis >> t.XAxis;
+  s.YAxis >> t.YAxis;
+  s.ZAxis >> t.ZAxis;
+  s.RXAxis >> t.RXAxis;
+  s.RYAxis >> t.RYAxis;
+  s.RZAxis >> t.RZAxis;
+  s.Slider >> t.RZAxis;
   for (int i = 1; i <= s.getButtonCount(); ++i) {
-    s.button(i).bind(t.button(i));
+    s.button(i) >> t.button(i);
   }
   for (int i = 1; i <= s.getHatCount(); ++i) {
-    s.hat(i).bind(t.hat(i));
+    s.hat(i) >> t.hat(i);
   }
 }
 

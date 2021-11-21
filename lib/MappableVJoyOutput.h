@@ -22,15 +22,15 @@ class MappableVJoyOutput final : public MappableOutput {
   ~MappableVJoyOutput();
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  ButtonOutput button(uint8_t id) const;
-  HatOutput hat(uint8_t id) const;
+  ButtonSinkRef button(uint8_t id) const;
+  HatSinkRef hat(uint8_t id) const;
 
-  AxisOutput XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
+  AxisSinkRef XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
 
   // Convenience :)
 
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
-  ButtonOutput Button1, Button2, Button3, Button4, Button5, Button6, Button7,
+  ButtonSinkRef Button1, Button2, Button3, Button4, Button5, Button6, Button7,
     Button8, Button9, Button10, Button11, Button12, Button13, Button14,
     Button15, Button16, Button17, Button18, Button19, Button20, Button21,
     Button22, Button23, Button24, Button25, Button26, Button27, Button28,
@@ -50,7 +50,7 @@ class MappableVJoyOutput final : public MappableOutput {
     Button120, Button121, Button122, Button123, Button124, Button125, Button126,
     Button127, Button128;
 
-  HatOutput Hat1, Hat2, Hat3, Hat4;
+  HatSinkRef Hat1, Hat2, Hat3, Hat4;
 
  private:
   std::shared_ptr<VJoyDevice> mDevice;

@@ -14,138 +14,84 @@
 #include <set>
 #include <type_traits>
 
+#include "UnsafeRef.h"
+
 namespace fredemmott::inputmapping {
 
-class Axis final {
+class Control {};
+
+class Axis final : public Control {
  public:
   using Value = long;
   static const Value MAX = 0xffff;
   static const Value MIN = 0;
 };
-class Button final {
+class Button final : public Control {
  public:
   using Value = bool;
 };
-class Hat final {
+class Hat final : public Control {
  public:
   using Value = uint16_t;
   static const Value MAX = 36000;
   static const Value MIN = 0;
 };
 
-class AxisInput;
-class ButtonInput;
-class HatInput;
+class AnySink {};
 
-class SinkBase {};
+template <typename TControl>
+class Sink : public AnySink {
+  static_assert(std::is_base_of_v<Control, TControl>);
 
-template <typename TValue>
-class Sink : public SinkBase {
  protected:
   Sink() = default;
 
  public:
-  using In = TValue;
-  virtual void map(TValue value) = 0;
+  using InControl = TControl;
+  using In = typename TControl::Value;
+  virtual void map(In value) = 0;
 };
-using AxisSink = Sink<Axis::Value>;
-using ButtonSink = Sink<Button::Value>;
-using HatSink  = Sink<Hat::Value>;
+using AxisSink = Sink<Axis>;
+using ButtonSink = Sink<Button>;
+using HatSink = Sink<Hat>;
 
-template <typename TSink>
-class FunctionSink : public TSink {
+template <typename TControl>
+class FunctionSink : public Sink<TControl> {
  public:
-  using Impl = std::function<void(typename TSink::In)>;
+  using Impl = std::function<void(typename TControl::Value)>;
   FunctionSink() = delete;
   FunctionSink(const Impl& impl) : impl(impl) {};
-  virtual void map(typename TSink::In value) override {
+  virtual void map(typename TControl::Value value) override {
     impl(value);
-  };
+  }
 
  private:
   Impl impl;
-};
-
-template <typename TSink, typename TSource>
-class FunctionTransform : public TSink, public TSource {
- public:
-  using In = typename TSink::In;
-  using Out = typename TSource::Out;
-  using Impl = std::function<Out(In)>;
-
-  FunctionTransform() = delete;
-  FunctionTransform(const Impl& impl) : impl(impl) {};
-  virtual void map(In value) override {
-    emit(impl(value));
-  };
-
- private:
-  Impl impl;
-};
-
-template <typename T>
-class UnsafeRef final {
-  friend class UnsafeRef;
-  T* p {nullptr};
-  std::shared_ptr<T> refcounted;
-
- public:
-  UnsafeRef() {
-  }
-  UnsafeRef(const std::shared_ptr<T>& impl) : p(impl.get()), refcounted(impl) {
-  }
-  explicit UnsafeRef(T* impl) : p(impl) {
-  }
-
-  operator bool() const {
-    return p;
-  }
-  T& operator*() const {
-    return *p;
-  }
-  T* operator->() const {
-    return p;
-  }
-
-  template <
-    typename Supertype,
-    std::enable_if_t<std::is_base_of_v<Supertype, T>, bool> = true>
-  operator UnsafeRef<Supertype>() {
-    UnsafeRef<Supertype> s;
-    s.p = p;
-    s.refcounted = refcounted;
-    return s;
-  }
-
-  template <
-    typename Subtype,
-    std::enable_if_t<std::is_base_of_v<T, Subtype>, bool> = true>
-  UnsafeRef<T>& operator=(const std::shared_ptr<Subtype>& other) {
-    refcounted = other;
-    p = refcounted.get();
-    return *this;
-  }
 };
 
 // Just so we can store a shared_ptr without worrying about the inner generics
-class SourceBase {
+class AnySource {
  protected:
-  SourceBase() = default;
+  AnySource() = default;
 
  public:
-  virtual ~SourceBase();
+  virtual ~AnySource();
 };
 
-template <typename TOut>
-class Source : public SourceBase {
- public:
-  using Out = TOut;
+template <typename TControl>
+class Source : public AnySource {
+  static_assert(std::is_base_of_v<Control, TControl>);
 
-  void setNext(const UnsafeRef<Sink<TOut>>& next) {
+ public:
+  using OutControl = TControl;
+  using Out = typename TControl::Value;
+
+  virtual void setNext(const UnsafeRef<Sink<TControl>>& next) {
     mNext = next;
   }
+
  protected:
-  void emit(TOut value) {
+  void emit(Out value) {
     if (!mNext) {
       return;
     }
@@ -153,215 +99,190 @@ class Source : public SourceBase {
   }
 
  private:
-  UnsafeRef<Sink<TOut>> mNext;
+  UnsafeRef<Sink<TControl>> mNext;
 };
 
-using AxisSource = Source<Axis::Value>;
-using ButtonSource = Source<Button::Value>;
-using HatSource  = Source<Hat::Value>;
+using AxisSource = Source<Axis>;
+using ButtonSource = Source<Button>;
+using HatSource = Source<Hat>;
 
-template <typename THead, typename TDerived>
-class PipelineTail {
-  static_assert(std::is_base_of_v<Sink<typename THead::In>, THead>);
+template <typename TIn, typename TOut>
+class FunctionTransform final : public Sink<TIn>, public Source<TOut> {
+  static_assert(std::is_base_of_v<Control, TIn>);
+  static_assert(std::is_base_of_v<Control, TOut>);
 
  public:
-  using Sink = THead;
+  using Impl = std::function<typename TOut::Value(typename TIn::Value)>;
+
+  FunctionTransform() = delete;
+  FunctionTransform(const Impl& impl) : impl(impl) {};
+  void map(typename TIn::Value value) final override {
+    emit(impl(value));
+  };
+
+ private:
+  Impl impl;
+};
+
+template <typename TControl>
+class PipelineTail : public Sink<TControl> {
+  static_assert(std::is_base_of_v<Control, TControl>);
+
+ public:
   PipelineTail() = delete;
 
+  // TODO: move to FunctionSink?
   template <
     typename TCallable,
     std::enable_if_t<
-      std::
-        is_convertible_v<TCallable, std::function<void(typename THead::In)>>,
+      std::is_convertible_v<
+        TCallable,
+        std::function<void(typename TControl::Value)>>,
       bool> = true>
   PipelineTail(TCallable impl)
-    : mHead(std::make_shared<FunctionSink<Sink>>(impl)) {
+    : mHead(std::make_shared<FunctionSink<TControl>>(impl)) {
   }
 
-  template <
-    typename TRef,
-    std::
-      enable_if_t<std::is_convertible_v<TRef, UnsafeRef<THead>>, bool> = true>
-  PipelineTail(TRef head) : mHead(head) {
+  PipelineTail(const UnsafeRef<Sink<TControl>>& head) : mHead(head) {
   }
-  PipelineTail(THead* ptr) : mHead(ptr) {
+  explicit PipelineTail(Sink<TControl>* ptr) : mHead(ptr) {
   }
 
-  template <typename... TRest>
-  PipelineTail(TDerived first, TRest... rest) {
-    std::vector<TDerived> inners {first, rest...};
-    mHead = std::make_shared<FunctionSink<Sink>>(
-      [inners](typename THead::In value) {
-        for (auto inner: inners) {
+  // TODO: move to ComboAction?
+  template <typename TFirst, typename... TRest>
+  PipelineTail(TFirst&& first, TRest&&... rest) {
+    // FIXME
+    /*
+    std::vector<Sink<TControl>> inners {first, rest...};
+    mHead = std::make_shared<FunctionSink<TControl>>(
+      [inners](typename TControl::Value value) {
+        for (auto& inner: inners) {
           inner.map(value);
         }
       });
+      */
   }
 
-  void map(typename THead::In value) const {
+  void map(typename TControl::Value value) override {
     mHead->map(value);
   };
 
-  UnsafeRef<THead> getHead() const {
+  UnsafeRef<Sink<TControl>> getHead() const {
     return mHead;
   }
 
  private:
-  UnsafeRef<THead> mHead;
+  UnsafeRef<Sink<TControl>> mHead;
 };
 
-class AxisOutput final : public PipelineTail<AxisSink, AxisOutput> {
- public:
-  using PipelineTail::PipelineTail;
-};
-class ButtonOutput final : public PipelineTail<ButtonSink, ButtonOutput> {
- public:
-  using PipelineTail::PipelineTail;
-};
-class HatOutput final : public PipelineTail<HatSink, HatOutput> {
- public:
-  using PipelineTail::PipelineTail;
-};
+using AxisOutput = PipelineTail<Axis>;
+using ButtonOutput = PipelineTail<Button>;
+using HatOutput = PipelineTail<Hat>;
 
 class Pipeline final {
  public:
   Pipeline() = delete;
-  explicit Pipeline(const UnsafeRef<SourceBase>& source) : mSource(source) {
-  }
-
-  template <typename THead, typename TTail>
-  Pipeline(THead head, TTail tail) : Pipeline(head.getHead()) {
-    head.bind(tail);
+  template<typename T, std::enable_if_t<std::is_base_of_v<AnySource, T>, bool> = true>
+  Pipeline(const UnsafeRef<T>& source) : mSource(source) {
   }
 
  private:
-  UnsafeRef<SourceBase> mSource;
+  UnsafeRef<AnySource> mSource;
 };
 
-template <typename TTail, typename TOutput>
-class PipelineHead {
-  static_assert(std::is_base_of_v<Source<typename TTail::Out>, TTail>);
-
+template <typename TControl>
+class SourceRef final : public Source<TControl> {
  public:
-  using Out = typename TTail::Out;
-  using HeadPtr = UnsafeRef<SourceBase>;
-  using Tail = TTail;
-  using TailPtr = UnsafeRef<TTail>;
+  using element_type = Source<TControl>;
+  using Impl = UnsafeRef<element_type>;
+  SourceRef(const Impl& impl) : p(impl) {};
+  virtual void setNext(const UnsafeRef<Sink<TControl>>& next) override {
+    p->setNext(next);
+  }
 
+  operator UnsafeRef<Source<TControl>> () const {
+    return p;
+  }
+
+ private:
+  Impl p;
+};
+using AxisSourceRef = SourceRef<Axis>;
+using ButtonSourceRef = SourceRef<Button>;
+using HatSourceRef = SourceRef<Hat>;
+
+template <typename TControl>
+class SinkRef final : public Sink<TControl> {
+ public:
+  using element_type = Sink<TControl>;
+  using Impl = UnsafeRef<element_type>;
+  SinkRef(const Impl& impl) : p(impl) {};
+
+  virtual void map(typename TControl::Value value) override {
+    p->map(value);
+  }
+
+  operator UnsafeRef<Sink<TControl>> () const {
+    return p;
+  }
+
+ private:
+  Impl p;
+};
+using AxisSinkRef = SinkRef<Axis>;
+using ButtonSinkRef = SinkRef<Button>;
+using HatSinkRef = SinkRef<Hat>;
+
+template <typename TControl>
+class PipelineHead final : public Source<TControl> {
+ public:
   PipelineHead() = delete;
-  explicit PipelineHead(const std::string& error) : mError(error) {};
-  explicit PipelineHead(const HeadPtr& source, const TailPtr& tail)
-    : mHead(source), mTail(tail) {};
-  explicit PipelineHead(TTail* tail) : mHead(tail), mTail(tail) {
-  }
-
-  template <
-    typename Tailish,
-    std::enable_if_t<std::is_convertible_v<Tailish, TailPtr>, bool> = true>
-  PipelineHead(Tailish&& tail) {
-    UnsafeRef<Tail> ref(tail);
-    mTail = ref;
-    mHead = ref;
-  }
-
-  template <
-    typename Tailish,
-    std::enable_if_t<std::is_base_of_v<Tail, Tailish>, bool> = true>
-  PipelineHead(const std::shared_ptr<Tailish>& tail)
+  PipelineHead(const UnsafeRef<Source<TControl>>& tail)
     : mHead(tail), mTail(tail) {
   }
-
-  template <
-    typename Output,
-    std::enable_if_t<!std::is_reference_v<Output>, bool> = true,
-    std::enable_if_t<!std::is_pointer_v<Output>, bool> = true,
-    std::enable_if_t<std::is_convertible_v<Output, TOutput>, bool> = true,
-    std::enable_if_t<!std::is_convertible_v<Output, SourceBase>, bool> = true,
-    std::enable_if_t<
-      !std::is_convertible_v<
-        Output,
-        std::function<std::any(typename TTail::Out)>>,
-      bool> = true>
-  Pipeline bind(const Output& next) {
-    mTail->setNext(TOutput(next).getHead());
-    return Pipeline(mHead);
+  explicit PipelineHead(Source<TControl>* tail) : mHead(tail), mTail(tail) {
   }
 
+  PipelineHead(
+    const UnsafeRef<AnySource>& source,
+    const UnsafeRef<Source<TControl>>& tail)
+    : mHead(source), mTail(tail) {};
+
   template <
-    typename Sink,
-    std::enable_if_t<!std::is_reference_v<Sink>, bool> = true,
-    std::
-      enable_if_t<std::is_base_of_v<typename TOutput::Sink, Sink>, bool> = true,
-    std::enable_if_t<!std::is_base_of_v<SourceBase, Sink>, bool> = true>
-  Pipeline bind(Sink&& next) {
-    auto ref = UnsafeRef(std::make_shared<Sink>(std::move(next)));
+    typename Next,
+    std::enable_if_t<!std::is_reference_v<Next>, bool> = true,
+    std::enable_if_t<std::is_base_of_v<Sink<TControl>, Next>, bool> = true,
+    std::enable_if_t<!std::is_base_of_v<AnySource, Next>, bool> = true>
+  Pipeline bind(Next&& next) {
+    auto ref = UnsafeRef(std::make_shared<Next>(std::move(next)));
     mTail->setNext(ref);
     return Pipeline(mHead);
   }
 
-#define DEFINE_INVOCABLE_TRANSFORM_TO(Input, Source, ValueType) \
-  template < \
-    typename Transform, \
-    std::enable_if_t< \
-      std::is_convertible_v< \
-        Transform, \
-        std::function<ValueType(typename TTail::Out)>>, \
-      bool> = true, \
-    std::enable_if_t< \
-      std::is_same_v< \
-        ValueType, \
-        std::result_of_t<Transform(typename TTail::Out)>>, \
-      bool> = true> \
-  Input bind(Transform next) { \
-    auto ref = UnsafeRef( \
-      std::make_shared<FunctionTransform<Sink<typename Input::Out>, Source>>( \
-        next)); \
-    mTail->setNext(ref); \
-    return Input(mHead, ref); \
+  template <
+    typename Transform,
+    std::enable_if_t<std::is_base_of_v<Sink<TControl>, Transform>, bool> = true,
+    std::enable_if_t<std::is_base_of_v<AnySource, Transform>, bool> = true>
+  PipelineHead<typename Transform::OutControl> bind(Transform* next) {
+    auto ref = UnsafeRef(next);
+    mTail->setNext(ref);
+    return PipelineHead(mHead, ref);
   }
-  DEFINE_INVOCABLE_TRANSFORM_TO(AxisInput, AxisSource, Axis::Value);
-  DEFINE_INVOCABLE_TRANSFORM_TO(ButtonInput, ButtonSource, Button::Value);
-  DEFINE_INVOCABLE_TRANSFORM_TO(HatInput, HatSource, Hat::Value);
-#undef DEFINE_INVOCABLE_TRANSFORM_TO
 
-#define DEFINE_SOURCE_SINK_TRANSFORM_TO(Input, Source, ValueType) \
-  template < \
-    typename Transform, \
-    std::enable_if_t<!std::is_reference_v<Transform>, bool> = true, \
-    std::enable_if_t< \
-      std::is_base_of_v<typename TOutput::Sink, Transform>, \
-      bool> = true, \
-    std::enable_if_t<std::is_base_of_v<Source, Transform>, bool> = true> \
-  Input bind(Transform* next) { \
-    auto ref = UnsafeRef(next); \
-    mTail->setNext(ref); \
-    return Input(mHead, ref); \
+  template <
+    typename Transform,
+    std::enable_if_t<!std::is_reference_v<Transform>, bool> = true,
+    std::enable_if_t<std::is_base_of_v<Sink<TControl>, Transform>, bool> = true,
+    std::enable_if_t<std::is_base_of_v<AnySource, Transform>, bool> = true>
+  PipelineHead<typename Transform::OutControl> bind(Transform&& next) {
+    auto ref = UnsafeRef(std::make_shared<Transform>(std::move(next)));
+    mTail->setNext(ref);
+    return Input(mHead, ref);
   }
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(AxisInput, AxisSource, Axis::Value);
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(ButtonInput, ButtonSource, Button::Value);
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(HatInput, HatSource, Hat::Value);
-#undef DEFINE_SOURCE_SINK_TRANSFORM_TO
-#define DEFINE_SOURCE_SINK_TRANSFORM_TO(Input, Source, ValueType) \
-  template < \
-    typename Transform, \
-    std::enable_if_t<!std::is_reference_v<Transform>, bool> = true, \
-    std::enable_if_t< \
-      std::is_base_of_v<typename TOutput::Sink, Transform>, \
-      bool> = true, \
-    std::enable_if_t<std::is_base_of_v<Source, Transform>, bool> = true> \
-  Input bind(Transform&& next) { \
-    auto ref = UnsafeRef(std::make_shared<Transform>(std::move(next))); \
-    mTail->setNext(ref); \
-    return Input(mHead, ref); \
-  }
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(AxisInput, AxisSource, Axis::Value);
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(ButtonInput, ButtonSource, Button::Value);
-  DEFINE_SOURCE_SINK_TRANSFORM_TO(HatInput, HatSource, Hat::Value);
-#undef DEFINE_SOURCE_SINK_TRANSFORM_TO
 
   // Handy for tests
-  Pipeline bind(typename TTail::Out* ptr) {
-    return bind([ptr](typename TTail::Out value) { *ptr = value; });
+  Pipeline bind(typename TControl::Value* ptr) {
+    return bind([ptr](typename TControl::Value value) { *ptr = value; });
   }
 
   template <typename T>
@@ -375,22 +296,65 @@ class PipelineHead {
   }
 
  private:
-  std::string mError;
-  HeadPtr mHead;
-  TailPtr mTail;
+  UnsafeRef<AnySource> mHead;
+  UnsafeRef<Source<TControl>> mTail;
 };
 
-class AxisInput : public PipelineHead<AxisSource, AxisOutput> {
- public:
-  using PipelineHead::PipelineHead;
-};
-class ButtonInput : public PipelineHead<ButtonSource, ButtonOutput> {
- public:
-  using PipelineHead::PipelineHead;
-};
-class HatInput : public PipelineHead<HatSource, HatOutput> {
- public:
-  using PipelineHead::PipelineHead;
-};
+using AxisInput = PipelineHead<Axis>;
+using ButtonInput = PipelineHead<Button>;
+using HatInput = PipelineHead<Hat>;
+
+// TODO: use C++20 concepts instead
+template <typename T, typename = void>
+struct is_transform : std::false_type {};
+
+template <typename T>
+struct is_transform<
+  T,
+  std::enable_if_t<
+    std::is_base_of_v<AnySink, T> && std::is_base_of_v<AnySource, T>>>
+  : std::true_type {};
+
+template <typename T>
+constexpr typename is_transform<T>::value_type is_transform_v
+  = is_transform<T>::value;
+
+template <typename T, typename = void>
+struct is_sink : std::false_type {};
+template <typename T>
+struct is_sink<
+  T,
+  std::enable_if_t<
+    std::is_base_of_v<AnySink, T> && !is_transform_v<T>>>
+  : std::true_type {};
+
+template <typename T>
+constexpr typename is_sink<T>::value_type is_sink_v = is_sink<T>::value;
+
+template <typename T, typename = void>
+struct is_source: std::false_type {};
+template <typename T>
+struct is_source<
+  T,
+  std::enable_if_t<
+    std::is_base_of_v<AnySource, T> && !is_transform_v<T>>>
+  : std::true_type {};
+
+template <typename T>
+constexpr typename is_source<T>::value_type is_source_v = is_source<T>::value;
+
+template<
+	typename SourceRef,
+	typename SinkRef,
+	std::enable_if_t<is_source_v<typename SourceRef::element_type>, bool> = true,
+	std::enable_if_t<is_sink_v<typename SinkRef::element_type>, bool> = true
+>
+Pipeline operator >> (
+	SourceRef& left,
+	const SinkRef& right 
+) {
+	left.setNext(right);
+	return Pipeline(UnsafeRef<typename SourceRef::element_type>(left));
+}
 
 }// namespace fredemmott::inputmapping
