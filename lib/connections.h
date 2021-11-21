@@ -53,7 +53,7 @@ template <
   typename SinkRef,
   std::enable_if_t<is_source_v<typename SourceRef::element_type>, bool> = true,
   std::enable_if_t<is_sink_v<typename SinkRef::element_type>, bool> = true>
-Pipeline operator>>(SourceRef& left, const SinkRef& right) {
+Pipeline operator>>(SourceRef left, SinkRef right) {
   left.setNext(right);
   return Pipeline(UnsafeRef<typename SourceRef::element_type>(left));
 }

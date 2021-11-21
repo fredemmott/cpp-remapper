@@ -184,13 +184,13 @@ std::shared_ptr<OutputDevice> MappableVJoyOutput::getDevice() const {
 
 ButtonSinkRef MappableVJoyOutput::button(uint8_t id) const {
   // TODO very explicit
-  return UnsafeRef(std::make_shared<FunctionSink<Button>>(
+  return UnsafeRef<Sink<Button>>(std::make_shared<FunctionSink<Button>>(
     [device = mDevice, id](bool value) { device->setButton(id, value); }));
 }
 
 HatSinkRef MappableVJoyOutput::hat(uint8_t id) const {
   // TODO very explicit
-  return UnsafeRef(std::make_shared<FunctionSink<Hat>>(
+  return UnsafeRef<Sink<Hat>>(std::make_shared<FunctionSink<Hat>>(
     [device = mDevice, id](bool value) { device->setHat(id, value); }));
 }
 

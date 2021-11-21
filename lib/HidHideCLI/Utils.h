@@ -18,7 +18,7 @@ namespace HidHide
     // Lookup a value from the string table resource based on the resource id provided
     std::wstring StringTable(_In_ UINT stringTableResourceId);
     */
-    inline std::wstring StringTable(_In_ LPWSTR str) {
+    inline std::wstring StringTable(_In_ LPCWSTR str) {
         return str;
     }
 

@@ -81,8 +81,6 @@ struct InputDevice::Impl {
   LPDIRECTINPUTDEVICE8A diDevice = nullptr;
   bool enumerated = false;
 
-  Impl() = default;
-  Impl(const Impl& other) = delete;
   void operator=(const Impl& other) = delete;
 
   ~Impl() {
@@ -110,9 +108,13 @@ struct InputDevice::Impl {
     return controlsData;
   }
 };
+struct Foo {
+  std::string bar;
+  Foo(const Foo&) = delete;
+};
 
 InputDevice::InputDevice(IDirectInput8A* di, LPCDIDEVICEINSTANCEA device)
-  : p(new Impl {{}, di, *device, nullptr, false}) {
+  : p(new Impl {.di8 = di, .device = *device}) {
 }
 
 InputDevice::~InputDevice() {

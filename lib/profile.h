@@ -11,6 +11,7 @@
 #include <tuple>
 #include <vector>
 
+#include "mapper.h"
 #include "MappableInput.h"
 #include "MappableOutput.h"
 #include "MappableVJoyOutput.h"

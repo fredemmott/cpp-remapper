@@ -57,7 +57,8 @@ AxisSourceRef find_axis(
   const auto info = device->getAxisInformation();
   for (uint8_t i = 0; i < info.size(); ++i) {
     if (info[i].type == t) {
-      return UnsafeRef(inputs.at(i));
+      // TODO: very explicit?
+      return UnsafeRef<Source<Axis>>(inputs.at(i));
     }
   }
   auto axis_name = ::fredemmott::gameinput::AxisInformation(t).name;
@@ -261,10 +262,10 @@ AxisSourceRef MappableInput::axis(uint8_t id) const {
       "axis number %d of %zu",
       id,
       getAxisCount());
-    return MissingSource<Axis>(getDevice()->getProductName(), buf);
+    return UnsafeRef<Source<Axis>>(MissingSource<Axis>(getDevice()->getProductName(), buf));
   }
   // TODO: why is explicit needed?
-  return UnsafeRef(p->axisInputs.at(id - 1));
+  return UnsafeRef<Source<Axis>>(p->axisInputs.at(id - 1));
 }
 
 ButtonSourceRef MappableInput::button(uint8_t id) const {
@@ -276,9 +277,9 @@ ButtonSourceRef MappableInput::button(uint8_t id) const {
       "button number %d of %zu",
       id,
       getButtonCount());
-    return MissingSource<Button>(getDevice()->getProductName(), buf);
+    return UnsafeRef<Source<Button>>(MissingSource<Button>(getDevice()->getProductName(), buf));
   }
-  return UnsafeRef(p->buttonInputs.at(id - 1));
+  return UnsafeRef<Source<Button>>(p->buttonInputs.at(id - 1));
 }
 
 HatSourceRef MappableInput::hat(uint8_t id) const {
@@ -290,9 +291,9 @@ HatSourceRef MappableInput::hat(uint8_t id) const {
       "hat number %d of %zu",
       id,
       getHatCount());
-    return MissingSource<Hat>(getDevice()->getProductName(), buf);
+    return UnsafeRef<Source<Hat>>(MissingSource<Hat>(getDevice()->getProductName(), buf));
   }
-  return UnsafeRef(p->hatInputs.at(id - 1));
+  return UnsafeRef<Source<Hat>>(p->hatInputs.at(id - 1));
 }
 
 void MappableInput::poll() {
