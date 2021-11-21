@@ -10,6 +10,8 @@
 #include "Controls.h"
 #include "UnsafeRef.h"
 
+#include <concepts>
+
 namespace fredemmott::inputmapping {
 
 // Just so we can store a shared_ptr without worrying about the inner generics
@@ -21,9 +23,8 @@ class AnySource {
   virtual ~AnySource();
 };
 
-template <typename TControl>
+template <std::derived_from<Control> TControl>
 class Source : public AnySource {
-  static_assert(std::is_base_of_v<Control, TControl>);
 
  public:
   using OutControl = TControl;
@@ -35,7 +36,7 @@ class Source : public AnySource {
 
  protected:
   void emit(Out value) {
-    if (!mNext) {
+    if (!mNext.isValid()) {
       return;
     }
     mNext->map(value);
@@ -48,5 +49,15 @@ class Source : public AnySource {
 using AxisSource = Source<Axis>;
 using ButtonSource = Source<Button>;
 using HatSource = Source<Hat>;
+
+// clang-format off
+template<typename T>
+concept is_source =
+  std::derived_from<T, AnySource>
+  && (!std::derived_from<T, AnySink>);
+
+template<typename T>
+concept is_source_or_transform = std::derived_from<T, AnySource>;
+// clang-format on
 
 }// namespace fredemmott::inputmapping

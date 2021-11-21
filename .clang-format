@@ -16,6 +16,7 @@ ColumnLimit: '80'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 ConstructorInitializerIndentWidth: '2'
 ContinuationIndentWidth: '2'
+IndentRequires: true
 IndentWidth: '2'
 MaxEmptyLinesToKeep: '1'
 PointerAlignment: Left
@@ -24,6 +25,6 @@ SpaceBeforeCpp11BracedList: 'true'
 SpaceBeforeAssignmentOperators: 'true'
 SpaceBeforeRangeBasedForLoopColon: 'false'
 SpacesBeforeTrailingComments: '0'
-Standard: c++17
+Standard: c++20
 TabWidth: '2'
 UseTab: Never

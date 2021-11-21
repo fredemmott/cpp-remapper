@@ -8,6 +8,8 @@
 
 #include "render_axis.h"
 
+#include "connections.h"
+
 #include <fstream>
 
 using std::ios;
@@ -51,11 +53,10 @@ namespace fredemmott::inputmapping {
 
 void render_axis(
   const std::string& bmp_filename,
-  AxisOutput& transform_in,
-  AxisInput& transform_out) {
+  AxisSinkRef transform_in,
+  AxisSourceRef transform_out) {
   long fx = -1;
-  transform_out >> AxisOutput([&fx](long value) { fx = value; });
-  transform_out >> [&fx](long value) { fx = value; };
+  transform_out >> &fx;
   const int step = 128;
   // + 1 for 'max value' vs 'number of distinct values'
   const auto resolution = (0xffff + 1) / step;

@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <concepts>
 #include <memory>
 
 namespace fredemmott::inputmapping {
@@ -24,46 +25,31 @@ class UnsafeRef final {
   }
   explicit UnsafeRef(T* impl) : p(impl) {
   }
-  UnsafeRef(const std::shared_ptr<T>& impl)
+
+  template <std::derived_from<T> TSubtype>
+  UnsafeRef(const std::shared_ptr<TSubtype>& impl)
     : p(impl.get()), refcounted(impl) {
   }
-  template <
-    typename TConcrete,
-    std::enable_if_t<!std::is_reference_v<TConcrete>, bool> = true,
-    std::enable_if_t<std::is_base_of_v<T, TConcrete>, bool> = true>
+
+  template <std::derived_from<T> TSubtype>
+  UnsafeRef(const UnsafeRef<TSubtype>& impl)
+    : p(impl.p), refcounted(impl.refcounted) {
+  }
+
+  template <std::derived_from<T> TConcrete>
   UnsafeRef(TConcrete&& temporary) {
-    refcounted = std::make_shared<T>(std::move(temporary));
+    refcounted = std::make_shared<TConcrete>(std::move(temporary));
     p = refcounted.get();
   }
 
-  operator bool() const {
-    return p;
-  }
+ bool isValid() const {
+   return p;
+ }
   T& operator*() const {
     return *p;
   }
   T* operator->() const {
     return p;
   }
-
-  template <
-    typename Supertype,
-    std::enable_if_t<std::is_base_of_v<Supertype, T>, bool> = true>
-  operator UnsafeRef<Supertype> () const {
-    UnsafeRef<Supertype> s;
-    s.p = p;
-    s.refcounted = refcounted;
-    return s;
-  }
-
-  template <
-    typename Subtype,
-    std::enable_if_t<std::is_base_of_v<T, Subtype>, bool> = true>
-  UnsafeRef<T>& operator=(const std::shared_ptr<Subtype>& other) {
-    refcounted = other;
-    p = refcounted.get();
-    return *this;
-  }
 };
-
 }// namespace fredemmott::inputmapping

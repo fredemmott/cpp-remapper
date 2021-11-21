@@ -57,6 +57,7 @@ $CLFlags = @(
   "/vmg",
   "/Zc:__cplusplus",
   "/std:c++20",
+  "/FC",
   "/DProjectDirLength=$((Get-Location).Path.Length)" # Needed by HidHideCli
 )
 

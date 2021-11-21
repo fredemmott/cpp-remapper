@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <concepts>
+
 #include "Source.h"
 #include "UnsafeRef.h"
 
@@ -17,7 +19,12 @@ class SourceRef final : public Source<TControl> {
  public:
   using element_type = Source<TControl>;
   using Impl = UnsafeRef<element_type>;
-  SourceRef(const Impl& impl) : p(impl) {};
+
+  template<typename T>
+  SourceRef(T impl) requires std::convertible_to<T, Impl> && (!std::convertible_to<typename T::element_type, AnySink>): p(impl) {};
+
+  explicit SourceRef(Source<TControl>* impl) : p(impl) {}
+
   virtual void setNext(const UnsafeRef<Sink<TControl>>& next) override {
     p->setNext(next);
   }
@@ -32,5 +39,19 @@ class SourceRef final : public Source<TControl> {
 using AxisSourceRef = SourceRef<Axis>;
 using ButtonSourceRef = SourceRef<Button>;
 using HatSourceRef = SourceRef<Hat>;
+
+// clang-format off
+template<typename T>
+// TODO: rename to source_or_ref
+concept is_source_ref =
+  is_source<typename T::element_type>
+  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+
+template<typename T>
+concept is_nonref_source =
+  is_source<T>
+  && !is_source_ref<T>;
+// clang-format on
+
 
 }// namespace fredemmott::inputmapping

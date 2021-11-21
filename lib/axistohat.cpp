@@ -13,7 +13,7 @@
 
 namespace fredemmott::inputmapping::actions {
 
-AxisToHat::AxisToHat(const HatOutput& next, uint8_t deadzone_percent)
+AxisToHat::AxisToHat(const HatSinkRef& next, uint8_t deadzone_percent)
   : mNext(next), mDeadzone(deadzone_percent) {
 }
 

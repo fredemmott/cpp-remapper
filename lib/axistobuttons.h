@@ -19,7 +19,7 @@ class AxisToButtons final : public AxisSink {
   struct Range {
     uint8_t minPercent;
     uint8_t maxPercent;
-    ButtonOutput next;
+    ButtonSinkRef next;
   };
 
   AxisToButtons(std::initializer_list<Range> ranges);
@@ -27,9 +27,9 @@ class AxisToButtons final : public AxisSink {
 
  private:
   struct RawRange {
-    long min;
-    long max;
-    ButtonOutput next;
+    Axis::Value min;
+    Axis::Value max;
+    ButtonSinkRef next;
   };
   std::vector<RawRange> mRanges;
 };

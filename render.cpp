@@ -18,34 +18,6 @@ using fredemmott::inputmapping::UnsafeRef;
 using fredemmott::inputmapping::Sink;
 using fredemmott::inputmapping::Source;
 
-/*
-template<typename TSink, typename TSource>
-class PipelineTransform : public Sink<typename TSink::In>, public Source<typename TSink::Out> {
-  UnsafeRef<TSink> mFirst;
-  public:
-    PipelineTransform(UnsafeRef<TSink> first, UnsafeRef<TSource> last): mFirst(first) {
-      ::fredemmott::inputmapping::PipelineHead(last).bind([this](typename TSource::Out){ emit(value()); });
-    }
-    virtual void map(typename TSink::In value) override {
-      mFirst->map(value);
-    }
-};
-
-template<
-  typename TSink,
-  typename TSource,
-  std::enable_if_t<std::is_base_of_v<::fredemmott::inputmapping::SourceBase, TSource>, bool> = true,
-  std::enable_if_t<std::is_base_of_v<::fredemmott::inputmapping::SourceBase, TSink>, bool> = true,
-  std::enable_if_t<std::is_base_of_v<::fredemmott::inputmapping::SinkBase, TSink>, bool> = true
->
-auto operator>>(TSink&& lhs, TSource&& rhs) {
-  UnsafeRef left = UnsafeRef(std::make_shared<TSink>(std::move(lhs)));
-  UnsafeRef right = UnsafeRef(std::make_shared<TSource>(std::move(rhs)));
-  left->setNext(right);
-  return PipelineTransform(left, right);
-}
-*/
-
 int main() {
   render_axis("linear.bmp", [](auto next) { return next; });
   render_axis("curve_0.bmp", AxisCurve(0));

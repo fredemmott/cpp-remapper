@@ -8,6 +8,7 @@
 #pragma once
 
 #include "actions.h"
+#include "connections.h"
 #include "devicedb.h"
 #include "mapper.h"
 #include "profile.h"

@@ -9,9 +9,17 @@
 #include "lib/easymode.h"
 #include "lib/render_axis.h"
 
+using fredemmott::inputmapping::Axis;
+using fredemmott::inputmapping::Button;
+using fredemmott::inputmapping::Control;
+using fredemmott::inputmapping::Hat;
+using fredemmott::inputmapping::Sink;
+using fredemmott::inputmapping::Source;
+
 using fredemmott::inputmapping::render_axis;
 
 #include <cstdio>
+#include <exception>
 
 #define REQUIRE(x) \
   if (!(x)) { \
@@ -27,7 +35,7 @@ struct ProgressPrinter {
   }
 
   ~ProgressPrinter() {
-    if (std::uncaught_exception()) {
+    if (std::uncaught_exceptions()) {
       printf("FAILED: %s()\n", mName);
     } else {
       printf("OK: %s()\n", mName);
@@ -39,34 +47,16 @@ struct ProgressPrinter {
 };
 #define START_TEST ProgressPrinter pp_##__COUNTER__(__func__)
 
-template <typename TBase>
-class Emitable : public TBase {
+template <std::derived_from<Control> TControl>
+class TestInput : public ::fredemmott::inputmapping::Source<TControl> {
  public:
-  using TBase::emit;
+  using Source<TControl>::emit;
 };
-template <class Input>
-class TestInput : public Input {
- private:
-  Emitable<typename Input::Tail> mSource;
+using TestAxis = TestInput<Axis>;
+using TestButton = TestInput<Button>;
+using TestHat = TestInput<Hat>;
 
- public:
-  TestInput() : Input(&mSource) {
-  }
-  void emit(typename Input::Out v) {
-    mSource.emit(v);
-  }
-};
-class TestAxis final : public TestInput<::fredemmott::inputmapping::AxisInput> {
-};
-class TestButton final
-  : public TestInput<::fredemmott::inputmapping::ButtonInput> {};
-class TestHat final : public TestInput<::fredemmott::inputmapping::HatInput> {};
-
-using fredemmott::inputmapping::Axis;
-using fredemmott::inputmapping::Button;
-using fredemmott::inputmapping::Hat;
-
-void test_ptr() {
+void test_value_ptr() {
   START_TEST;
   long out = -1;
   TestAxis axis;
@@ -79,10 +69,13 @@ void test_lambdas() {
   START_TEST;
   long out = -1;
   TestAxis axis;
-  axis.bind([&out](long value) { out = value; });
+  axis >> &out;
   axis.emit(1337);
   REQUIRE(out == 1337);
-  axis >> [](long value) { return Axis::MAX - value; } >> &out;
+
+  // TODO one line
+  auto step = axis >> [](Axis::Value value) { return Axis::MAX - value; };
+  step  >> &out;
   axis.emit(123);
   REQUIRE(out == Axis::MAX - 123);
   axis.emit(Axis::MAX - 456);
@@ -95,7 +88,14 @@ void test_source_sink_transform() {
   long out = -1;
   TestAxis axis;
   SquareDeadzone dz(10);
-  axis >> &dz >> &out;
+
+  // Via pointer
+  //axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz)
+  ::fredemmott::inputmapping::UnsafeRef<Source<Axis>> axisRef(&axis);
+  auto ret = axisRef >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz);
+  ret = axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz);
+  axis >> &dz;
+  //TODO axis >> &dz >> &out;
   axis.emit(0);
   REQUIRE(out == 0);
   axis.emit(Axis::MAX);
@@ -105,7 +105,7 @@ void test_source_sink_transform() {
   axis.emit(Axis::MAX - 100);
   REQUIRE(out < Axis::MAX - 100);
 
-  axis.bind(SquareDeadzone {10}).bind(&out);
+  // Via temporary
   axis >> SquareDeadzone {10} >> &out;
 }
 
@@ -253,7 +253,7 @@ void static_test_vigem() {
 
 int main() {
   printf("----- Starting Test Run -----\n");
-  test_ptr();
+  test_value_ptr();
   test_lambdas();
   test_bind_to_sink();
   test_source_sink_transform();

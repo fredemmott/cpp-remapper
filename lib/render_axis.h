@@ -10,28 +10,28 @@
 #include <functional>
 #include <type_traits>
 
+#include "TransformRef.h"
 #include "actionsapi.h"
+#include "FunctionTransform.h"
 
 namespace fredemmott::inputmapping {
 
 void render_axis(
   const std::string& bmp_filename,
-  AxisOutput& transform_in,
-  AxisInput& transform_out);
+  AxisSinkRef transform_in,
+  AxisSourceRef transform_out);
 
-template <typename T>
-void render_axis(const std::string& bmp_filename, T& transform) {
-  render_axis(bmp_filename, AxisOutput(&transform), AxisInput(&transform));
+template<transform<Axis, Axis> T>
+void render_axis(const std::string& bmp_filename, const T& transform) {
+  render_axis(
+    bmp_filename, AxisOutputRef(&transform), AxisInputRef(&transform));
 }
 
-template <
-  typename T,
-  std::enable_if_t<
-    std::is_convertible_v<T, std::function<Axis::Value(Axis::Value)>>,
-    bool> = true>
+template <transform_invocable<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, const T& func) {
-  FunctionTransform<AxisSink, AxisSource> transform(func);
-  render_axis(bmp_filename, AxisOutput(&transform), AxisInput(&transform));
+  FunctionTransform transform(func);
+  render_axis(
+    bmp_filename, AxisOutputRef(&transform), AxisInputRef(&transform));
 }
 
 }// namespace fredemmott::inputmapping

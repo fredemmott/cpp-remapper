@@ -7,18 +7,19 @@
  */
 #pragma once
 
+#include <concepts>
+#include <functional>
 #include <type_traits>
 
 #include "Controls.h"
 
 namespace fredemmott::inputmapping {
 
+class AnySource;
 class AnySink {};
 
-template <typename TControl>
+template <std::derived_from<Control> TControl>
 class Sink : public AnySink {
-  static_assert(std::is_base_of_v<Control, TControl>);
-
  protected:
   Sink() = default;
 
@@ -30,5 +31,18 @@ class Sink : public AnySink {
 using AxisSink = Sink<Axis>;
 using ButtonSink = Sink<Button>;
 using HatSink = Sink<Hat>;
+
+// clang-format off
+template<typename T>
+concept is_sink =
+  (!std::derived_from<T, AnySource>)
+  && std::derived_from<T, AnySink>;
+
+template<typename T, typename TControl>
+concept sink_invocable =
+  std::is_base_of_v<Control, TControl>
+  && std::invocable<T, typename TControl::Value>
+  && std::same_as<void, std::invoke_result_t<T, typename TControl::Value>>;
+// clang-format on
 
 }// namespace fredemmott::inputmapping

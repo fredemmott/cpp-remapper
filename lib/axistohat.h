@@ -21,25 +21,27 @@ namespace fredemmott::inputmapping::actions {
 class AxisToHat {
  public:
   static const uint8_t DEFAULT_DEADZONE_PERCENT = 90;
-  const AxisOutput XAxis = [this](long x) {
+
+  // TODO: explicit
+  AxisSinkRef XAxis = [this](Axis::Value x) {
     mX = x;
     update();
   };
-  const AxisOutput YAxis = [this](long y) {
+  AxisSinkRef YAxis = [this](Axis::Value y) {
     mY = y;
     update();
   };
 
   AxisToHat(
-    const HatOutput& next,
+    const HatSinkRef& next,
     uint8_t deadzone_percent = DEFAULT_DEADZONE_PERCENT);
   ~AxisToHat();
 
  private:
-  HatOutput mNext;
+  HatSinkRef mNext;
   uint8_t mDeadzone = DEFAULT_DEADZONE_PERCENT;
-  long mX = 0;
-  long mY = 0;
+  Axis::Value mX = 0;
+  Axis::Value mY = 0;
 
   void update();
 };

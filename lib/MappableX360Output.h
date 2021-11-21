@@ -24,9 +24,9 @@ class MappableX360Output final : public MappableOutput {
 
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  const AxisOutput LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
+  const AxisSinkRef LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
 
-  const ButtonOutput ButtonA, ButtonB, ButtonX, ButtonY, ButtonBack,
+  const ButtonSinkRef ButtonA, ButtonB, ButtonX, ButtonY, ButtonBack,
     ButtonStart, ButtonGuide, DPadUp, DPadDown, DPadLeft, DPadRight,
     ButtonLStick, ButtonRStick, ButtonLShoulder, ButtonRShoulder;
 

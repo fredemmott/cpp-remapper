@@ -23,8 +23,7 @@ MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id)
 
 MappableVJoyOutput::MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev)
   :
-  // TODO: explicit make_shared?
-#define A(a) a(UnsafeRef(std::make_shared<FunctionSink<Axis>>([dev](long value) { dev->set##a(value); })))
+#define A(a) a(std::make_shared<FunctionSink<Axis>>([dev](long value) { dev->set##a(value); }))
 #define AA(a) A(a##Axis)
     AA(X),
     AA(Y),

@@ -15,11 +15,8 @@
 
 namespace fredemmott::inputmapping {
 
-template <typename TIn, typename TOut>
+template <std::derived_from<Control> TIn, std::derived_from<Control> TOut>
 class FunctionTransform final : public Sink<TIn>, public Source<TOut> {
-  static_assert(std::is_base_of_v<Control, TIn>);
-  static_assert(std::is_base_of_v<Control, TOut>);
-
  public:
   using Impl = std::function<typename TOut::Value(typename TIn::Value)>;
 

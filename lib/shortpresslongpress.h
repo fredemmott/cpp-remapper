@@ -17,15 +17,15 @@ namespace fredemmott::inputmapping::actions {
 class ShortPressLongPress : public ButtonSink {
  public:
   ShortPressLongPress(
-    ButtonOutput short_handler,
-    ButtonOutput long_handle,
+    ButtonSinkRef short_handler,
+    ButtonSinkRef long_handle,
     const std::chrono::steady_clock::duration duration
     = std::chrono::milliseconds(300));
-  virtual void map(bool state);
+  virtual void map(Button::Value state) override;
 
  private:
-  ButtonOutput mShortPress;
-  ButtonOutput mLongPress;
+  ButtonSinkRef mShortPress;
+  ButtonSinkRef mLongPress;
   std::chrono::steady_clock::duration mLongDuration;
 
   std::chrono::time_point<std::chrono::steady_clock> mStart;

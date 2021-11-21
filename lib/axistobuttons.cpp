@@ -14,7 +14,7 @@
 namespace fredemmott::inputmapping::actions {
 
 AxisToButtons::AxisToButtons(std::initializer_list<Range> ranges) {
-  const long max = std::numeric_limits<uint16_t>::max();
+  const long max = Axis::MAX;
   for (const auto& range: ranges) {
     mRanges.push_back(
       {(range.minPercent * max) / 100,
@@ -43,9 +43,8 @@ namespace {
 // Check that the compiler lets us call it as intended
 void static_test() {
   MappableVJoyOutput o(nullptr);
-  ButtonOutput x([](bool) {});
   AxisToButtons foo {
-    {0, 0, o.Button1}, {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {}}};
+    {0, 0, o.Button1}/* TODO , {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {} }*/};
 }
 
 }// namespace
