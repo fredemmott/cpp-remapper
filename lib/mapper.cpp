@@ -13,11 +13,6 @@
 #include "connections.h"
 #include "inputdevice.h"
 
-// clang-format off
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-// clang-format on
-
 namespace fredemmott::inputmapping {
 
 using fredemmott::gameinput::InputDevice;
