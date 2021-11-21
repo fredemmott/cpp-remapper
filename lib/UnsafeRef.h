@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <memory>
+
 namespace fredemmott::inputmapping {
 
 template <typename T>

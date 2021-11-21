@@ -7,7 +7,8 @@
  */
 #pragma once
 
-#include "actionsapi.h"
+#include "Sink.h"
+#include "Source.h"
 
 namespace fredemmott::inputmapping::actions {
 
