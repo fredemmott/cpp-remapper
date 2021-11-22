@@ -34,15 +34,11 @@ using ButtonSinkRef = SinkRef<Button>;
 using HatSinkRef = SinkRef<Hat>;
 
 // clang-format off
-template<typename T>
-concept any_sink_ref =
-  any_sink<typename T::element_type>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
-
-template<typename T>
-concept is_nonref_sink =
-  any_sink<typename T::element_type>
-  && !any_sink_ref<T>;
+template <typename T, typename TControl>
+concept convertible_to_sink_ref =
+  sink<T, TControl>
+  || sink_ref<T, TControl>
+  || sink_invocable<T, TControl>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

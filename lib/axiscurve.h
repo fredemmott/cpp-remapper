@@ -10,7 +10,7 @@
 #include "Sink.h"
 #include "Source.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 /** A simple curve with tuneable 'curviness'.
  *
@@ -31,4 +31,4 @@ class AxisCurve final : public AxisSource, public AxisSink {
   float mCurviness;
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

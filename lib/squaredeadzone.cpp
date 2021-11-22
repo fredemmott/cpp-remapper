@@ -8,7 +8,7 @@
 #define _NO_MIN_MAX
 #include "squaredeadzone.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 SquareDeadzone::SquareDeadzone(uint8_t percent) : mPercent(percent) {
 }
@@ -35,4 +35,4 @@ void SquareDeadzone::map(long value) {
   emit(scaled / 100);
 }
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

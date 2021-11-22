@@ -11,7 +11,7 @@
 
 #include "actionsapi.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 /// Different actions for if a button is short-pressed or long-pressed
 class ShortPressLongPress : public ButtonSink {
@@ -31,4 +31,4 @@ class ShortPressLongPress : public ButtonSink {
   std::chrono::time_point<std::chrono::steady_clock> mStart;
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

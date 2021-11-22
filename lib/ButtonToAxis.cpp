@@ -7,10 +7,10 @@
  */
 #include "ButtonToAxis.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 void ButtonToAxis::map(bool value) {
   emit(value ? 65535 : 0);
 }
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

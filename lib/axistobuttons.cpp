@@ -11,7 +11,7 @@
 
 #include <limits>
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 AxisToButtons::AxisToButtons(std::initializer_list<Range> ranges) {
   const long max = Axis::MAX;
@@ -30,22 +30,25 @@ void AxisToButtons::map(long value) {
   }
 }
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping
 
 // --- Tests ---
 
 #include "MappableVJoyOutput.h"
+#include "connections.h"
+
 using namespace fredemmott::inputmapping;
-using namespace fredemmott::inputmapping::actions;
 
 namespace {
 
 // Check that the compiler lets us call it as intended
 void static_test() {
   MappableVJoyOutput o(nullptr);
-  /*AxisToButtons foo {
-    {0, 0, o.Button1}, {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {} }};
-    */
+  AxisToButtons::Range range1 { 0, 0, o.Button1 };
+  // TODO(test)
+  //AxisToButtons::Range range2 { 0, 0, all<Button>(o.Button1, o.Button2) };
+  //AxisToButtons foo {
+   // {0, 0, o.Button1}, {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {}}};
 }
 
 }// namespace

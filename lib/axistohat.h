@@ -11,7 +11,7 @@
 
 #include "actionsapi.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 /** Converts two axis to a continuous (360-degree) hat.
  *
@@ -44,4 +44,4 @@ class AxisToHat {
   void update();
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

@@ -7,19 +7,53 @@
  */
 #pragma once
 
+#include <concepts>
+
 #include "Sink.h"
 #include "SinkRef.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
-template<typename TControl>
+template <typename TControl>
 class CompositeSink final : public Sink<TControl> {
  public:
-  CompositeSink();
-  void map(long value);
+  CompositeSink(std::vector<SinkRef<TControl>> sinks): mSinks(sinks) {}
+
+  virtual void map(typename TControl::Value value) override {
+    for (auto& inner: mSinks) {
+      inner->map(value);
+    }
+  };
 
  private:
   std::vector<SinkRef<TControl>> mSinks;
+
+  template <
+    std::convertible_to<SinkRef<TControl>> TFirst,
+    std::convertible_to<SinkRef<TControl>>... TRest>
+  void fill_sinks(const TFirst& first, TRest... rest) {
+    mSinks.push_back(first);
+    if constexpr (sizeof...(rest) > 0) {
+      fill_sinks(rest...);
+    }
+  }
 };
 
-}// namespace fredemmott::inputmapping::actions
+template <
+  convertible_to_sink_ref<Axis> TFirst,
+  convertible_to_sink_ref<Axis>... TRest
+>
+auto all(TFirst first, TRest... rest) {
+  return CompositeSink<Axis>({first, rest...});
+}
+
+template <
+  convertible_to_sink_ref<Button> TFirst,
+  convertible_to_sink_ref<Button>... TRest
+>
+auto all(TFirst first, TRest... rest) {
+  return CompositeSink<Button>({first, rest...});
+}
+
+
+}// namespace fredemmott::inputmapping

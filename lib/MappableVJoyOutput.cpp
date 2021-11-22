@@ -182,11 +182,11 @@ std::shared_ptr<OutputDevice> MappableVJoyOutput::getDevice() const {
 }
 
 ButtonSinkRef MappableVJoyOutput::button(uint8_t id) const {
-  return [device = mDevice, id](bool value) { device->setButton(id, value); };
+  return [device = mDevice, id](Button::Value value) { device->setButton(id, value); };
 }
 
 HatSinkRef MappableVJoyOutput::hat(uint8_t id) const {
-  return [device = mDevice, id](bool value) { device->setHat(id, value); };
+  return [device = mDevice, id](Hat::Value value) { device->setHat(id, value); };
 }
 
 }// namespace fredemmott::inputmapping

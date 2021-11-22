@@ -11,7 +11,7 @@
 
 #include "actionsapi.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 /** A simple deadzone for a single axis.
  *
@@ -39,4 +39,4 @@ class SquareDeadzone : public AxisSink, public AxisSource {
   uint8_t mPercent;
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

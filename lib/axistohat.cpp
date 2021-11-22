@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 AxisToHat::AxisToHat(const HatSinkRef& next, uint8_t deadzone_percent)
   : mNext(next), mDeadzone(deadzone_percent) {
@@ -39,4 +39,4 @@ void AxisToHat::update() {
   mNext->map((long)degrees * 100);
 }
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

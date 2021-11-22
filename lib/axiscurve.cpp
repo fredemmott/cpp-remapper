@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 AxisCurve::AxisCurve(float curviness) : mCurviness(curviness) {
 }
@@ -39,4 +39,4 @@ void AxisCurve::map(long value) {
   emit((clamped * scale) + 0x7fff);
 }
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

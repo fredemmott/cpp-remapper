@@ -30,7 +30,7 @@ concept any_source_ref =
 template<typename T, typename TControl>
 concept source_ref =
   any_source_ref<T>
-  && std::convertible_to<typename T::element_type, TControl>;
+  && source<typename T::element_type, TControl>;
 // clang-format on
 
 

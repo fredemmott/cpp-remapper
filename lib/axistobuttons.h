@@ -12,7 +12,7 @@
 
 #include "actionsapi.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 class AxisToButtons final : public AxisSink {
  public:
@@ -34,4 +34,4 @@ class AxisToButtons final : public AxisSink {
   std::vector<RawRange> mRanges;
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

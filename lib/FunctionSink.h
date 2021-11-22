@@ -9,6 +9,7 @@
 
 #include <functional>
 
+#include "function_traits.h"
 #include "Sink.h"
 
 namespace fredemmott::inputmapping {
@@ -30,9 +31,9 @@ class FunctionSink : public Sink<TControl> {
 // clang-format off
 template<typename T, typename TControl>
 concept sink_invocable =
-	std::is_base_of_v<Control, TControl>
-	&& std::invocable<T, typename TControl::Value>
-	&& std::same_as<void, std::invoke_result_t<T, typename TControl::Value>>;
+  std::is_base_of_v<Control, TControl>
+  && std::invocable<T, typename TControl::Value>
+  && detail::has_exact_signature<T, void(typename TControl::Value)>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

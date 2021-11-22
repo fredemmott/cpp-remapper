@@ -19,13 +19,13 @@ using fredemmott::inputmapping::Sink;
 using fredemmott::inputmapping::Source;
 
 int main() {
-  render_axis("linear.bmp", [](auto next) { return next; });
+  render_axis("linear.bmp", [](Axis::Value next) { return next; });
   render_axis("curve_0.bmp", AxisCurve(0));
   render_axis("curve_0.5.bmp", AxisCurve(0.5));
   render_axis("curve_neg0.5.bmp",AxisCurve(-0.5));
   render_axis("curve_0.99.bmp", AxisCurve(0.99));
   render_axis("dead_10.bmp", SquareDeadzone(10));
-  /*
+  /* TODO
    render_axis("dead_curve.bmp", SquareDeadzone(50) >> AxisCurve(0.5));
    render_axis("curve_dead.bmp", AxisCurve(0.5) >> SquareDeadzone(50));
    */

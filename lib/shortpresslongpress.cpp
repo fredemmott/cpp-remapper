@@ -9,7 +9,7 @@
 
 #include "mapper.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 namespace {
 const std::chrono::milliseconds INJECTED_PRESS_DURATION(100);
@@ -47,4 +47,4 @@ void static_test() {
 }
 }// namespace
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping

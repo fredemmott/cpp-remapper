@@ -14,7 +14,7 @@
 #include "profile.h"
 
 using namespace fredemmott::gameinput::devicedb;
-using namespace fredemmott::inputmapping::actions;
+using namespace fredemmott::inputmapping;
 using namespace fredemmott::inputmapping::vigemids;
 using namespace fredemmott::inputmapping::vjoyids;
 using fredemmott::gameinput::HardwareID;

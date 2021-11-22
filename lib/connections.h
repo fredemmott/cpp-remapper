@@ -32,6 +32,7 @@ template <
   sink_invocable<OutControl> Right>
 Pipeline operator>>(Left left, Right right) {
   auto sink = std::make_shared<FunctionSink<OutControl>>(right);
+
   left->setNext(sink);
   return Pipeline(UnsafeRef<typename Left::element_type>(left));
 }
@@ -54,6 +55,10 @@ template <
   typename Control = typename Left::element_type::OutControl,
   transform_invocable<Control, Control> Right>
 SourcePipeline<Control> operator>>(Left left, Right right) {
+  static_assert(std::same_as<
+    typename Control::Value,
+    detail::function_traits<Right>::FirstArg
+  >);
   auto t = std::make_shared<FunctionTransform<Control, Control>>(right);
   left->setNext(t);
   return SourcePipeline<Control>(left, t);

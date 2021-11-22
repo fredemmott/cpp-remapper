@@ -9,6 +9,7 @@
 
 #include <concepts>
 
+#include "function_traits.h"
 #include "Sink.h"
 #include "Source.h"
 
@@ -34,7 +35,9 @@ template<typename T, typename TIn>
 concept transform_invocable_from =
   std::is_base_of_v<Control, TIn>
   && std::invocable<T, typename TIn::Value>
-  && !std::same_as<void, std::invoke_result_t<T, typename TIn::Value>>;
+  && std::same_as<
+    typename TIn::Value,
+    typename ::fredemmott::inputmapping::detail::function_traits<T>::FirstArg>;
 
 template<typename T, typename TIn, typename TOut>
 concept transform_invocable =

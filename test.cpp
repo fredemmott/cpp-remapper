@@ -236,6 +236,16 @@ void test_bind_to_sink() {
   REQUIRE(b2);
 }
 
+void test_bind_to_multi() {
+  START_TEST;
+  TestAxis axis;
+  // 1, 2, n are special
+  axis >> [](long) {};
+  AxisSinkRef([](long) {});
+  AxisSinkRef([](long) {}, [](long){});
+  axis >> CompositeSink<Axis>({ [](long) {}, [](long) {} });
+}
+
 void static_test_vjoy() {
   // Input device is irrelevant, but we currently need one.
   auto [p, _, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
@@ -251,6 +261,7 @@ int main() {
   test_value_ptr();
   test_lambdas();
   test_bind_to_sink();
+  test_bind_to_multi();
   test_source_sink_transform();
   test_small_square_deadzone();
   test_large_square_deadzone();

@@ -12,11 +12,11 @@
 
 #include "actionsapi.h"
 
-namespace fredemmott::inputmapping::actions {
+namespace fredemmott::inputmapping {
 
 class ButtonToAxis final : public ButtonSink, public AxisSource {
  public:
   void map(bool value);
 };
 
-}// namespace fredemmott::inputmapping::actions
+}// namespace fredemmott::inputmapping
