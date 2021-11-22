@@ -25,7 +25,6 @@ Pipeline operator>>(Left left, Right right) requires std::same_as<
   return Pipeline(UnsafeRef<typename Left::element_type>(left));
 }
 
-// TODO: unneeded with SinkRef invocable constructor?
 ///// SourceRef >> SinkFunc /////
 template <
   is_source_ref Left,
@@ -89,6 +88,7 @@ auto operator>>(Left&& left, Right right) requires
   return owned >> right;
 }
 
+///// Make any temporary/movable right work with any supported left /////
 template <typename Left, sink_or_transform Right>
 auto operator>>(Left left, Right&& right) requires
   joinable<Left, UnsafeRef<Right>> {
@@ -96,6 +96,7 @@ auto operator>>(Left left, Right&& right) requires
   return left >> ref;
 }
 
+///// Make any right raw ptr work with any supported left /////
 template <typename Left, sink_or_transform Right>
 auto operator>>(Left left, Right* right) requires
   joinable<Left, UnsafeRef<Right>> {

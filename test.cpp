@@ -73,9 +73,7 @@ void test_lambdas() {
   axis.emit(1337);
   REQUIRE(out == 1337);
 
-  // TODO one line
-  auto step = axis >> [](Axis::Value value) { return Axis::MAX - value; };
-  step  >> &out;
+  axis >> [](Axis::Value value) { return Axis::MAX - value; } >> &out;
   axis.emit(123);
   REQUIRE(out == Axis::MAX - 123);
   axis.emit(Axis::MAX - 456);
@@ -90,12 +88,9 @@ void test_source_sink_transform() {
   SquareDeadzone dz(10);
 
   // Via pointer
-  //axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz)
+  // axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz)
   ::fredemmott::inputmapping::UnsafeRef<Source<Axis>> axisRef(&axis);
-  auto ret = axisRef >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz);
-  ret = axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz);
-  axis >> &dz;
-  //TODO axis >> &dz >> &out;
+  axis >> &dz >> &out;
   axis.emit(0);
   REQUIRE(out == 0);
   axis.emit(Axis::MAX);
