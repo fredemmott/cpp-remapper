@@ -22,20 +22,24 @@ class MISource : public Source {
   using Source::emit;
 };
 
-template<typename TControl>
-class MissingSource final: public Source<TControl> {
+template <typename TControl>
+class MissingSource final : public Source<TControl> {
   std::string mDevice;
   std::string mControl;
-  public:
 
-  MissingSource(const std::string& device, const std::string& control) : mDevice(device), mControl(control){
+ public:
+  MissingSource(const std::string& device, const std::string& control)
+    : mDevice(device), mControl(control) {
   }
 
   void setNext(const UnsafeRef<Sink<TControl>>&) override {
-    printf("WARNING: Attempted to attach to %s, but that does not exist on %s. Ignoring.\n", mControl.c_str(), mDevice.c_str());
+    printf(
+      "WARNING: Attempted to attach to %s, but that does not exist on %s. "
+      "Ignoring.\n",
+      mControl.c_str(),
+      mDevice.c_str());
   }
 };
-
 
 class MIAxisSource final : public MISource<AxisSource> {};
 class MIButtonSource final : public MISource<ButtonSource> {};
@@ -57,13 +61,12 @@ AxisSourceRef find_axis(
   const auto info = device->getAxisInformation();
   for (uint8_t i = 0; i < info.size(); ++i) {
     if (info[i].type == t) {
-      // TODO: very explicit?
-      return UnsafeRef<Source<Axis>>(inputs.at(i));
+      return inputs.at(i);
     }
   }
   auto axis_name = ::fredemmott::gameinput::AxisInformation(t).name;
   auto product_name = device->getProductName();
-  return UnsafeRef<Source<Axis>>(std::move(MissingSource<Axis>(product_name, axis_name)));
+  return std::make_shared<MissingSource<Axis>>(product_name, axis_name);
 }
 }// namespace
 
@@ -256,44 +259,34 @@ std::shared_ptr<InputDevice> MappableInput::getDevice() const {
 AxisSourceRef MappableInput::axis(uint8_t id) const {
   if (id == 0 || id > getAxisCount()) {
     char buf[255];
-    snprintf(
-      buf,
-      sizeof(buf),
-      "axis number %d of %zu",
-      id,
-      getAxisCount());
-    return UnsafeRef<Source<Axis>>(MissingSource<Axis>(getDevice()->getProductName(), buf));
+    snprintf(buf, sizeof(buf), "axis number %d of %zu", id, getAxisCount());
+    return std::make_shared<MissingSource<Axis>>(
+      getDevice()->getProductName(), buf);
   }
-  // TODO: why is explicit needed?
-  return UnsafeRef<Source<Axis>>(p->axisInputs.at(id - 1));
+
+  return p->axisInputs.at(id - 1);
 }
 
 ButtonSourceRef MappableInput::button(uint8_t id) const {
   if (id == 0 || id > getButtonCount()) {
     char buf[255];
-    snprintf(
-      buf,
-      sizeof(buf),
-      "button number %d of %zu",
-      id,
-      getButtonCount());
-    return UnsafeRef<Source<Button>>(MissingSource<Button>(getDevice()->getProductName(), buf));
+    // TODO: snprintf -> std::format
+    snprintf(buf, sizeof(buf), "button number %d of %zu", id, getButtonCount());
+    return std::make_shared<MissingSource<Button>>(
+      getDevice()->getProductName(), buf);
   }
-  return UnsafeRef<Source<Button>>(p->buttonInputs.at(id - 1));
+
+  return p->buttonInputs.at(id - 1);
 }
 
 HatSourceRef MappableInput::hat(uint8_t id) const {
   if (id == 0 || id > getHatCount()) {
     char buf[255];
-    snprintf(
-      buf,
-      sizeof(buf),
-      "hat number %d of %zu",
-      id,
-      getHatCount());
-    return UnsafeRef<Source<Hat>>(MissingSource<Hat>(getDevice()->getProductName(), buf));
+    snprintf(buf, sizeof(buf), "hat number %d of %zu", id, getHatCount());
+    return std::make_shared<MissingSource<Hat>>(
+      getDevice()->getProductName(), buf);
   }
-  return UnsafeRef<Source<Hat>>(p->hatInputs.at(id - 1));
+  return p->hatInputs.at(id - 1);
 }
 
 void MappableInput::poll() {

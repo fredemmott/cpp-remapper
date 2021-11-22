@@ -21,8 +21,6 @@ namespace fredemmott::inputmapping::actions {
 class AxisToHat {
  public:
   static const uint8_t DEFAULT_DEADZONE_PERCENT = 90;
-
-  // TODO: explicit
   AxisSinkRef XAxis = [this](Axis::Value x) {
     mX = x;
     update();

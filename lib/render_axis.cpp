@@ -74,7 +74,7 @@ void render_axis(
 
   // finally, the values :)
   for (int i = 0; i <= 0xffff; ++i) {
-    transform_in.map(i);
+    transform_in->map(i);
     const auto x = i / step;
     const auto y = fx / step;
     Pixel& p = data[offset(x, y)];

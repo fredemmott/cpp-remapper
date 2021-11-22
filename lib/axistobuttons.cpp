@@ -26,7 +26,7 @@ AxisToButtons::AxisToButtons(std::initializer_list<Range> ranges) {
 void AxisToButtons::map(long value) {
   for (auto& range: mRanges) {
     bool active = range.min <= value && range.max >= value;
-    range.next.map(active);
+    range.next->map(active);
   }
 }
 

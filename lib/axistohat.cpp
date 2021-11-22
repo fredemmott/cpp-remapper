@@ -30,13 +30,13 @@ void AxisToHat::update() {
   // needed for corners.
   const auto distance = sqrt((x * x) + (y * y));
   if ((distance * 100) / 0xffff < mDeadzone / 2) {
-    mNext.map(0xffff);// center
+    mNext->map(0xffff);// center
     return;
   }
   const auto radians = atan2(y, x);
   const auto raw_degrees = ((180 / M_PI) * radians) + 90;
   const auto degrees = (raw_degrees < 0) ? raw_degrees + 360 : raw_degrees;
-  mNext.map((long)degrees * 100);
+  mNext->map((long)degrees * 100);
 }
 
 }// namespace fredemmott::inputmapping::actions

@@ -23,7 +23,7 @@ MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id)
 
 MappableVJoyOutput::MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev)
   :
-#define A(a) a(std::make_shared<FunctionSink<Axis>>([dev](long value) { dev->set##a(value); }))
+#define A(a) a([dev](long value) { dev->set##a(value); })
 #define AA(a) A(a##Axis)
     AA(X),
     AA(Y),
@@ -182,15 +182,11 @@ std::shared_ptr<OutputDevice> MappableVJoyOutput::getDevice() const {
 }
 
 ButtonSinkRef MappableVJoyOutput::button(uint8_t id) const {
-  // TODO very explicit
-  return UnsafeRef<Sink<Button>>(std::make_shared<FunctionSink<Button>>(
-    [device = mDevice, id](bool value) { device->setButton(id, value); }));
+  return [device = mDevice, id](bool value) { device->setButton(id, value); };
 }
 
 HatSinkRef MappableVJoyOutput::hat(uint8_t id) const {
-  // TODO very explicit
-  return UnsafeRef<Sink<Hat>>(std::make_shared<FunctionSink<Hat>>(
-    [device = mDevice, id](bool value) { device->setHat(id, value); }));
+  return [device = mDevice, id](bool value) { device->setHat(id, value); };
 }
 
 }// namespace fredemmott::inputmapping

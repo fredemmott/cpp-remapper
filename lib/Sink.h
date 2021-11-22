@@ -37,12 +37,6 @@ template<typename T>
 concept is_sink =
   (!std::derived_from<T, AnySource>)
   && std::derived_from<T, AnySink>;
-
-template<typename T, typename TControl>
-concept sink_invocable =
-  std::is_base_of_v<Control, TControl>
-  && std::invocable<T, typename TControl::Value>
-  && std::same_as<void, std::invoke_result_t<T, typename TControl::Value>>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

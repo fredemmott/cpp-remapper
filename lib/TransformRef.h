@@ -16,18 +16,18 @@ namespace fredemmott::inputmapping {
 
 // clang-format off
 template<typename T>
-concept is_any_transform =
+concept any_transform =
   std::derived_from<T, AnySource>
   && std::derived_from<T, AnySink>;
 
 template<typename T, typename TIn, typename TOut>
 concept transform =
-  std::derived_from<T, Sink<typename TIn::InControl>>
-  && std::derived_from<T, Source<typename TOut::OutControl>>;
+  std::derived_from<T, Sink<TIn>>
+  && std::derived_from<T, Source<TOut>>;
 
 template<typename T, typename TIn>
-concept is_transform_from =
-  is_any_transform<T>
+concept transform_from =
+  any_transform<T>
   && std::derived_from<T, Sink<TIn>>;
 
 template<typename T, typename TIn>
@@ -44,14 +44,28 @@ concept transform_invocable =
     std::invoke_result_t<T, typename TIn::Value>>;
 
 template<typename T>
-concept is_transform_ref =
-  is_any_transform<typename T::element_type>
+concept transform_ref =
+  any_transform<typename T::element_type>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
 template<typename T, typename TIn>
-concept is_transform_from_ref =
-  is_transform_from<typename T::element_type, TIn>
+concept transform_from_ref =
+  transform_from<typename T::element_type, TIn>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+
+template<typename T>
+concept sink_or_transform = std::derived_from<T, AnySink>;
+
+template<typename T>
+concept sink_or_transform_ref =
+  sink_or_transform<typename T::element_type>;
+
+template<typename T>
+concept source_or_transform = std::derived_from<T, AnySource>;
+
+template<typename T>
+concept source_or_transform_ref =
+  source_or_transform<typename T::element_type>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping
