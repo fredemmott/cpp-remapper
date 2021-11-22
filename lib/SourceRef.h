@@ -23,13 +23,13 @@ using HatSourceRef = SourceRef<Hat>;
 
 // clang-format off
 template<typename T>
-concept is_source_ref =
-  is_source<typename T::element_type>
+concept any_source_ref =
+  any_source<typename T::element_type>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
 template<typename T, typename TControl>
 concept source_ref =
-  is_source_ref<T>
+  any_source_ref<T>
   && std::convertible_to<typename T::element_type, TControl>;
 // clang-format on
 

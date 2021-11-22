@@ -44,7 +44,7 @@ concept transform_invocable =
     std::invoke_result_t<T, typename TIn::Value>>;
 
 template<typename T>
-concept transform_ref =
+concept any_transform_ref =
   any_transform<typename T::element_type>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
@@ -53,19 +53,24 @@ concept transform_from_ref =
   transform_from<typename T::element_type, TIn>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
-template<typename T>
-concept sink_or_transform = std::derived_from<T, AnySink>;
+template<typename T, typename TIn, typename TOut>
+concept transform_ref =
+  transform_from_ref<T, TIn>
+  && std::derived_from<T, Source<TOut>>;
 
 template<typename T>
-concept sink_or_transform_ref =
-  sink_or_transform<typename T::element_type>;
+concept any_sink_or_transform = std::derived_from<T, AnySink>;
 
 template<typename T>
-concept source_or_transform = std::derived_from<T, AnySource>;
+concept any_sink_or_transform_ref =
+  any_sink_or_transform<typename T::element_type>;
 
 template<typename T>
-concept source_or_transform_ref =
-  source_or_transform<typename T::element_type>;
+concept any_source_or_transform = std::derived_from<T, AnySource>;
+
+template<typename T>
+concept any_source_or_transform_ref =
+  any_source_or_transform<typename T::element_type>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

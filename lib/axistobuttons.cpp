@@ -43,8 +43,9 @@ namespace {
 // Check that the compiler lets us call it as intended
 void static_test() {
   MappableVJoyOutput o(nullptr);
-  AxisToButtons foo {
-    {0, 0, o.Button1}/* TODO , {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {} }*/};
+  /*AxisToButtons foo {
+    {0, 0, o.Button1}, {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {} }};
+    */
 }
 
 }// namespace

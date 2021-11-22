@@ -52,12 +52,14 @@ using HatSource = Source<Hat>;
 
 // clang-format off
 template<typename T>
-concept is_source =
+concept any_source =
   std::derived_from<T, AnySource>
   && (!std::derived_from<T, AnySink>);
 
-template<typename T>
-concept is_source_or_transform = std::derived_from<T, AnySource>;
+template<typename T, typename TControl>
+concept source =
+  any_source<T>
+  && std::derived_from<T, Source<TControl>>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

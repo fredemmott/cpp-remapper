@@ -8,6 +8,8 @@
 #pragma once
 #include "devicespecifier.h"
 
+#include <format>
+
 #include "inputdevice.h"
 
 namespace fredemmott::gameinput {

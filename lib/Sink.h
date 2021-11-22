@@ -34,9 +34,14 @@ using HatSink = Sink<Hat>;
 
 // clang-format off
 template<typename T>
-concept is_sink =
+concept any_sink =
   (!std::derived_from<T, AnySource>)
   && std::derived_from<T, AnySink>;
+
+template<typename T, typename TControl>
+concept sink =
+  any_sink<T>
+  && std::derived_from<T, Sink<TControl>>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

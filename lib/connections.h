@@ -17,7 +17,7 @@
 namespace fredemmott::inputmapping {
 
 ///// SourceRef >> SinkRef /////
-template <is_source_ref Left, is_sink_ref Right>
+template <any_source_ref Left, any_sink_ref Right>
 Pipeline operator>>(Left left, Right right) requires std::same_as<
   typename Left::element_type::OutControl,
   typename Right::element_type::InControl> {
@@ -27,7 +27,7 @@ Pipeline operator>>(Left left, Right right) requires std::same_as<
 
 ///// SourceRef >> SinkFunc /////
 template <
-  is_source_ref Left,
+  any_source_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   sink_invocable<OutControl> Right>
 Pipeline operator>>(Left left, Right right) {
@@ -38,7 +38,7 @@ Pipeline operator>>(Left left, Right right) {
 
 ///// SourceRef >> TransformRef /////
 template <
-  is_source_ref Left,
+  any_source_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   transform_from_ref<OutControl> Right>
 SourcePipeline<OutControl> operator>>(
@@ -50,7 +50,7 @@ SourcePipeline<OutControl> operator>>(
 
 ///// SourceRef >> TransformFunc /////
 template <
-  is_source_ref Left,
+  any_source_ref Left,
   typename Control = typename Left::element_type::OutControl,
   transform_invocable<Control, Control> Right>
 SourcePipeline<Control> operator>>(Left left, Right right) {
@@ -61,7 +61,7 @@ SourcePipeline<Control> operator>>(Left left, Right right) {
 
 ///// SourceRef >> Value* (handy for testing) /////
 template <
-  is_source_ref Left,
+  any_source_ref Left,
   std::same_as<typename Left::element_type::Out> Right>
 Pipeline operator>>(Left left, Right* right) {
   return left >> [right](Right value) { *right = value; };
@@ -73,7 +73,7 @@ concept joinable = requires(Left left, Right right) {
 };
 
 ///// Make any non-temporary/moved source work with any supported right ////
-template <source_or_transform Left, typename Right>
+template <any_source_or_transform Left, typename Right>
 auto operator>>(Left& left, Right right) requires
   joinable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
   auto ref = UnsafeRef(&left);
@@ -81,7 +81,7 @@ auto operator>>(Left& left, Right right) requires
 }
 
 ///// Make any temporary/moved source work with any supported right ////
-template <source_or_transform Left, typename Right>
+template <any_source_or_transform Left, typename Right>
 auto operator>>(Left&& left, Right right) requires
   joinable<SourceRef<typename Left::OutControl>, Right> {
   auto owned = std::make_shared<Left>(std::move(left));
@@ -89,7 +89,7 @@ auto operator>>(Left&& left, Right right) requires
 }
 
 ///// Make any temporary/movable right work with any supported left /////
-template <typename Left, sink_or_transform Right>
+template <typename Left, any_sink_or_transform Right>
 auto operator>>(Left left, Right&& right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(std::move(right));
@@ -97,7 +97,7 @@ auto operator>>(Left left, Right&& right) requires
 }
 
 ///// Make any right raw ptr work with any supported left /////
-template <typename Left, sink_or_transform Right>
+template <typename Left, any_sink_or_transform Right>
 auto operator>>(Left left, Right* right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(right);

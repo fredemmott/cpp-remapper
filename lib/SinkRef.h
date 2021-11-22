@@ -35,14 +35,14 @@ using HatSinkRef = SinkRef<Hat>;
 
 // clang-format off
 template<typename T>
-concept is_sink_ref =
-  is_sink<typename T::element_type>
+concept any_sink_ref =
+  any_sink<typename T::element_type>
   && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
 
 template<typename T>
 concept is_nonref_sink =
-  is_sink<typename T::element_type>
-  && !is_sink_ref<T>;
+  any_sink<typename T::element_type>
+  && !any_sink_ref<T>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping
