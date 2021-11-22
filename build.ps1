@@ -37,7 +37,7 @@ if ($IDEBuildFile) {
   } elseif ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEBuildFile.endsWith('.cpp')) {
     $Profiles = $($IDEBuildFile)
   } else {
-    $Profiles = @("test.cpp", "example.cpp", "render.cpp")
+    $Profiles = (Get-Item *.cpp).Name
   }
 }
 
