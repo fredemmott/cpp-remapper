@@ -295,7 +295,6 @@ foreach ($ProfileSource in $Profiles) {
 
   Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource
 
-  (Get-Command cl.exe).Path
   Objs-Exe-Rule `
     -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
     -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)

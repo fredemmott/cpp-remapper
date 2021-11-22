@@ -23,7 +23,7 @@ class FunctionTransform final : public Sink<TIn>, public Source<TOut> {
   FunctionTransform() = delete;
   FunctionTransform(const Impl& impl) : impl(impl) {};
   void map(typename TIn::Value value) final override {
-    emit(impl(value));
+    this->emit(impl(value));
   };
 
  private:

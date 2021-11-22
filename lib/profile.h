@@ -104,19 +104,14 @@ std::vector<OutputPtr> select_outputs() {
   return {};
 }
 
-template <typename... Rest>
+template <typename First, typename... Rest>
 std::vector<OutputPtr> select_outputs(
-  const MappableInput& _not_an_output,
-  Rest... rest) {
-  return select_outputs(rest...);
-}
-
-template <typename... Rest>
-std::vector<OutputPtr> select_outputs(
-  const MappableOutput& first,
+  const First& first,
   Rest... rest) {
   auto ret = select_outputs(rest...);
-  ret.push_back(first.getDevice());
+  if constexpr (std::derived_from<First, MappableOutput>) {
+    ret.push_back(first.getDevice());
+  }
   return ret;
 }
 
@@ -124,19 +119,14 @@ std::vector<MappableInput> select_inputs() {
   return {};
 }
 
-template <typename... Rest>
+template <typename First, typename... Rest>
 std::vector<MappableInput> select_inputs(
-  const MappableOutput& _not_an_input,
-  Rest... rest) {
-  return select_inputs(rest...);
-}
-
-template <typename... Rest>
-std::vector<MappableInput> select_inputs(
-  const MappableInput& first,
+  const First& first,
   Rest... rest) {
   auto ret = select_inputs(rest...);
-  ret.push_back(first);
+  if constexpr (std::derived_from<First, MappableInput>) {
+    ret.push_back(first);
+  }
   return ret;
 }
 }// namespace

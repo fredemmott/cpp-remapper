@@ -31,9 +31,8 @@ void render_axis(const std::string& bmp_filename, T&& transform)
 
 template <transform_invocable<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, const T& func) {
-  FunctionTransform transform(func);
-  render_axis(
-    bmp_filename, AxisSinkRef(&transform), AxisSourceRef(&transform));
+  FunctionTransform<Axis, Axis> transform(func);
+  render_axis(bmp_filename, std::move(transform));
 }
 
 }// namespace fredemmott::inputmapping
