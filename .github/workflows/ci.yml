@@ -15,7 +15,7 @@ jobs:
       - name: Extract vJoy SDK
         run: |
           Expand-Archive vJoy-SDK.zip .
-          cp SDK\lib\vJoyInterface.dll .
+          cp SDK\lib\amd64\vJoyInterface.dll .
       - name: Build (Release)
         run: .\build.ps1 all
       - name: Build (Debug)
