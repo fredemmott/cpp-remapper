@@ -12,7 +12,7 @@
 #include "FunctionSink.h"
 #include "FunctionTransform.h"
 #include "TransformRef.h"
-#include "UnsafeRef.h" // TODO: split out decay_equiv
+#include "UnsafeRef.h"// TODO: split out decay_equiv
 #include "actionsapi.h"
 
 namespace fredemmott::inputmapping {
@@ -48,19 +48,19 @@ Pipeline operator>>(Left left, Right right) {
 ///// SourceOrTransformRef >> TransformRef /////
 template <
   any_source_or_transform_ref Left,
-  typename OutControl = typename Left::element_type::OutControl,
-  transform_from_ref<OutControl> Right>
+  transform_from_ref<typename Left::element_type::OutControl> Right>
 auto operator>>(Left left, Right right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
-    return SourcePipeline<OutControl>(left, right);
+    return SourcePipeline<typename Right::element_type::OutControl>(
+      left, right);
   }
 
   if constexpr (any_transform_ref<Left>) {
     return TransformPipeline<
-      OutControl,
-      typename Right::element_type::InControl>(left, right);
+      typename Left::element_type::InControl,
+      typename Right::element_type::OutControl>(left, right);
   }
 }
 
@@ -124,7 +124,8 @@ auto operator>>(Left& left, Right* right) requires
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, Right&& right) requires
   joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
-  return std::make_shared<Left>(std::move(left)) >> std::make_shared<Right>(std::move(right));
+  return std::make_shared<Left>(std::move(left))
+    >> std::make_shared<Right>(std::move(right));
 }
 
 template <detail::decay_equiv Left, detail::decay_equiv Right>
