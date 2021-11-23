@@ -18,7 +18,11 @@ jobs:
           cp SDK\lib\amd64\vJoyInterface.dll .
       - name: Build (Release)
         run: .\build.ps1 all
-      - name: Build (Debug)
+      - name: Build (Debug - MSVC ASAN)
         run: .\build.ps1 all -BuildMode Debug
-      - name: Run test (Debug)
+      - name: Build (Debug - Clang)
+        run: .\build.ps1 all -BuildMode Debug -Compiler Clang
+      - name: Run test (Debug ASAN)
         run: .\test-Debug.exe
+      - name: Run test (Debug Clang)
+        run: .\test-Debug-clang.exe
