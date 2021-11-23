@@ -35,6 +35,9 @@ param(
 )
 
 $AllProfiles = (Get-Item *.cpp).Name
+if (Test-Path profiles) {
+  $AllProfiles += Get-Item profiles\*.cpp | ForEach-Object { "profiles\$($_.Name)" }
+}
 if ($Profiles -eq @("all")) {
   $Profiles = $AllProfiles;
 }
