@@ -94,7 +94,7 @@ auto operator>>(Left&& left, Right right) requires
 
 ///// Make any temporary/movable right work with any supported left /////
 template <typename Left, any_sink_or_transform Right>
-auto operator>>(Left left, Right&& right) requires
+auto operator>>(Left& left, Right&& right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(std::move(right));
   return left >> ref;
@@ -102,7 +102,7 @@ auto operator>>(Left left, Right&& right) requires
 
 ///// Make any right raw ptr work with any supported left /////
 template <typename Left, any_sink_or_transform Right>
-auto operator>>(Left left, Right* right) requires
+auto operator>>(Left& left, Right* right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(right);
   return left >> ref;

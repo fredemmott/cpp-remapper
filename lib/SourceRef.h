@@ -16,7 +16,7 @@
 namespace fredemmott::inputmapping {
 
 template<std::derived_from<Control> TControl>
-using SourceRef = std::shared_ptr<Source<TControl>>;
+using SourceRef = UnsafeRef<Source<TControl>>;
 using AxisSourceRef = SourceRef<Axis>;
 using ButtonSourceRef = SourceRef<Button>;
 using HatSourceRef = SourceRef<Hat>;
