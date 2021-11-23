@@ -20,7 +20,7 @@ using namespace fredemmott::inputmapping;
 #define REQUIRE(x) \
   if (!(x)) { \
     printf( \
-      "Expectation '%s' failed in %s() at line %d\n", #x, __func__, __LINE__); \
+      "Expectation '%s' failed in %s() at %s:%d\n", #x, __func__, __FILE__, __LINE__); \
     __debugbreak(); \
     exit(1); \
   }
