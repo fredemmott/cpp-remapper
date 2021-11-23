@@ -12,9 +12,16 @@
 
 namespace fredemmott::inputmapping {
 
-template <typename T>
+namespace detail {
+  template<typename T>
+  concept decay_equiv = std::same_as<T, std::decay_t<T>>;
+}
+
+template <detail::decay_equiv T>
 class UnsafeRef {
+  template<detail::decay_equiv U>
   friend class UnsafeRef;
+
   T* p {nullptr};
   std::shared_ptr<T> refcounted;
 

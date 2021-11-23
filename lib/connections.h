@@ -12,17 +12,26 @@
 #include "FunctionSink.h"
 #include "FunctionTransform.h"
 #include "TransformRef.h"
+#include "UnsafeRef.h" // TODO: split out decay_equiv
 #include "actionsapi.h"
 
 namespace fredemmott::inputmapping {
 
-///// SourceRef >> SinkRef /////
-template <any_source_ref Left, any_sink_ref Right>
-Pipeline operator>>(Left left, Right right) requires std::same_as<
-  typename Left::element_type::OutControl,
-  typename Right::element_type::InControl> {
+///// SourceOrTransformRef >> SinkRef /////
+template <
+  any_source_or_transform_ref Left,
+  typename OutControl = typename Left::element_type::OutControl,
+  sink_ref<OutControl> Right>
+auto operator>>(Left left, Right right) {
   left->setNext(right);
-  return Pipeline(UnsafeRef<typename Left::element_type>(left));
+
+  if constexpr (any_source_ref<Left>) {
+    return Pipeline(UnsafeRef<typename Left::element_type>(left));
+  }
+
+  if constexpr (any_transform_ref<Left>) {
+    return TransformPipeline(left, right);
+  }
 }
 
 ///// SourceRef >> SinkFunc /////
@@ -36,16 +45,23 @@ Pipeline operator>>(Left left, Right right) {
   return Pipeline(UnsafeRef<typename Left::element_type>(left));
 }
 
-///// SourceRef >> TransformRef /////
+///// SourceOrTransformRef >> TransformRef /////
 template <
-  any_source_ref Left,
+  any_source_or_transform_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   transform_from_ref<OutControl> Right>
-SourcePipeline<OutControl> operator>>(
-  Left left,
-  Right right) {
+auto operator>>(Left left, Right right) {
   left->setNext(right);
-  return SourcePipeline<OutControl>(left, right);
+
+  if constexpr (any_source_ref<Left>) {
+    return SourcePipeline<OutControl>(left, right);
+  }
+
+  if constexpr (any_transform_ref<Left>) {
+    return TransformPipeline<
+      OutControl,
+      typename Right::element_type::InControl>(left, right);
+  }
 }
 
 ///// SourceRef >> TransformFunc /////
@@ -54,10 +70,6 @@ template <
   typename Control = typename Left::element_type::OutControl,
   transform_invocable<Control, Control> Right>
 SourcePipeline<Control> operator>>(Left left, Right right) {
-  static_assert(std::same_as<
-    typename Control::Value,
-    detail::function_traits<Right>::FirstArg
-  >);
   auto t = std::make_shared<FunctionTransform<Control, Control>>(right);
   left->setNext(t);
   return SourcePipeline<Control>(left, t);
@@ -76,36 +88,36 @@ concept joinable = requires(Left left, Right right) {
   left >> right;
 };
 
-///// Make any non-temporary/moved source work with any supported right ////
+///// SourceRef >> Value* (handy for testing) /////
 template <any_source_or_transform Left, typename Right>
-auto operator>>(Left& left, Right right) requires
+auto operator>>(Left& left, Right&& right) requires
   joinable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
+  static_assert(joinable<UnsafeRef<Left>, Right>);
   auto ref = UnsafeRef(&left);
-  return ref >> right;
+  return ref >> std::move(right);
 }
 
 ///// Make any temporary/moved source work with any supported right ////
 template <any_source_or_transform Left, typename Right>
-auto operator>>(Left&& left, Right right) requires
+auto operator>>(Left&& left, Right&& right) requires
   joinable<SourceRef<typename Left::OutControl>, Right> {
   auto owned = std::make_shared<Left>(std::move(left));
-  return owned >> right;
+  return owned >> std::move(right);
 }
 
 ///// Make any temporary/movable right work with any supported left /////
 template <typename Left, any_sink_or_transform Right>
-auto operator>>(Left& left, Right&& right) requires
+auto operator>>(Left left, Right&& right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(std::move(right));
-  return left >> ref;
+  return std::move(left) >> ref;
 }
 
-///// Make any right raw ptr work with any supported left /////
 template <typename Left, any_sink_or_transform Right>
-auto operator>>(Left& left, Right* right) requires
+auto operator>>(Left left, Right* right) requires
   joinable<Left, UnsafeRef<Right>> {
   UnsafeRef<Right> ref(right);
-  return left >> ref;
+  return std::move(left) >> ref;
 }
 
 }// namespace fredemmott::inputmapping

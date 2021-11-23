@@ -10,7 +10,11 @@
 namespace HidHide
 {
     typedef std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::FindVolumeClose)> FindVolumeClosePtr;
+    #ifdef _CLANG_CL
+    typedef std::function<bool(_In_ std::wstring const& volumeName, _In_ std::filesystem::path const& volumeMountPoint)> IterateAllVolumeMountPointsForFileStorageCallback;
+    #else
     typedef std::function<__declspec(noreturn) bool(_In_ std::wstring const& volumeName, _In_ std::filesystem::path const& volumeMountPoint)> IterateAllVolumeMountPointsForFileStorageCallback;
+    #endif
     typedef std::pair<std::filesystem::path, std::filesystem::path> VolumeMountPointAndDosDeviceName;
 
     // Get the DosDeviceName associated with a volume name

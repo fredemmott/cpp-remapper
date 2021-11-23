@@ -17,8 +17,6 @@ namespace fredemmott::inputmapping {
 
 class AnySource;
 class AnySink {};
-template <typename T>
-class UnsafeRef;
 
 template <std::derived_from<Control> TControl>
 class Sink : public AnySink {
@@ -44,16 +42,6 @@ template<typename T, typename TControl>
 concept sink =
   any_sink<T>
   && std::derived_from<T, Sink<TControl>>;
-
-template<typename T>
-concept any_sink_ref =
-	any_sink<typename T::element_type>
-	&& std::convertible_to<T, UnsafeRef<typename T::element_type>>;
-
-template<typename T, typename TControl>
-concept sink_ref =
-	any_sink_ref<T>
-	&& sink<typename T::element_type, TControl>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

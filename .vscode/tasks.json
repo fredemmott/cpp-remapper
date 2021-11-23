@@ -35,7 +35,28 @@
         }
       },
       "problemMatcher": "$msCompile",
-      "group": { "kind": "build", "isDefault": true }
+      "group": "build"
+    },
+    {
+      "label": "Build (Clang Debug)",
+      "command": ".\\build.ps1",
+      "args": [
+        "${file}",
+        "-BuildMode",
+        "Debug",
+        "-Compiler",
+        "clang",
+        "-GuessIntentForIDE",
+      ],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe"
+        }
+      },
+      "problemMatcher": [ "$msCompile" ],
+      "group": "build"
     }
   ],
 }

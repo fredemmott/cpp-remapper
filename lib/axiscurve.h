@@ -23,12 +23,12 @@ namespace fredemmott::inputmapping {
  */
 class AxisCurve final : public AxisSource, public AxisSink {
  public:
-  AxisCurve(float curviness);
+  AxisCurve(double curviness);
   virtual ~AxisCurve();
   void map(long value);
 
  private:
-  float mCurviness;
+  double mCurviness;
 };
 
 }// namespace fredemmott::inputmapping

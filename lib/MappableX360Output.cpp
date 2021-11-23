@@ -34,7 +34,7 @@ MappableX360Output::MappableX360Output(std::shared_ptr<X360Device> dev)
     A(RTrigger),
 #undef A
 #define B(name, enum) \
-  name([dev](bool value) { dev->setButton(X360Device::Button::##enum, value); })
+  name([dev](bool value) { dev->setButton(X360Device::Button::enum, value); })
 #define BB(x) B(Button##x, x)
     BB(A),
     BB(B),

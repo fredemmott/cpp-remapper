@@ -89,7 +89,7 @@ class MappableInput::Impl {
 
 MappableInput::MappableInput(const std::shared_ptr<InputDevice>& dev)
   : p(std::make_shared<Impl>(dev)),
-#define A(x) x##Axis(find_axis(dev, p->axisInputs, AxisType::##x))
+#define A(x) x##Axis(find_axis(dev, p->axisInputs, AxisType::x))
     A(X),
     A(Y),
     A(Z),

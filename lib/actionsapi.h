@@ -8,6 +8,7 @@
 #pragma once
 
 #include <any>
+#include <concepts>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -24,7 +25,7 @@
 
 namespace fredemmott::inputmapping {
 
-template <typename TControl>
+template <std::derived_from<Control> TControl>
 class SinkPipeline final : public Sink<TControl> {
   static_assert(std::is_base_of_v<Control, TControl>);
 
@@ -39,6 +40,7 @@ class SinkPipeline final : public Sink<TControl> {
   UnsafeRef<Sink<TControl>> mHead;
 };
 
+// TODO: rename to CompletePipeline
 class Pipeline final {
  public:
   Pipeline() = delete;
@@ -50,7 +52,7 @@ class Pipeline final {
   UnsafeRef<AnySource> mSource;
 };
 
-template <typename TControl>
+template <std::derived_from<Control> TControl>
 class SourcePipeline final : public Source<TControl> {
  public:
   SourcePipeline() = delete;
@@ -67,6 +69,28 @@ class SourcePipeline final : public Source<TControl> {
  private:
   UnsafeRef<AnySource> mFirst;
   UnsafeRef<Source<TControl>> mLast;
+};
+
+// TODO: add test
+template <std::derived_from<Control> TIn,
+std::derived_from<Control> TOut>
+class TransformPipeline final : public Sink<TIn>, public Source<TOut> {
+  public:
+    TransformPipeline() = delete;
+    TransformPipeline(
+      const SinkRef<TIn>& first,
+      const SourceRef<TOut>& last): mFirst(first), mLast(last) {}
+
+  virtual void setNext(const UnsafeRef<Sink<TIn>>& next) override {
+    mLast->setNext(next);
+  }
+
+  virtual void map(typename TIn::Value value) override {
+    mFirst->map(value);
+  }
+ private:
+  UnsafeRef<Sink<TIn>> mFirst;
+  UnsafeRef<Source<TOut>> mLast;
 };
 
 }// namespace fredemmott::inputmapping

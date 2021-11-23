@@ -11,7 +11,7 @@
 
 namespace fredemmott::inputmapping {
 
-AxisCurve::AxisCurve(float curviness) : mCurviness(curviness) {
+AxisCurve::AxisCurve(double curviness) : mCurviness(curviness) {
 }
 
 AxisCurve::~AxisCurve() {
