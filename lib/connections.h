@@ -22,7 +22,7 @@ template <
   any_source_or_transform_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   sink_ref<OutControl> Right>
-auto operator>>(Left left, Right right) {
+auto operator>>(Left left, const Right& right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
@@ -116,6 +116,12 @@ auto operator>>(Left& left, Right&& right) requires
 }
 
 template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left& left, const Right& right) requires
+  joinable<UnsafeRef<Left>, const Right&> {
+  return UnsafeRef(&left) >> right;
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left& left, Right* right) requires
   joinable<UnsafeRef<Left>, Right*> {
   return UnsafeRef(&left) >> right;
@@ -126,6 +132,12 @@ auto operator>>(Left&& left, Right&& right) requires
   joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
   return std::make_shared<Left>(std::move(left))
     >> std::make_shared<Right>(std::move(right));
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left&& left, const Right& right) requires
+  joinable<UnsafeRef<Left>, const Right&> {
+  return std::make_shared<Left>(std::move(left)) >> right;
 }
 
 template <detail::decay_equiv Left, detail::decay_equiv Right>
