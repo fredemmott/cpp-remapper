@@ -5,8 +5,8 @@
       "label": "Build (Release)",
       "command": ".\\build.ps1",
       "args": [
-        "-IDEBuildFile",
-        "${file}"
+        "${file}",
+        "-GuessIntentForIDE"
       ],
       "type": "shell",
       "options": {
@@ -22,10 +22,10 @@
       "label": "Build (Debug)",
       "command": ".\\build.ps1",
       "args": [
-        "-IDEBuildFile",
         "${file}",
         "-BuildMode",
-        "Debug"
+        "Debug",
+        "-GuessIntentForIDE"
       ],
       "type": "shell",
       "options": {
