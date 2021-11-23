@@ -39,6 +39,7 @@ class CompositeSink final : public Sink<TControl> {
   }
 };
 
+// clang-format off
 template <
   convertible_to_sink_ref<Axis> TFirst,
   convertible_to_sink_ref<Axis>... TRest
@@ -55,5 +56,13 @@ auto all(TFirst first, TRest... rest) {
   return CompositeSink<Button>({first, rest...});
 }
 
+template <
+  convertible_to_sink_ref<Hat> TFirst,
+  convertible_to_sink_ref<Hat>... TRest
+>
+auto all(TFirst first, TRest... rest) {
+  return CompositeSink<Hat>({first, rest...});
+}
+// clang-format on
 
 }// namespace fredemmott::inputmapping

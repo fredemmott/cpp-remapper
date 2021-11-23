@@ -7,16 +7,12 @@
  */
 
 #include "lib/easymode.h"
+#include "lib/CompositeSink.h"
+#include "lib/Sink.h"
+#include "lib/Source.h"
 #include "lib/render_axis.h"
 
-using fredemmott::inputmapping::Axis;
-using fredemmott::inputmapping::Button;
-using fredemmott::inputmapping::Control;
-using fredemmott::inputmapping::Hat;
-using fredemmott::inputmapping::Sink;
-using fredemmott::inputmapping::Source;
-
-using fredemmott::inputmapping::render_axis;
+using namespace fredemmott::inputmapping;
 
 #include <cstdio>
 #include <exception>
@@ -47,7 +43,7 @@ struct ProgressPrinter {
 };
 #define START_TEST ProgressPrinter pp_##__COUNTER__(__func__)
 
-template <std::derived_from<Control> TControl>
+template <typename TControl>
 class TestInput : public ::fredemmott::inputmapping::Source<TControl> {
  public:
   using Source<TControl>::emit;
@@ -241,9 +237,7 @@ void test_bind_to_multi() {
   TestAxis axis;
   // 1, 2, n are special
   axis >> [](long) {};
-  AxisSinkRef([](long) {});
-  AxisSinkRef([](long) {}, [](long){});
-  axis >> CompositeSink<Axis>({ [](long) {}, [](long) {} });
+  axis >> ::fredemmott::inputmapping::all([](long) {}, [](long) {});
 }
 
 void static_test_vjoy() {

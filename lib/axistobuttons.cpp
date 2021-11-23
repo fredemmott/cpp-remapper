@@ -35,6 +35,7 @@ void AxisToButtons::map(long value) {
 // --- Tests ---
 
 #include "MappableVJoyOutput.h"
+#include "CompositeSink.h"
 #include "connections.h"
 
 using namespace fredemmott::inputmapping;
@@ -45,9 +46,9 @@ namespace {
 void static_test() {
   MappableVJoyOutput o(nullptr);
   AxisToButtons::Range range1 { 0, 0, o.Button1 };
-  // TODO(test)
-  //AxisToButtons::Range range2 { 0, 0, all<Button>(o.Button1, o.Button2) };
-  //AxisToButtons foo {
+
+  AxisToButtons::Range range2 { 0, 0, all(o.Button1, o.Button2) };
+  // TODO AxisToButtons foo {
    // {0, 0, o.Button1}, {0, 0, {o.Button1, o.Button2}}, {100, 100, [](bool) {}}};
 }
 

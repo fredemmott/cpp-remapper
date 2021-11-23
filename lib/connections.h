@@ -32,7 +32,6 @@ template <
   sink_invocable<OutControl> Right>
 Pipeline operator>>(Left left, Right right) {
   auto sink = std::make_shared<FunctionSink<OutControl>>(right);
-
   left->setNext(sink);
   return Pipeline(UnsafeRef<typename Left::element_type>(left));
 }

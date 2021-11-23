@@ -20,13 +20,13 @@
 namespace fredemmott::inputmapping {
 
 template <std::derived_from<Control> TControl>
-class SinkRef : public std::shared_ptr<Sink<TControl>> {
+class SinkRef : public UnsafeRef<Sink<TControl>> {
  public:
-  using std::shared_ptr<Sink<TControl>>::shared_ptr;
+  using UnsafeRef<Sink<TControl>>::UnsafeRef;
 
   template <sink_invocable<TControl> Func>
   SinkRef(const Func& fun) {
-    this->reset(new FunctionSink<TControl>(fun));
+    *this = std::make_shared<FunctionSink<TControl>>(fun);
   }
 };
 using AxisSinkRef = SinkRef<Axis>;

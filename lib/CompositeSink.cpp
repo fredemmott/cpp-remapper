@@ -12,6 +12,8 @@
  */
 #include "CompositeSink.h"
 
+#include <concepts>
+
 #include "SinkRef.h"
 
 namespace {
@@ -23,14 +25,13 @@ void static_test() {
   auto two_buttons = all(b, b);
   auto many_buttons = all(b, b, b, b, b);
 
-  /* TODO:
   auto lambda = all([](bool) {});
-  auto many_lambdas = all(
-    [](bool) {},
-    [](bool) {},
-    [](bool) {}
-  );
-  */
+  auto many_lambdas = all([](bool) {}, [](bool) {}, [](bool) {});
+  static_assert(std::same_as<CompositeSink<Button>, decltype(many_lambdas)>);
+
+  auto many_axis_lambdas = all([](long) {}, [](long) {}, [](long) {});
+  static_assert(!std::same_as<CompositeSink<Axis>, decltype(many_lambdas)>);
+  static_assert(std::same_as<CompositeSink<Axis>, decltype(many_axis_lambdas)>);
 }
 
 }// namespace

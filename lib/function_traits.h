@@ -21,6 +21,7 @@ struct function_traits<TRet(TClass::*)(TArgs...) const> :
 
 template<typename TRet, typename... TArgs>
 struct function_traits<TRet(TArgs...)> {
+  using ReturnType = TRet;
 	using Signature = TRet(TArgs...);
   using ArgTypes = std::tuple<TArgs...>;
   template<std::size_t N>
@@ -29,7 +30,15 @@ struct function_traits<TRet(TArgs...)> {
 };
 
 template<typename T, typename TSignature>
-concept has_exact_signature
+concept exact_signature
 	= std::same_as<TSignature, typename function_traits<T>::Signature>;
 
-};
+template<typename T, typename... TArgs>
+concept exact_arguments
+	= std::same_as<std::tuple<TArgs...>, typename function_traits<T>::ArgTypes>;
+
+template<typename T, typename TRet>
+concept exact_return_type
+	= std::same_as<TRet, typename function_traits<T>::ReturnType>;
+
+}

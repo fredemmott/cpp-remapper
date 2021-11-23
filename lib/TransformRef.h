@@ -35,16 +35,12 @@ template<typename T, typename TIn>
 concept transform_invocable_from =
   std::is_base_of_v<Control, TIn>
   && std::invocable<T, typename TIn::Value>
-  && std::same_as<
-    typename TIn::Value,
-    typename ::fredemmott::inputmapping::detail::function_traits<T>::FirstArg>;
+  && detail::exact_arguments<T, typename TIn::Value>;
 
 template<typename T, typename TIn, typename TOut>
 concept transform_invocable =
   transform_invocable_from<T, TIn>
-  && std::same_as<
-    typename TOut::Value,
-    std::invoke_result_t<T, typename TIn::Value>>;
+  && detail::exact_return_type<T, typename TOut::Value>;
 
 template<typename T>
 concept any_transform_ref =

@@ -13,7 +13,7 @@
 namespace fredemmott::inputmapping {
 
 template <typename T>
-class UnsafeRef final {
+class UnsafeRef {
   friend class UnsafeRef;
   T* p {nullptr};
   std::shared_ptr<T> refcounted;
