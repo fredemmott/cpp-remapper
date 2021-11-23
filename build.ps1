@@ -29,7 +29,9 @@ param(
   [ValidateSet('x86', 'x64')]
   [string] $Platform = 'x64',
   [switch] $ForceRebuild,
-  [switch] $GuessIntentForIDE
+  [switch] $GuessIntentForIDE,
+  [ValidateSet('clang', 'cl')]
+  [string] $Compiler = 'cl'
 )
 
 $AllProfiles = (Get-Item *.cpp).Name
@@ -49,11 +51,11 @@ if ($GuessIntentForIDE) {
 }
 
 $CWD = (Get-Item .).FullName
-$IntermediateDir = "$CWD\build\${Platform}-${BuildMode}"
+$IntermediateDir = "$CWD\build\${Platform}-${Compiler}-${BuildMode}"
 $ExeSuffix = "-${BuildMode}";
 New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
 
-# Needed by HidHideCli
+$LINKFlags = @()
 $CLFlags = @(
   "/nologo",
   "/I.",
@@ -68,14 +70,43 @@ $CLFlags = @(
   "/DProjectDirLength=$((Get-Location).Path.Length)" # Needed by HidHideCli
 )
 
+switch($Platform) {
+  "x86" {
+    $VCVarsBat = "vcvars32.bat"
+    $ExeSuffix = "$ExeSuffix-x86"
+    # VJoy SDK
+    $LINKFlags += "/LIBPATH:SDK\lib"
+    $ClangArch = "i386"
+  }
+  "x64" {
+    $VCVarsBat = "vcvars64.bat"
+    # VJoy SDK
+    $LINKFlags += "/LIBPATH:SDK\lib\amd64"
+    $ClangArch = "x86_64"
+  }
+
+  default {
+    Write-Output "Unsupported platform '$Platform'"
+    exit 1
+  }
+}
+
 switch($BuildMode) {
   "Debug" {
-    $CLFlags += @("/Zi", "/MTd", "/fsanitize=address")
-    $LINKFlags=@("/DEBUG:FULL")
+    $CLFlags += @("/Zi", "/MTd")
+    $LINKFlags += @("/DEBUG:FULL")
+
+    if ($Compiler -eq "cl") {
+      $CLFlags += "/fsanitize=address";
+    }
+    # asan doesn't work with /MTd with clang :'(
+    # $LINKFlags += @(
+    #	"/LIBPATH:$(clang -print-resource-dir)\lib\windows"
+    #	"clang_rt.asan-${ClangArch}.lib"
+    # )
   }
   "Release" {
     $CLFlags += @("/O2", "/MT")
-    $LINKFlags=@()
     $ExeSuffix=''
   }
 
@@ -85,24 +116,20 @@ switch($BuildMode) {
   }
 }
 
-switch($Platform) {
-  "x86" {
-    $VCVarsBat = "vcvars32.bat"
-    $ExeSuffix = "$ExeSuffix-x86"
-    # VJoy SDK
-    $LINKFlags += "/LIBPATH:SDK\lib"
-  }
-  "x64" {
-    $VCVarsBat = "vcvars64.bat"
-    # VJoy SDK
-    $LINKFlags += "/LIBPATH:SDK\lib\amd64"
-  }
 
-  default {
-    Write-Output "Unsupported platform '$Platform'"
-    exit 1
-  }
+$CL = 'cl.exe'
+if ($Compiler -eq "clang") {
+  $CL = 'clang-cl.exe'
+  $CLFlags += @(
+    "/D_CLANG_CL",
+    # Extra flags for HidHideCLI
+    "-Wno-format",
+    "-Wno-pragma-pack",
+    "-Wno-pragma-once-outside-header"
+  )
+  $ExeSuffix += "-clang"
 }
+
 $LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
 
 $ErrorActionPreference = "Stop"
@@ -229,16 +256,34 @@ function Cpp-Obj-Rule {
 
   $Cpp = (Get-Relative-Name $Cpp)
 
-
-  $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps.json")
-  if (Test-Path $DepsPath) {
-    $Headers = Get-Content $DepsPath | Out-String | ConvertFrom-Json | % { $_.Data.Includes }
+  if ($Compiler -eq "cl") {
+    $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps.json")
+    $DepsCLFlags = @("/sourceDependencies", $DepsPath)
+    if (Test-Path $DepsPath) {
+      $Headers = Get-Content $DepsPath | Out-String | ConvertFrom-Json | % { $_.Data.Includes }
+    }
+  }
+  if ($Compiler -eq "clang") {
+    $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps")
+    $DepsCLFlags = @("/clang:-MD", "/clang:-MF$DepsPath")
+    if (Test-Path $DepsPath) {
+      # Make-style foo.o: foo.h bar.h
+      $Str = (Get-Content $DepsPath).Trim() | Out-String
+      # Skip 'foo.o':
+      $Str = $Str.Substring($Str.IndexOf(':') + 2);
+      $Headers = (
+        $Str `
+        -Replace " \\`r`n", "`r`n" `
+        -Replace "([^\\]) ", "`$1`r`n" `
+        -Replace "\\ ", " "
+      ).Trim() -Split "`r`n" | ForEach-Object { $_.Trim() }
+    }
   }
 
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CL: ${Target}: $Cpp"
     Invoke-Exe-Checked {
-      CL.exe $CLFlags /sourceDependencies $DepsPath /c "/Fo$Target" $Cpp
+      & $CL $CLFlags $DepsCLFlags /c "/Fo$Target" (Get-Item $Cpp).FullName
     }
   }
 }
