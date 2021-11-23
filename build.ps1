@@ -22,22 +22,29 @@
 
 [cmdletbinding()]
 param(
-  [string] $ProfileSource,
-  [string] $IDEBuildFile,
+  [Parameter(Mandatory=$true)]
+  [string[]] $Profiles,
   [ValidateSet('Release', 'Debug')]
   [string] $BuildMode = 'Release',
   [ValidateSet('x86', 'x64')]
   [string] $Platform = 'x64',
-  [switch] $ForceRebuild
+  [switch] $ForceRebuild,
+  [switch] $GuessIDEBuildIntent
 )
 
-if ($IDEBuildFile) {
-  if ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item profiles).FullName) {
-    $Profiles = @($IDEBuildFile)
-  } elseif ((Get-Item $IDEBuildFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEBuildFile.endsWith('.cpp')) {
-    $Profiles = $($IDEBuildFile)
+$AllProfiles = (Get-Item *.cpp).Name
+if ($Profiles -eq @("all")) {
+  $Profiles = $AllProfiles;
+}
+
+if ($GuessIDEBuiltIntent) {
+  $IDEFile = $Profiles[0];
+  if ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item profiles).FullName) {
+    $Profiles = @($IDEFile)
+  } elseif ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEFile.endsWith('.cpp')) {
+    $Profiles = $($IDEFile)
   } else {
-    $Profiles = (Get-Item *.cpp).Name
+    $Profiles = $AllProfiles
   }
 }
 
