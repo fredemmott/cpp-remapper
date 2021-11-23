@@ -29,7 +29,7 @@ param(
   [ValidateSet('x86', 'x64')]
   [string] $Platform = 'x64',
   [switch] $ForceRebuild,
-  [switch] $GuessIDEBuildIntent
+  [switch] $GuessIntentForIDE
 )
 
 $AllProfiles = (Get-Item *.cpp).Name
@@ -37,7 +37,7 @@ if ($Profiles -eq @("all")) {
   $Profiles = $AllProfiles;
 }
 
-if ($GuessIDEBuiltIntent) {
+if ($GuessIntentForIDE) {
   $IDEFile = $Profiles[0];
   if ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item profiles).FullName) {
     $Profiles = @($IDEFile)
