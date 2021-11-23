@@ -84,8 +84,6 @@ void test_source_sink_transform() {
   SquareDeadzone dz(10);
 
   // Via pointer
-  // axis >> ::fredemmott::inputmapping::UnsafeRef<SquareDeadzone>(&dz)
-  ::fredemmott::inputmapping::UnsafeRef<Source<Axis>> axisRef(&axis);
   axis >> &dz >> &out;
   axis.emit(0);
   REQUIRE(out == 0);
@@ -98,6 +96,10 @@ void test_source_sink_transform() {
 
   // Via temporary
   axis >> SquareDeadzone {10} >> &out;
+  axis.emit(0);
+  REQUIRE(out == 0);
+  axis.emit(Axis::MAX);
+  REQUIRE(out == Axis::MAX);
 }
 
 void test_square_deadzone_impl(uint8_t percent) {

@@ -93,31 +93,44 @@ template <any_source_or_transform Left, typename Right>
 auto operator>>(Left& left, Right&& right) requires
   joinable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
   static_assert(joinable<UnsafeRef<Left>, Right>);
-  auto ref = UnsafeRef(&left);
-  return ref >> std::move(right);
+  return UnsafeRef(&left) >> std::move(right);
 }
 
-///// Make any temporary/moved source work with any supported right ////
-template <any_source_or_transform Left, typename Right>
-auto operator>>(Left&& left, Right&& right) requires
-  joinable<SourceRef<typename Left::OutControl>, Right> {
-  auto owned = std::make_shared<Left>(std::move(left));
-  return owned >> std::move(right);
-}
-
-///// Make any temporary/movable right work with any supported left /////
-template <typename Left, any_sink_or_transform Right>
+// TODO: canonical conversions
+template <any_source_or_transform_ref Left, detail::decay_equiv Right>
 auto operator>>(Left left, Right&& right) requires
   joinable<Left, UnsafeRef<Right>> {
-  UnsafeRef<Right> ref(std::move(right));
-  return std::move(left) >> ref;
+  return left >> std::make_shared<Right>(std::move(right));
 }
 
-template <typename Left, any_sink_or_transform Right>
+template <any_source_or_transform_ref Left, detail::decay_equiv Right>
 auto operator>>(Left left, Right* right) requires
   joinable<Left, UnsafeRef<Right>> {
-  UnsafeRef<Right> ref(right);
-  return std::move(left) >> ref;
+  return left >> UnsafeRef(right);
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left& left, Right&& right) requires
+  joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
+  return UnsafeRef(&left) >> std::make_shared<Right>(std::move(right));
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left& left, Right* right) requires
+  joinable<UnsafeRef<Left>, Right*> {
+  return UnsafeRef(&left) >> right;
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left&& left, Right&& right) requires
+  joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
+  return std::make_shared<Left>(std::move(left)) >> std::make_shared<Right>(std::move(right));
+}
+
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left&& left, Right* right) requires
+  joinable<UnsafeRef<Left>, Right*> {
+  return std::make_shared<Left>(std::move(left)) >> right;
 }
 
 }// namespace fredemmott::inputmapping

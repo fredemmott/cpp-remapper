@@ -13,13 +13,19 @@
 namespace fredemmott::inputmapping {
 
 namespace detail {
-  template<typename T>
-  concept decay_equiv = std::same_as<T, std::decay_t<T>>;
-}
+template <typename T>
+concept decay_equiv = std::same_as<T, std::decay_t<T>>;
 
-template <detail::decay_equiv T>
+template <typename T>
+  concept container = requires (T) { typename T::element_type; };
+
+template <typename T>
+  concept unsafe_ref_target = decay_equiv<T> && !container<T>;
+}// namespace detail
+
+template <detail::unsafe_ref_target T>
 class UnsafeRef {
-  template<detail::decay_equiv U>
+  template <detail::unsafe_ref_target U>
   friend class UnsafeRef;
 
   T* p {nullptr};
@@ -49,9 +55,9 @@ class UnsafeRef {
     p = refcounted.get();
   }
 
- bool isValid() const {
-   return p;
- }
+  bool isValid() const {
+    return p;
+  }
   T& operator*() const {
     return *p;
   }
