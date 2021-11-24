@@ -101,14 +101,6 @@ concept pipeable = requires(Left left, Right right) {
   left >> right;
 };
 
-///// SourceRef >> Value* (handy for testing) /////
-template <any_source_or_transform Left, typename Right>
-auto operator>>(Left& left, Right&& right) requires
-  pipeable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
-  static_assert(pipeable<UnsafeRef<Left>, Right>);
-  return UnsafeRef(&left) >> std::move(right);
-}
-
 /* Now we're onto dealing with stuff that isn't a ref.
  *
  * `detail::decay_equiv` means that `std::decay<T>` is the same type as `T`; for example,
@@ -131,6 +123,15 @@ auto operator>>(Left& left, Right&& right) requires
  * `auto mytransform = [](Axis::Value value) { return Axis::MAX - value; };` - using
  * `mytransform` requires it to be taken as a mutable reference.
  */
+
+///// Support a ref that's stored in a local, e.g. axis >> [](){} /////
+template <any_source_or_transform Left, typename Right>
+auto operator>>(Left& left, Right&& right) requires
+	pipeable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
+	static_assert(pipeable<UnsafeRef<Left>, Right>);
+	return UnsafeRef(&left) >> std::move(right);
+}
+
 
 ///// Support temporary/moved RHS /////
 template <any_source_or_transform_ref Left, detail::decay_equiv Right>
