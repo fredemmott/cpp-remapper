@@ -7,8 +7,6 @@
  */
 #pragma once
 
-#include <type_traits>
-
 #include "Controls.h"
 #include "UnsafeRef.h"
 
@@ -24,11 +22,7 @@ class AnySource;
 class ClosedPipeline final {
  public:
   ClosedPipeline() = delete;
-  // TODO: are templates still needed here?
-  template <
-    typename T,
-    std::enable_if_t<std::is_base_of_v<AnySource, T>, bool> = true>
-  ClosedPipeline(const UnsafeRef<T>& source) : mSource(source) {
+  ClosedPipeline(const UnsafeRef<AnySource>& source) : mSource(source) {
   }
 
  private:
