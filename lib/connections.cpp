@@ -11,6 +11,8 @@
 #include <concepts>
 
 #include "axiscurve.h"
+#include "MappableInput.h"
+#include "MappableVJoyOutput.h"
 #include "squaredeadzone.h"
 
 namespace fredemmott::inputmapping {
@@ -28,5 +30,12 @@ void static_test_transform_pipelines() {
   auto z = SquareDeadzone(50) >> AxisCurve(0.5);
   static_assert(std::same_as<decltype(x), decltype(z)>);
 }
+
+void static_test_transfomed_source_pipelines() {
+  MappableInput stick(nullptr);
+  MappableVJoyOutput vj1(0);
+  stick.XAxis >> SquareDeadzone(10) >> AxisCurve(-0.5) >> vj1.XAxis;
+}
+
 }// namespace
 }// namespace fredemmott::inputmapping
