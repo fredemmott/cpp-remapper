@@ -27,6 +27,18 @@
       "cwd": "${workspaceFolder}",
       "environment": [],
       "console": "integratedTerminal"
+    },
+    {
+      "name": "Current Profile (Clang)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${fileBasenameNoExtension}-Debug-clang.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "preLaunchTask": "Build (Clang Debug)",
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal"
     }
   ]
 }
