@@ -193,6 +193,10 @@ function Rebuild-If-Outdated {
 
   $TargetMTime=$(Get-Item $Target).LastWriteTime
   foreach ($Source in $Sources) {
+    if (!(Test-Path $Source)) {
+      &$Wrap
+      return;
+    }
     if ((Get-Item "$Source").LastWriteTime -gt $TargetMTime) {
       &$Wrap
       return
