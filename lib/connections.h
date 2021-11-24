@@ -153,14 +153,6 @@ auto operator>>(Left& left, Right&& right) requires
   return UnsafeRef(&left) >> std::make_shared<Right>(std::move(right));
 }
 
-///// Local left, const right ptr, e.g. `foo >> vjoy1.LeftAxis`
-template <detail::decay_equiv Left, detail::decay_equiv Right>
-auto operator>>(Left& left, const Right& right) requires
-  any_sink_or_transform_ref<Right> // unneeded, but good to check
-  && pipeable<UnsafeRef<Left>, const Right&> {
-  return UnsafeRef(&left) >> right;
-}
-
 ////// Local left, pointer RHS /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left& left, Right* right) requires
