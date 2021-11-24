@@ -284,7 +284,7 @@ function Cpp-Obj-Rule {
   }
 
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
-    Write-Output "  CL: ${Target}: $Cpp"
+    Write-Output "  CXX ($Compiler): ${Target}: $Cpp"
     Invoke-Exe-Checked {
       & $CL $CLFlags $DepsCLFlags /c "/Fo$Target" (Get-Item $Cpp).FullName
     }
