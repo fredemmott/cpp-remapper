@@ -20,15 +20,18 @@ class Axis final : public Control {
   static const Value MAX = 0xffff;
   static const Value MIN = 0;
 };
+
 class Button final : public Control {
  public:
   using Value = bool;
 };
+
 class Hat final : public Control {
  public:
   using Value = uint16_t;
   static const Value MAX = 36000;
   static const Value MIN = 0;
+  static const Value CENTER = 0xffff;
 };
 
 }// namespace fredemmott::inputmapping

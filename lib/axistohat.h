@@ -9,16 +9,19 @@
 
 #include <cstdint>
 
-#include "actionsapi.h"
+#include "Source.h"
+#include "SinkRef.h"
 
 namespace fredemmott::inputmapping {
+
+// TODO: clearly untested, was not a HatSource
 
 /** Converts two axis to a continuous (360-degree) hat.
  *
  * Deflections > 327.67 degrees will not be shown correctly in the Windows
  * test app - use "Monitor vJoy" instead.
  */
-class AxisToHat {
+class AxisToHat final : public HatSource {
  public:
   static const uint8_t DEFAULT_DEADZONE_PERCENT = 90;
   AxisSinkRef XAxis = [this](Axis::Value x) {
@@ -31,12 +34,10 @@ class AxisToHat {
   };
 
   AxisToHat(
-    const HatSinkRef& next,
     uint8_t deadzone_percent = DEFAULT_DEADZONE_PERCENT);
   ~AxisToHat();
 
  private:
-  HatSinkRef mNext;
   uint8_t mDeadzone = DEFAULT_DEADZONE_PERCENT;
   Axis::Value mX = 0;
   Axis::Value mY = 0;

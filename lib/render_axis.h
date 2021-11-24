@@ -12,7 +12,8 @@
 
 #include "FunctionTransform.h"
 #include "TransformRef.h"
-#include "actionsapi.h"
+#include "SinkRef.h"
+#include "SourceRef.h"
 
 namespace fredemmott::inputmapping {
 

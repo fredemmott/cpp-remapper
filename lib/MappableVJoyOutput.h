@@ -10,10 +10,11 @@
 #include <cstdint>
 
 #include "MappableOutput.h"
-#include "VJoyDevice.h"
-#include "actionsapi.h"
+#include "SinkRef.h"
 
 namespace fredemmott::inputmapping {
+
+class VJoyDevice;
 
 class MappableVJoyOutput final : public MappableOutput {
  public:
@@ -25,11 +26,10 @@ class MappableVJoyOutput final : public MappableOutput {
   ButtonSinkRef button(uint8_t id) const;
   HatSinkRef hat(uint8_t id) const;
 
+  // TODO: constify?
   AxisSinkRef XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
-
-  // Convenience :)
-
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
+
   ButtonSinkRef Button1, Button2, Button3, Button4, Button5, Button6, Button7,
     Button8, Button9, Button10, Button11, Button12, Button13, Button14,
     Button15, Button16, Button17, Button18, Button19, Button20, Button21,

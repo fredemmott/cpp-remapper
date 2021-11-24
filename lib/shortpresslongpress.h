@@ -9,7 +9,7 @@
 
 #include <chrono>
 
-#include "actionsapi.h"
+#include "SinkRef.h"
 
 namespace fredemmott::inputmapping {
 

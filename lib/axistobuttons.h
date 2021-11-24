@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "actionsapi.h"
+#include "SinkRef.h"
 
 namespace fredemmott::inputmapping {
 

@@ -11,10 +11,11 @@
 #include <memory>
 
 #include "MappableOutput.h"
-#include "X360Device.h"
-#include "actionsapi.h"
+#include "SinkRef.h"
 
 namespace fredemmott::inputmapping {
+
+class X360Device;
 
 class MappableX360Output final : public MappableOutput {
  public:

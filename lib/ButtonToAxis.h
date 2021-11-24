@@ -7,16 +7,14 @@
  */
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
-#include "actionsapi.h"
+#include "Sink.h"
+#include "Source.h"
 
 namespace fredemmott::inputmapping {
 
 class ButtonToAxis final : public ButtonSink, public AxisSource {
  public:
-  void map(bool value);
+  void map(Button::Value value);
 };
 
 }// namespace fredemmott::inputmapping

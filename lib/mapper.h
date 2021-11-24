@@ -9,10 +9,9 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <map>
-#include <ratio>
-
-#include "actionsapi.h"
+#include <vector>
 
 namespace fredemmott::gameinput {
 class InputDevice;

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Controls.h"
+#include "Sink.h"
 #include "UnsafeRef.h"
 
 #include <concepts>
