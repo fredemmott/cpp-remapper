@@ -17,16 +17,29 @@
 
 namespace fredemmott::inputmapping {
 
+// clang-format is not good for readability with this amount of C++ concepts at the moment :(
+
+// clang-format off
+
+/* Most of the 'how to tie stuff together' stuff works on '_ref's, which is
+ * essentially 'kinda looks like a `shared_ptr<>`.
+ *
+ * We work with `shared_ptr<>` where possible, but to support working with
+ * lvalues, we also have `UnsafeRef<T>`, which contains a raw pointer, and
+ * an optional `shared_ptr<>` that must be equal to maintain the refcount.'
+ *
+ * Let's start with the canonical ref-based operators:
+ */
+
 ///// SourceOrTransformRef >> SinkRef /////
 template <
   any_source_or_transform_ref Left,
-  typename OutControl = typename Left::element_type::OutControl,
-  sink_ref<OutControl> Right>
+  sink_ref<typename Left::element_type::OutControl> Right>
 auto operator>>(Left left, const Right& right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
-    return Pipeline(UnsafeRef<typename Left::element_type>(left));
+    return ClosedPipeline(UnsafeRef<typename Left::element_type>(left));
   }
 
   if constexpr (any_transform_ref<Left>) {
@@ -39,10 +52,10 @@ template <
   any_source_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   sink_invocable<OutControl> Right>
-Pipeline operator>>(Left left, Right right) {
+ClosedPipeline operator>>(Left left, Right right) {
   auto sink = std::make_shared<FunctionSink<OutControl>>(right);
   left->setNext(sink);
-  return Pipeline(UnsafeRef<typename Left::element_type>(left));
+  return ClosedPipeline(UnsafeRef<typename Left::element_type>(left));
 }
 
 ///// SourceOrTransformRef >> TransformRef /////
@@ -79,70 +92,102 @@ SourcePipeline<Control> operator>>(Left left, Right right) {
 template <
   any_source_ref Left,
   std::same_as<typename Left::element_type::Out> Right>
-Pipeline operator>>(Left left, Right* right) {
+ClosedPipeline operator>>(Left left, Right* right) {
   return left >> [right](Right value) { *right = value; };
 }
 
 template <typename Left, typename Right>
-concept joinable = requires(Left left, Right right) {
+concept pipeable = requires(Left left, Right right) {
   left >> right;
 };
 
 ///// SourceRef >> Value* (handy for testing) /////
 template <any_source_or_transform Left, typename Right>
 auto operator>>(Left& left, Right&& right) requires
-  joinable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
-  static_assert(joinable<UnsafeRef<Left>, Right>);
+  pipeable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
+  static_assert(pipeable<UnsafeRef<Left>, Right>);
   return UnsafeRef(&left) >> std::move(right);
 }
 
-// TODO: canonical conversions
+/* Now we're onto dealing with stuff that isn't a ref.
+ *
+ * `detail::decay_equiv` means that `std::decay<T>` is the same type as `T`; for example,
+ * `detail::decay_equiv(T&)` is false, as `T&` != `T`.
+ *
+ * The idea is that:
+ * - if it's potentially stored elsewhere (e.g. in a local), keep using the original value
+ * - otherwise, consider it disposable and `std::move` it to somewhere we own.
+ *
+ * `Foo&&` is an r-value reference, a.k.a. moved value a.k.a temporary. This is supported
+ * to allow temporary transformations, e.g.
+ * `stick.XAxis >> AxisCurve(0.5) >> mysink` - in this case, the `AxisCurve` is an
+ * rvalue-reference. These are converted to refs by calling `std::make_shared<T>`.
+ *
+ * We need to be extremely careful to avoid takinng a `const T&`, as rvalue-references are
+ * convertible to const references, but not to mutable references.
+ *
+ * `Foo&` is an lvalue-reference, and needed to support `stick.XAxis` in the previous
+ * example, or anything stored in a local, e.g.
+ * `auto mytransform = [](Axis::Value value) { return Axis::MAX - value; };` - using
+ * `mytransform` requires it to be taken as a mutable reference.
+ */
+
+///// Support temporary/moved RHS /////
 template <any_source_or_transform_ref Left, detail::decay_equiv Right>
 auto operator>>(Left left, Right&& right) requires
-  joinable<Left, UnsafeRef<Right>> {
+  pipeable<Left, UnsafeRef<Right>> {
   return left >> std::make_shared<Right>(std::move(right));
 }
 
+///// Support pointer RHS /////
 template <any_source_or_transform_ref Left, detail::decay_equiv Right>
 auto operator>>(Left left, Right* right) requires
-  joinable<Left, UnsafeRef<Right>> {
+  pipeable<Left, UnsafeRef<Right>> {
   return left >> UnsafeRef(right);
 }
 
+///// Local left, temporary right, e.g. `stick.Axis >> AxisCurve` /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left& left, Right&& right) requires
-  joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
+  pipeable<UnsafeRef<Left>, UnsafeRef<Right>> {
   return UnsafeRef(&left) >> std::make_shared<Right>(std::move(right));
 }
 
+///// Local left, const right ptr, e.g. `foo >> vjoy1.LeftAxis`
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left& left, const Right& right) requires
-  joinable<UnsafeRef<Left>, const Right&> {
+  any_sink_or_transform_ref<Right> // unneeded, but good to check
+  && pipeable<UnsafeRef<Left>, const Right&> {
   return UnsafeRef(&left) >> right;
 }
 
+////// Local left, pointer RHS /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left& left, Right* right) requires
-  joinable<UnsafeRef<Left>, Right*> {
+  pipeable<UnsafeRef<Left>, Right*> {
   return UnsafeRef(&left) >> right;
 }
 
+///// Temporary left, temporary right /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, Right&& right) requires
-  joinable<UnsafeRef<Left>, UnsafeRef<Right>> {
+  pipeable<UnsafeRef<Left>, UnsafeRef<Right>> {
   return std::make_shared<Left>(std::move(left))
     >> std::make_shared<Right>(std::move(right));
 }
 
+///// Temporary left, const ref right, e.g. foo >> vj1.XAxis /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, const Right& right) requires
-  joinable<UnsafeRef<Left>, const Right&> {
+  any_sink_or_transform_ref<Right>
+  && pipeable<UnsafeRef<Left>, const Right&> {
   return std::make_shared<Left>(std::move(left)) >> right;
 }
 
+///// Temporary left, raw pointer right /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, Right* right) requires
-  joinable<UnsafeRef<Left>, Right*> {
+  pipeable<UnsafeRef<Left>, Right*> {
   return std::make_shared<Left>(std::move(left)) >> right;
 }
 
