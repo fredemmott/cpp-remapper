@@ -210,7 +210,7 @@ function Get-Relative-Directory{
   $Directory=Split-Path $FilePath -Parent
   if ($Directory -eq $CWD -or $Directory -eq "") {
     return "";
-  } elseif ($Directory.StartsWith("$CWD\")) {
+  } elseif ($Directory.ToLower().StartsWith("$CWD\".ToLower())) {
      return $Directory.Substring($CWD.Length + 1) + "\";
   }
   return $Directory+"\";
@@ -267,7 +267,7 @@ function Cpp-Obj-Rule {
     }
   }
   if ($Compiler -eq "clang") {
-    $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps")
+    $DepsPath = (Get-Relative-Name "$IntermediateDir\$Cpp.deps.txt")
     $DepsCLFlags = @("/clang:-MD", "/clang:-MF$DepsPath")
     if (Test-Path $DepsPath) {
       # Make-style foo.o: foo.h bar.h
