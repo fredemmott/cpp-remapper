@@ -9,15 +9,18 @@
 
 #include <concepts>
 
+#include "ClosedPipeline.h"
 #include "FunctionSink.h"
 #include "FunctionTransform.h"
+#include "SinkPipeline.h"
+#include "SourcePipeline.h"
+#include "TransformPipeline.h"
 #include "TransformRef.h"
 #include "UnsafeRef.h"// TODO: split out decay_equiv
-#include "actionsapi.h"
 
 namespace fredemmott::inputmapping {
 
-// clang-format is not good for readability with this amount of C++ concepts at the moment :(
+// clang-format doesn't properly support C++20 "Concepts" yet.
 
 // clang-format off
 

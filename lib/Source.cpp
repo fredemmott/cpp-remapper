@@ -6,12 +6,10 @@
  * in the root directory of this source tree.
  */
 
-// Check for syntax errors in this file without getting anything else involved.
-#include "actionsapi.h"
+#include "Source.h"
 
 namespace fredemmott::inputmapping {
 
-AnySource::~AnySource() {
-}
+AnySource::~AnySource() {}
 
 }// namespace fredemmott::inputmapping
