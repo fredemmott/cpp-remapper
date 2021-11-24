@@ -205,6 +205,7 @@ void InputDevice::activate() {
   if (mActivated) {
     return;
   }
+  mActivated = true;
   const DWORD count = getAxisCount() + getHatCount() + getButtonCount();
   LPDIOBJECTDATAFORMAT df = new DIOBJECTDATAFORMAT[count];
   off_t offset = 0;
@@ -253,31 +254,42 @@ void InputDevice::activate() {
 
   p->diDevice->SetDataFormat(&data);
   mOffsets = {firstAxis, firstButton, firstHat};
+  auto name = this->getProductName();
   delete[] df;
+
+  #ifdef _DEBUG
+  printf("----- DEBUG '%s' -----\n", name.c_str());
+  printf("  Counts: a: %d, b: %d, h: %d\n", controls.axes.size(), controls.buttons, controls.hats);
+  printf("  Offsets: a: 0x%lx, b: 0x%lx, h: 0x%lx\n", firstAxis, firstButton, firstHat);
+  printf("  Data size: %llx\n", mDataSize);
+  printf("----- END DEBUG -----\n");
+  #endif
 }
 
 InputDevice::State InputDevice::getState() {
   activate();
   p->diDevice->Poll();
-  std::vector<uint8_t> buf(mDataSize);
+  std::vector<std::byte> buf(mDataSize);
   p->diDevice->GetDeviceState(mDataSize, buf.data());
   return State(mOffsets, buf);
 }
 
 InputDevice::State::State(
   const StateOffsets& offsets,
-  const std::vector<uint8_t>& buf)
-  : offsets(offsets), buffer(buf) {
+  const std::vector<std::byte>& buf) : offsets(offsets), buffer(buf) {
 }
 
-long* InputDevice::State::getAxes() const {
-  return (long*)(buffer.data() + offsets.firstAxis);
-}
-bool* InputDevice::State::getButtons() const {
-  return (bool*)(buffer.data() + offsets.firstButton);
+InputDevice::State::~State() {}
+
+long InputDevice::State::getAxis(uint8_t i) const {
+  return *(long*) &buffer[offsets.firstAxis + (i * sizeof(long))];
 }
 
-uint16_t* InputDevice::State::getHats() const {
-  return (uint16_t*)(buffer.data() + offsets.firstHat);
+bool InputDevice::State::getButton(uint8_t i) const {
+  return *(bool*) &buffer[offsets.firstButton + (i * sizeof(bool))];
+}
+
+uint16_t InputDevice::State::getHat(uint8_t i) const {
+  return *(uint16_t*) &buffer[offsets.firstHat + (i * sizeof(uint16_t))];
 }
 }// namespace fredemmott::gameinput

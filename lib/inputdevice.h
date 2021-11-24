@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <optional>
 #include <string>
@@ -42,23 +43,24 @@ class InputDevice final {
 
   HANDLE getEvent();
 
+  // TODO move to Stateclass
   struct StateOffsets {
     off_t firstAxis;
     off_t firstButton;
     off_t firstHat;
   };
 
-  class State {
+  class State final {
    private:
     StateOffsets offsets;
-    std::vector<uint8_t> buffer;
-
+    std::vector<std::byte> buffer;
    public:
-    State(const StateOffsets& offsets, const std::vector<uint8_t>& buffer);
+    State(const StateOffsets& offsets, const std::vector<std::byte>& buffer);
+    ~State();
 
-    long* getAxes() const;
-    bool* getButtons() const;
-    uint16_t* getHats() const;
+    long getAxis(uint8_t i) const;
+    bool getButton(uint8_t i) const;
+    uint16_t getHat(uint8_t i) const;
   };
   State getState();
 

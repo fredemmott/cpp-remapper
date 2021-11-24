@@ -292,31 +292,29 @@ HatSourceRef MappableInput::hat(uint8_t id) const {
 void MappableInput::poll() {
   auto a = p->state;
   auto b = p->device->getState();
-  p->state = b;
 
   const auto axes = getAxisCount(), buttons = getButtonCount(),
              hats = getHatCount();
 
-  auto aAxes = a.getAxes(), bAxes = b.getAxes();
   for (auto i = 0; i < axes; ++i) {
-    if (aAxes[i] != bAxes[i]) {
-      p->axisInputs[i]->emit(bAxes[i]);
+    if (a.getAxis(i) != b.getAxis(i)) {
+      p->axisInputs[i]->emit(b.getAxis(i));
     }
   }
 
-  auto aButtons = a.getButtons(), bButtons = b.getButtons();
   for (auto i = 0; i < buttons; ++i) {
-    if (aButtons[i] != bButtons[i]) {
-      p->buttonInputs[i]->emit(bButtons[i]);
+    if (a.getButton(i) != b.getButton(i)) {
+      p->buttonInputs[i]->emit(b.getButton(i));
     }
   }
 
-  auto aHats = a.getHats(), bHats = b.getHats();
   for (auto i = 0; i < hats; ++i) {
-    if (aHats[i] != bHats[i]) {
-      p->hatInputs[i]->emit(bHats[i]);
+    if (a.getHat(i) != b.getHat(i)) {
+      p->hatInputs[i]->emit(b.getHat(i));
     }
   }
+
+  p->state = b;
 }
 
 }// namespace fredemmott::inputmapping
