@@ -40,6 +40,6 @@ jobs:
           $ExeSuffix = .\build.ps1 all `
             -BuildMode ${{matrix.mode}} `
             -Platform ${{matrix.platform}} `
-            -Compiler ${{matrix.compiler}}) `
+            -Compiler ${{matrix.compiler}} `
             -ShowExeSuffix
           & .\test${ExeSuffix}.exe
