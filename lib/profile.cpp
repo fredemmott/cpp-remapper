@@ -66,4 +66,32 @@ MappableInput Profile::popInput() {
 Mapper* Profile::operator->() const {
   return p->mapper.get();
 }
+
+}// namespace fredemmott::inputmapping
+
+#include "connections.h"
+#include "devicedb.h"
+
+namespace fredemmott::inputmapping {
+
+namespace {
+
+using namespace fredemmott::gameinput::devicedb;
+using namespace fredemmott::inputmapping::vjoyids;
+using namespace fredemmott::inputmapping::vigemids;
+
+void static_test_vjoy() {
+  // Input device is irrelevant, but we currently need one.
+  auto [p, stick, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
+  stick.Button1 >> vj1.Button1;
+}
+
+void static_test_vigem() {
+  // Input device is irrelevant, but we currently need one.
+  auto [p, stick, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD_1);
+  stick.Button1 >> xpad.ButtonA;
+}
+
+}// namespace
+
 }// namespace fredemmott::inputmapping

@@ -242,16 +242,6 @@ void test_bind_to_multi() {
   axis >> ::fredemmott::inputmapping::all([](long) {}, [](long) {});
 }
 
-void static_test_vjoy() {
-  // Input device is irrelevant, but we currently need one.
-  auto [p, _, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
-}
-
-void static_test_vigem() {
-  // Input device is irrelevant, but we currently need one.
-  auto [p, _, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD_1);
-}
-
 int main() {
   printf("----- Starting Test Run -----\n");
   test_value_ptr();
