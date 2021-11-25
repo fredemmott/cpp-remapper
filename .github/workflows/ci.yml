@@ -5,10 +5,14 @@ jobs:
     name: Build
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         compiler: [ clang, cl ]
         mode: [ Release, Debug ]
         platform: [ x86, x64 ]
+        exclude:
+          - compiler: clang
+            platform: x86
     steps:
       - name: Checkout
         uses: actions/checkout@v2
