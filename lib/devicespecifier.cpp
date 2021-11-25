@@ -12,6 +12,9 @@
 
 namespace fredemmott::gameinput {
 
+DeviceSpecifierBase::DeviceSpecifierBase() {
+}
+
 DeviceSpecifierBase::~DeviceSpecifierBase() {
 }
 

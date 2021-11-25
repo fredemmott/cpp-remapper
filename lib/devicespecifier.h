@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <concepts>
 #include <string>
 #include <tuple>
 #include <variant>
@@ -18,6 +19,8 @@ class InputDevice;
 
 // Add any subclasses to DeviceSpecifier::Impl typedef too.
 class DeviceSpecifierBase {
+ protected:
+  DeviceSpecifierBase();
  public:
   virtual ~DeviceSpecifierBase();
   virtual bool matches(const InputDevice& device) const = 0;
@@ -76,7 +79,7 @@ class DeviceSpecifier final : public DeviceSpecifierBase {
  public:
   typedef std::variant<VIDPID, HardwareID, InstanceID> Impl;
 
-  template <typename T>
+  template <std::derived_from<DeviceSpecifierBase> T>
   DeviceSpecifier(const T& val) : p(val) {
   }
 
@@ -87,12 +90,5 @@ class DeviceSpecifier final : public DeviceSpecifierBase {
  private:
   Impl p;
 };
-
-[[deprecated(
-  "Use `DeviceSpecifier` instead of `DeviceID`")]] typedef DeviceSpecifier
-  DeviceID;
-
-[[deprecated(
-  "Use `HardwareID` instead of `HID_ID`")]] typedef HardwareID HID_ID;
 
 }// namespace fredemmott::gameinput
