@@ -105,6 +105,7 @@ switch($BuildMode) {
   }
   "Release" {
     $CLFlags += @("/O2", "/MT")
+    $LINKFlags += @("/DEBUG")
   }
 
   default {
