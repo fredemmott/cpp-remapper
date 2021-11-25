@@ -17,6 +17,8 @@ namespace fredemmott::inputmapping {
 class VJoyDevice;
 
 class MappableVJoyOutput final : public MappableOutput {
+ private:
+  std::shared_ptr<VJoyDevice> mDevice;
  public:
   explicit MappableVJoyOutput(uint8_t vjoy_id);
   MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev);
@@ -49,9 +51,6 @@ class MappableVJoyOutput final : public MappableOutput {
     Button127, Button128;
 
   const HatSinkRef Hat1, Hat2, Hat3, Hat4;
-
- private:
-  std::shared_ptr<VJoyDevice> mDevice;
 };
 
 }// namespace fredemmott::inputmapping
