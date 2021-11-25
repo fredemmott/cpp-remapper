@@ -60,9 +60,7 @@ class Profile final {
 
 // Implementation details to make your eyes bleed.
 namespace detail {
-auto get_devices(Profile*) {
-  return std::make_tuple();
-}
+std::tuple<> get_devices(Profile*);
 
 template <typename... Ts>
 auto get_devices(
@@ -85,8 +83,7 @@ auto get_devices(Profile* p, const ViGEmX360ID& _first, Ts... rest) {
     std::make_tuple(MappableX360Output()), get_devices(p, rest...));
 }
 
-void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&) {
-}
+void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&);
 
 template <typename... Rest>
 void fill_input_ids(
@@ -110,9 +107,7 @@ void fill_input_ids(
 
 using OutputPtr = std::shared_ptr<OutputDevice>;
 
-std::vector<OutputPtr> select_outputs() {
-  return {};
-}
+std::vector<OutputPtr> select_outputs();
 
 template <typename First, typename... Rest>
 std::vector<OutputPtr> select_outputs(const First& first, Rest... rest) {
@@ -123,9 +118,7 @@ std::vector<OutputPtr> select_outputs(const First& first, Rest... rest) {
   return ret;
 }
 
-std::vector<MappableInput> select_inputs() {
-  return {};
-}
+std::vector<MappableInput> select_inputs();
 
 template <typename First, typename... Rest>
 std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
@@ -141,7 +134,7 @@ std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
 template <typename... Ts>
 auto create_profile(const gameinput::DeviceSpecifier& first, Ts... rest) {
   std::vector<gameinput::DeviceSpecifier> input_ids;
-  fill_input_ids(input_ids, first, rest...);
+  detail::fill_input_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
   auto devices = detail::get_devices(&p, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
