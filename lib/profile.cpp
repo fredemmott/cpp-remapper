@@ -67,11 +67,14 @@ Mapper* Profile::operator->() const {
   return p->mapper.get();
 }
 
-namespace detail {
+}// namespace fredemmott::inputmapping
+
+namespace fredemmott::inputmapping::detail {
 
 std::tuple<> get_devices(Profile*) {
   return std::make_tuple();
 }
+
 std::vector<MappableInput> select_inputs() {
   return {};
 }
@@ -82,9 +85,7 @@ std::vector<std::shared_ptr<OutputDevice>> select_outputs() {
 
 void fill_input_ids(std::vector<DeviceSpecifier>&) {
 }
-}// namespace detail
-
-}// namespace fredemmott::inputmapping
+}// namespace fredemmott::inputmapping::detail
 
 #include "connections.h"
 #include "devicedb.h"

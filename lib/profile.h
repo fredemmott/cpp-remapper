@@ -20,9 +20,6 @@
 
 namespace fredemmott::inputmapping {
 
-class Mapper;
-struct MappableInput;
-
 namespace detail {
 struct OutputID {};
 struct ViGEmX360ID : public OutputID {};
@@ -61,10 +58,7 @@ namespace detail {
 std::tuple<> get_devices(Profile*);
 
 template <typename... Ts>
-auto get_devices(
-  Profile* p,
-  const DeviceSpecifier& first,
-  Ts... rest) {
+auto get_devices(Profile* p, const DeviceSpecifier& first, Ts... rest) {
   auto device = p->popInput();
   return std::tuple_cat(std::make_tuple(device), get_devices(p, rest...));
 }
@@ -96,7 +90,6 @@ void fill_input_ids(
   std::vector<DeviceSpecifier>& device_ids,
   First first,
   Rest... rest) {
-
   if constexpr (std::derived_from<First, DeviceSpecifier>) {
     device_ids.push_back(first);
   }

@@ -18,7 +18,7 @@ class InputDevice;
 }
 
 namespace fredemmott::inputmapping {
-struct MappableInput;
+class MappableInput;
 class MappableOutput;
 class MappableVJoyOutput;
 class OutputDevice;
