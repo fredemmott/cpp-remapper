@@ -22,7 +22,7 @@ jobs:
         run: .\build.ps1 all -BuildMode Debug
       - name: Build (Debug - Clang)
         run: .\build.ps1 all -BuildMode Debug -Compiler Clang
-      - name: Run test (Debug ASAN)
-        run: .\test-Debug.exe
       - name: Run test (Debug Clang)
         run: .\test-Debug-clang.exe
+      - name: Run test (Debug ASAN)
+        run: .\test-Debug.exe
