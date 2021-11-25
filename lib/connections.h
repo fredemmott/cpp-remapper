@@ -130,9 +130,9 @@ concept pipeable = requires(Left left, Right right) {
 ///// Support a ref that's stored in a local, e.g. axis >> [](){} /////
 template <any_source_or_transform Left, typename Right>
 auto operator>>(Left& left, Right&& right) requires
-	pipeable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
-	static_assert(pipeable<UnsafeRef<Left>, Right>);
-	return UnsafeRef(&left) >> std::move(right);
+  pipeable<UnsafeRef<Source<typename Left::OutControl>>, Right> {
+  static_assert(pipeable<UnsafeRef<Left>, Right>);
+  return UnsafeRef(&left) >> std::move(right);
 }
 
 
@@ -164,12 +164,20 @@ auto operator>>(Left& left, Right* right) requires
   return UnsafeRef(&left) >> right;
 }
 
-///// Temporary left, temporary right /////
+///// Temporary left, temporary ref-able right /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, Right&& right) requires
   pipeable<UnsafeRef<Left>, UnsafeRef<Right>> {
   return std::make_shared<Left>(std::move(left))
     >> std::make_shared<Right>(std::move(right));
+}
+
+///// Temporary left, temporary non-ref-able-right (e.g. lambda) /////
+template <detail::decay_equiv Left, detail::decay_equiv Right>
+auto operator>>(Left&& left, Right&& right) requires
+  pipeable<UnsafeRef<Left>, Right> {
+  return std::make_shared<Left>(std::move(left))
+    >> std::move(right);
 }
 
 ///// Temporary left, const ref right, e.g. foo >> vj1.XAxis /////
