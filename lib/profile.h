@@ -85,14 +85,12 @@ void fill_input_ids(
   fill_input_ids(device_ids, rest...);
 }
 
-template <typename First, typename... Rest>
+template <typename... Rest>
 void fill_input_ids(
   std::vector<DeviceSpecifier>& device_ids,
-  First first,
+  const DeviceSpecifier& first,
   Rest... rest) {
-  if constexpr (std::derived_from<First, DeviceSpecifier>) {
-    device_ids.push_back(first);
-  }
+  device_ids.push_back(first);
   fill_input_ids(device_ids, rest...);
 }
 
