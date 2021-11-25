@@ -13,6 +13,7 @@ int main() {
   auto [p, throttle, stick, vj1, vj2]
     = create_profile(TM_THROTTLE_INSTANCE, VPC_RIGHT_WARBRD, VJOY_1, VJOY_2);
 
+  // Copy all inputs to outputs
   p->passthrough(throttle, vj1);
   p->passthrough(stick, vj2);
 

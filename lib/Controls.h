@@ -29,7 +29,7 @@ class Button final : public Control {
 class Hat final : public Control {
  public:
   using Value = uint16_t;
-  static const Value MAX = 36000;
+  static const Value MAX = 35999;
   static const Value MIN = 0;
   static const Value CENTER = 0xffff;
 };

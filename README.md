@@ -4,11 +4,13 @@ This project provides a concise API for remapping input devices (e.g.
 joysticks) in C++.
 
 It aims to:
-- use modern standard C++ wherever possible
+- use modern standard C++ wherever possible; C++20 is required.
 - have minimum dependencies
 
-It uses vJoy (it is a vJoy 'feeder'), and supports HidHide without
-replugging devices (if ran as administrator and supported by hardware).
+It integrates with:
+- vJoy for virtual DirectInput controllers
+- [ViGEmBus](https://github.com/ViGEm/ViGEmBus) for virtual XBox 360 controllers
+- [HidHide](https://github.com/ViGEm/HidHide) for automatically hiding remapped controllers from games
 
 # What does a profile look like?
 
@@ -28,67 +30,42 @@ int main() {
   p->passthrough(stick, vj2);
 
   // Map a button
-  p->map(throttle.Button1, vj1.Button1);
+  throttle.Button1 >> vj1.Button1;
 
-  // Let's do something a but more fun...
+  // Let's do something a bit more fun...
 
   // 1 physical button to 2 virtual buttons at the same time...
-  p->map(throttle.Button1, {vj1.Button1, vj1.Button2} );
+  throttle.Button1 >> all(vj1.Button1, vj1.Button2);
 
   // ... or one for short press, one for long press
-  p->map(throttle.Button1, ShortPressLongPress { vj1.Button1, vj1.Button2 } );
+  throttle.Button1 >> ShortPressLongPress { vj1.Button1, vj1.Button2 };
   // ... with a custom duration for 'long press' (default is 300ms)
-  p->map(
+  throttle.Button1 >> ShortPressLongPress
     throttle.Button1,
     ShortPressLongPress { vj1.Button1, vj1.Button2, std::chrono::seconds(1) }
   );
 
   // Convert an axis to buttons, e.g. turn a ministick
   // into 4-way buttons
-  p->map(
-    throttle.XAxis,
+  throttle.XAxis >>
     AxisToButtons {
-      { 0, 0, vj1.button(throttle.ButtonCount + 1) },
-      { 100, 100, vj1.button(throttle.ButtonCount  + 2) }
+      { 0, 0, vj1.button(throttle.getButtonCount() + 1) },
+      { 100, 100, vj1.button(throttle.getButtonCount()  + 2) }
     }
   );
 
-  // Several at the same time.
-  p->map({
-    {
-      throttle.XAxis,
-      AxisToButtons {
-        { 0, 0, vj1.button(throttle.ButtonCount + 1) },
-        { 100, 100, vj1.button(throttle.ButtonCount  + 2) }
-      },
-    }, {
-      throttle.YAxis,
-      AxisToButtons {
-        { 0, 0, vj1.button(throttle.ButtonCount + 3) },
-        { 100, 100, vj1.button(throttle.ButtonCount + 4) }
-      },
-    }, {
-      stick.RXAxis,
-      AxisToButtons {
-        { 0, 0, vj2.button(stick.ButtonCount + 1) },
-        { 100, 100, vj2.button(stick.ButtonCount + 2) }
-      },
-    }, {
-      stick.RYAxis,
-      AxisToButtons {
-        { 0, 0, vj2.button(stick.ButtonCount + 3) },
-        { 100, 100, vj2.button(stick.ButtonCount + 4) }
-      },
-    },
-  });
+  // Let's invert an axis, then apply a deadzone and curve
+  throttle.YAxis
+    >> [](Axis::Value value) { return Axis::MAX - value; }
+    >> AxisDeadzone(10)
+    >> AxisCurve(0.5)
+    >> vj1.YAxis;
 
   p->run();
   return 0;
 }
 ```
 
-Later calls to `map()` replace any previous bindings for the specified source
-button.
 
 # How do I use this?
 
@@ -167,6 +144,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `AxisCurve`
 - `AxisToButtons`
 - `AxisToHat`
+- `ButtonToAxis`
 - `ShortPressLongPress`
 - `SquareDeadzone`
 
@@ -188,8 +166,8 @@ around 0.5 and work from there.
 It is used like this:
 
 ```C++
-p->map(device.XAxis, AxisCurve { 0.5, vjoy1.XAxis });
-p->map(device.YAxis, AxisCurve { 0.5, vjoy1.YAxis });
+device.XAxis >> AxisCurve(0.5) >> vjoy1.XAxis;
+device.YAxis >> AxisCurve(0.5) >> vjoy1.YAxis;
 ```
 
 ## AxisToHat
@@ -203,8 +181,9 @@ It used like this:
 ```C++
 AxisToHat myFirstHat(vjoy1.Hat1); // default deadzone
 AxisToHat myHat(vjoy1.Hat1, 90); // custom deadzone, in percent
-p->map(device.XAxis, myHat.XAxis);
-p->map(device.YAxis, myHat.YAxis);
+device.XAxis >> &myHat.XAxis;
+device.YAxis >> &myHat.YAxis;
+myHat >> vjoy1.Hat1;
 ```
 
 This creates a continuous (360-degree) hat out of the two axis.
@@ -218,56 +197,63 @@ that:
   North, East, South, or West, but only a 71% deflection for NE, SE, SW, or SW,
   as (100%, 100%) is 141% the distance from center of (100%, 0%) or (0%, 100%).
 
+## ButtonToAxis
+
+This converts a button to an axis; this axis is always either 0 (if the button is not pressed), or at the maximum value (if the button is pressed). This can be useful for binding buttons to X360 controller triggers, which are axis. For example:
+
+```C++
+stick.Button1 >> ButtonToAxis() >> x360.RTrigger;
+```
+
 ## Using a lambda or function
 
 If you wanted to use a lambda to invert button 1
 (pressed -> unpressed, unpressed -> pressed):
 
 ```C++
-p->map(real_device.Button1, [=](bool pressed) { vjoy.Button1.set(!pressed); });
+real_device.Button1 >> [](Button::Value pressed) { vjoy.Button1.set(!pressed); };
 ```
 
 Lambdas can be used in most places that accept a button; as an unrealistic example:
 
 ```
-p->map(
-  real_device.XAxis,
-  AxisToButton { 0, 0, [=](bool pressed) { vjoy.Button1.set(!pressed); }
-);
+real_device.XAxis >> AxisToButton({ 0, 0, [=](bool pressed) { vjoy.Button1.set(!pressed); });
 ```
 
 ## Defining an action
 
-An 'action' is an object that reacts to an input; you define an action by
-creating a class that extends `fredemmott::inputmapping::AxisAction`,
-`ButtonAction`, or `HatAction`, for example:
+There are two basic kinds of admins
+- a `Source<T>`: emits values; this is usually an axis/button/hat on a physical device
+- a `Sink<T>`: receives values; this is usually an axis/button/hat on a vJoy or ViGEmBus device
+
+`T` is `Axis`, `Button`, or `Hat`.
+
+Most actions are both `Source`s and `Sink`s, and can be thought of as transformations.
+Transformations can have the same input and output type, but this is not required. For example:
+
+- `AxisCurve` is a `Sink<Axis>` and a `Source<Axis>`
+- `ButtonToAxis` is a `Sink<Button>` and a `Source<Axis>`
 
 ```C++
 using namespace fredemmott::inputmapping;
 
-class InvertButton final : public ButtonAction {
-private:
-  ButtonEventHandler mNext;
+class InvertButton final : public Sink<Button>, public Source<Button> {
 public:
 
-  InvertButton(const ButtonEventHandler& next) : mNext(next) {}
-  ~InvertButton() {}
+  InvertButton() {}
+  virtual ~InvertButton() {}
 
   void map(bool value) {
-    mNext->map(!value);
+    emit(!value);
   }
 };
 
 int main() {
   // ...
-  p.map(source.Button1, InvertButton { vjoy.Button1 } );
+  source.Button1 >> InvertButton >> vjoy.Button1;
   // ...
 }
 ```
-
-`fredemmott::inputmapping::ButtonEventHandler` is an abstraction to allow
-taking an action, lambda, or vJoy button identifier, for consistency
-and to allow chaining.
 
 If you implement additional actions, please consider contributing a pull request :)
 
@@ -306,14 +292,17 @@ Do not use `sleep` or similar functions:
 
 ## Continuous Hats
 
-Continous hats are a `uint16_t`, with:
+Continous hats are a `Hat::Type` (`uint16_t`), with:
 - centidegrees (i.e. 0 -> 35999) for actual values
-- 0xffff for center
+- `Hat::CENTER` (`0xffff`) for center
 
 The Windows 'Game Controller' test page appears to treat them as signed
 `int16_t`; this means that the Windows test page will not show continuous
-hat values greater than 327.67 degrees. When testing your profile, use the
-"Monitor vJoy" application.
+hat values greater than 327.67 degrees. When testing your profile, use alternatives like:
+
+- "Monitor vJoy"
+- "VPC Joystick Tester"
+- https://gamepad-tester.com for X360 outputs
 
 # What support is available?
 
