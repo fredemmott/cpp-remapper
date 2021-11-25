@@ -31,7 +31,7 @@ class MissingSource final : public Source<TControl> {
 
   void setNext(const UnsafeRef<Sink<TControl>>&) override {
     printf(
-      "WARNING: Attempted to attach to %s, but that does not exist on %s. "
+      "WARNING: Attempted to attach to '%s', but that does not exist on '%s'. "
       "Ignoring.\n",
       mControl.c_str(),
       mDevice.c_str());
