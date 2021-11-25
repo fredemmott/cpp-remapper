@@ -20,21 +20,21 @@ jobs:
       - name: Extract vJoy SDK
         run: |
           Expand-Archive vJoy-SDK.zip .
-          if ( ${{matrix.platform} -eq "x64") {
+          if ( ${{matrix.platform}} -eq "x64" ) {
             cp SDK\lib\amd64\vJoyInterface.dll .
           } else {
             cp SDK\lib\vJoyInterface.dll .
           }
       - name: Build
         run: |
-          .\build.ps1 all \
-            -BuildMode ${{matrix.mode}} \
-            -Platform ${{matrix.platform}} \
+          .\build.ps1 all `
+            -BuildMode ${{matrix.mode}} `
+            -Platform ${{matrix.platform}} `
             -Compiler ${{matrix.compiler}}
       - name: Run tests
         run: |
-          $ExeSuffix = .\build.ps1 all \
-            -BuildMode ${{matrix.mode}} \
-            -Platform ${{matrix.platform}} \
+          $ExeSuffix = .\build.ps1 all `
+            -BuildMode ${{matrix.mode}} `
+            -Platform ${{matrix.platform}} `
             -Compiler ${{matrix.compiler}}
           .\test${ExeSuffix}.exe
