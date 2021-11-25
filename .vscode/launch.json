@@ -17,7 +17,19 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Current Profile",
+      "name": "Current Profile (Release)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${fileBasenameNoExtension}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "preLaunchTask": "Build (Release)",
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Current Profile (Debug)",
       "type": "cppvsdbg",
       "request": "launch",
       "program": "${fileBasenameNoExtension}-Debug.exe",
