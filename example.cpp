@@ -8,30 +8,28 @@
 #include "easymode.h"
 
 int main() {
-  const InstanceID TM_THROTTLE_INSTANCE {
-    "HID\\VID_044F&PID_0404\\9&1e87ca54&1&0000"};
-  auto [p, throttle, stick, vj1, vj2]
-    = create_profile(TM_THROTTLE_INSTANCE, VPC_RIGHT_WARBRD, VJOY_1, VJOY_2);
+  auto [p, throttle, stick, vj1, vj2, x360, ds4] = create_profile(
+    VPC_MT50CM3_THROTTLE,
+    VPC_RIGHT_WARBRD,
+    VJOY_1,
+    VJOY_2,
+    VIGEM_X360_PAD,
+    VIGEM_DS4_PAD);
 
   // Copy all inputs to outputs
   p->passthrough(throttle, vj1);
   p->passthrough(stick, vj2);
 
-  // Replace the ministick mappings on both devices to additional buttons
-  throttle.XAxis >> AxisToButtons {
-    {0, 0, vj1.button(throttle.getButtonCount() + 1)},
-    {100, 100, vj1.button(throttle.getButtonCount() + 2)}};
-  throttle.YAxis >> AxisToButtons {
-    {0, 0, vj1.button(throttle.getButtonCount() + 3)},
-    {100, 100, vj1.button(throttle.getButtonCount() + 4)}};
-  stick.RXAxis >> AxisToButtons {
-    {0, 0, vj2.button(stick.getButtonCount() + 1)},
-    {100, 100, vj2.button(stick.getButtonCount() + 2)}};
-  stick.RYAxis >> AxisToButtons {
-    {0, 0, vj2.button(stick.getButtonCount() + 3)},
-    {100, 100, vj2.button(stick.getButtonCount() + 4)}};
+  // Copy axis to virtual gamepads: throttle and twist on left stick, stick xy
+  // on right stick
+  throttle.RXAxis >> all(vj1.RXAxis, x360.LYAxis, ds4.LYAxis);
+  stick.ZAxis >> all(vj2.ZAxis, x360.LXAxis, ds4.LXAxis);
 
-  stick.Button12 >> ShortPressLongPress {vj2.Button2, vj2.Button3};
+  stick.XAxis >> all(vj2.XAxis, x360.RXAxis, ds4.RXAxis);
+  stick.YAxis >> all(vj2.YAxis, x360.RYAxis, ds4.RYAxis);
+
+  // Test at least one button works :)
+  stick.Button3 >> all(vj1.Button1, x360.ButtonA, ds4.ButtonCross);
   p->run();
   return 0;
 }

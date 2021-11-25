@@ -257,13 +257,21 @@ void InputDevice::activate() {
   auto name = this->getProductName();
   delete[] df;
 
-  #ifdef _DEBUG
+#ifdef _DEBUG
   printf("----- DEBUG '%s' -----\n", name.c_str());
-  printf("  Counts: a: %d, b: %d, h: %d\n", controls.axes.size(), controls.buttons, controls.hats);
-  printf("  Offsets: a: 0x%lx, b: 0x%lx, h: 0x%lx\n", firstAxis, firstButton, firstHat);
+  printf(
+    "  Counts: a: %d, b: %d, h: %d\n",
+    controls.axes.size(),
+    controls.buttons,
+    controls.hats);
+  printf(
+    "  Offsets: a: 0x%lx, b: 0x%lx, h: 0x%lx\n",
+    firstAxis,
+    firstButton,
+    firstHat);
   printf("  Data size: %llx\n", mDataSize);
   printf("----- END DEBUG -----\n");
-  #endif
+#endif
 }
 
 InputDevice::State InputDevice::getState() {
@@ -276,13 +284,15 @@ InputDevice::State InputDevice::getState() {
 
 InputDevice::State::State(
   const StateOffsets& offsets,
-  const std::vector<std::byte>& buf) : offsets(offsets), buffer(buf) {
+  const std::vector<std::byte>& buf)
+  : offsets(offsets), buffer(buf) {
 }
 
-InputDevice::State::~State() {}
+InputDevice::State::~State() {
+}
 
 long InputDevice::State::getAxis(uint8_t i) const {
-  return *(long*) &buffer[offsets.firstAxis + (i * sizeof(long))];
+  return *(long*)&buffer[offsets.firstAxis + (i * sizeof(long))];
 }
 
 bool InputDevice::State::getButton(uint8_t i) const {
@@ -297,6 +307,13 @@ bool InputDevice::State::getButton(uint8_t i) const {
 }
 
 uint16_t InputDevice::State::getHat(uint8_t i) const {
-  return *(uint16_t*) &buffer[offsets.firstHat + (i * sizeof(uint16_t))];
+  return *(uint16_t*)&buffer[offsets.firstHat + (i * sizeof(uint16_t))];
+}
+
+void InputDevice::State::dump() const {
+  for (const auto byte: buffer) {
+    printf("%02x", (int)byte);
+  }
+  printf("\n");
 }
 }// namespace fredemmott::inputmapping

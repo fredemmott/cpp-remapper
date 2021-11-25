@@ -13,6 +13,7 @@
 
 #include "MappableInput.h"
 #include "MappableOutput.h"
+#include "MappableDS4Output.h"
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
 #include "devicespecifier.h"
@@ -23,6 +24,7 @@ namespace fredemmott::inputmapping {
 namespace detail {
 struct OutputID {};
 struct ViGEmX360ID : public OutputID {};
+struct ViGEmDS4ID : public OutputID {};
 
 struct VJoyID : public OutputID {
   VJoyID(uint8_t value) : value(value) {
@@ -38,6 +40,7 @@ const detail::VJoyID VJOY_1 {1}, VJOY_2 {2}, VJOY_3 {3}, VJOY_4 {4}, VJOY_5 {5},
   VJOY_12 {12}, VJOY_13 {13}, VJOY_14 {14}, VJOY_15 {15}, VJOY_16 {16};
 
 const detail::ViGEmX360ID VIGEM_X360_PAD;
+const detail::ViGEmDS4ID VIGEM_DS4_PAD;
 
 class Profile final {
  public:
@@ -73,6 +76,12 @@ template <typename... Ts>
 auto get_devices(Profile* p, const ViGEmX360ID& _first, Ts... rest) {
   return std::tuple_cat(
     std::make_tuple(MappableX360Output()), get_devices(p, rest...));
+}
+
+template <typename... Ts>
+auto get_devices(Profile* p, const ViGEmDS4ID& _first, Ts... rest) {
+  return std::tuple_cat(
+    std::make_tuple(MappableDS4Output()), get_devices(p, rest...));
 }
 
 void fill_input_ids(std::vector<DeviceSpecifier>&);

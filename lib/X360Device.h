@@ -18,7 +18,6 @@
 #include <ViGEm/Client.h>
 // clang-format on
 
-
 namespace fredemmott::inputmapping {
 
 class X360Device final : public OutputDevice {

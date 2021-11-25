@@ -289,9 +289,18 @@ HatSourceRef MappableInput::hat(uint8_t id) const {
 void MappableInput::poll() {
   auto a = p->state;
   auto b = p->device->getState();
+  p->state = b;
+
+#ifdef VERBOSE_INPUT_DEBUG
+  printf("-");
+  a.dump();
+  printf("+");
+  b.dump();
+#endif
 
   const auto axes = getAxisCount(), buttons = getButtonCount(),
              hats = getHatCount();
+
 
   for (auto i = 0; i < axes; ++i) {
     if (a.getAxis(i) != b.getAxis(i)) {
@@ -310,8 +319,6 @@ void MappableInput::poll() {
       p->hatInputs[i]->emit(b.getHat(i));
     }
   }
-
-  p->state = b;
 }
 
 }// namespace fredemmott::inputmapping

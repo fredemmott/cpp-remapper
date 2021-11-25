@@ -97,15 +97,14 @@ namespace {
 using namespace fredemmott::inputmapping::devicedb;
 
 void static_test_vjoy() {
-  // Input device is irrelevant, but we currently need one.
   auto [p, stick, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
   stick.Button1 >> vj1.Button1;
 }
 
 void static_test_vigem() {
-  // Input device is irrelevant, but we currently need one.
-  auto [p, stick, xpad] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD);
+  auto [p, stick, xpad, ds4] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD, VIGEM_DS4_PAD);
   stick.Button1 >> xpad.ButtonA;
+  stick.Button2 >> ds4.ButtonTriangle;
 }
 
 }// namespace

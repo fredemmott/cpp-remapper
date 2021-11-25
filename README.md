@@ -9,7 +9,7 @@ It aims to:
 
 It integrates with:
 - vJoy for virtual DirectInput controllers
-- [ViGEmBus](https://github.com/ViGEm/ViGEmBus) for virtual XBox 360 controllers
+- [ViGEmBus](https://github.com/ViGEm/ViGEmBus) for virtual XBox 360 and DualShock 4 controllers
 - [HidHide](https://github.com/ViGEm/HidHide) for automatically hiding remapped controllers from games
 
 # What does a profile look like?
@@ -18,11 +18,13 @@ It integrates with:
 #include "easymode.h"
 
 int main() {
-  auto [p, throttle, stick, vj1, vj2] = create_profile(
+  auto [p, throttle, stick, vj1, vj2, x360, ds4] = create_profile(
     TM_WARTHOG_THROTTLE,
     VPC_RIGHT_WARBRD,
     VJOY_1,
-    VJOY_2
+    VJOY_2,
+    VIGEM_X360_PAD,
+    VIGEM_DS4_PAD,
   );
 
   // Copy all inputs to outputs

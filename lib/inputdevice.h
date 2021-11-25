@@ -61,6 +61,7 @@ class InputDevice final {
     long getAxis(uint8_t i) const;
     bool getButton(uint8_t i) const;
     uint16_t getHat(uint8_t i) const;
+    void dump() const;
   };
   State getState();
 
