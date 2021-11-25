@@ -12,7 +12,7 @@
 
 #include "devicespecifier.h"
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 class InputDevice;
 
 class HidHide {
@@ -29,4 +29,4 @@ class HidHide {
   void deinit();
 };
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

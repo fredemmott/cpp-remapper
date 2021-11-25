@@ -10,7 +10,7 @@
 
 #include "inputdevice.h"
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 DeviceSpecifierBase::DeviceSpecifierBase() {
 }
@@ -87,4 +87,4 @@ std::string DeviceSpecifier::getHumanReadable() const {
   return unwrap_impl(p).getHumanReadable();
 }
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

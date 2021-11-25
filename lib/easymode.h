@@ -13,8 +13,5 @@
 #include "mapper.h"
 #include "profile.h"
 
-using namespace fredemmott::gameinput::devicedb;
+using namespace fredemmott::inputmapping::devicedb;
 using namespace fredemmott::inputmapping;
-using fredemmott::gameinput::HardwareID;
-using fredemmott::gameinput::InstanceID;
-using fredemmott::gameinput::VIDPID;

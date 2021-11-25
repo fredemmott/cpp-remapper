@@ -15,7 +15,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 class InputDevice;
 
@@ -31,4 +31,4 @@ class InputDeviceCollection {
   std::vector<std::shared_ptr<InputDevice>> mDevices;
 };
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

@@ -13,7 +13,7 @@
 #include <tuple>
 #include <variant>
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 class InputDevice;
 
@@ -91,4 +91,4 @@ class DeviceSpecifier final : public DeviceSpecifierBase {
   Impl p;
 };
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

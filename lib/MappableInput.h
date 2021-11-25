@@ -21,11 +21,11 @@ class MappableInput final {
   std::shared_ptr<Impl> p;
 
  public:
-  MappableInput(const std::shared_ptr<fredemmott::gameinput::InputDevice>& dev);
+  MappableInput(const std::shared_ptr<InputDevice>& dev);
   MappableInput(const MappableInput& other) = default;
   ~MappableInput();
 
-  std::shared_ptr<::fredemmott::gameinput::InputDevice> getDevice() const;
+  std::shared_ptr<InputDevice> getDevice() const;
   void poll();
 
   AxisSourceRef axis(uint8_t id) const;

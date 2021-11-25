@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 #define AXIS_TYPES AT(X) AT(Y) AT(Z) AT(RX) AT(RY) AT(RZ) AT(SLIDER)
 enum class AxisType {
@@ -39,4 +39,4 @@ struct AxisInformation {
 };
 #undef AXIS_TYPES
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

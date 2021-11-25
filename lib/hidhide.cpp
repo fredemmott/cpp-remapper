@@ -18,7 +18,7 @@
 #include "inputdevice.h"
 #include "inputdevicecollection.h"
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 HidHide::HidHide(const std::vector<DeviceSpecifier>& specifiers) {
   printf("Configuring HidHide...\n");
   try {
@@ -87,4 +87,4 @@ void HidHide::deinit() {
   hidhide.ApplyConfigurationChanges();
 }
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

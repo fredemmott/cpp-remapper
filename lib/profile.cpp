@@ -16,17 +16,17 @@
 #include "inputdevicecollection.h"
 #include "mapper.h"
 
-using namespace fredemmott::gameinput;
+using namespace fredemmott::inputmapping;
 
 namespace fredemmott::inputmapping {
 struct Profile::Impl {
-  std::vector<gameinput::DeviceSpecifier> ids;
+  std::vector<DeviceSpecifier> ids;
   std::unique_ptr<Mapper> mapper;
   std::unique_ptr<HidHide> guardian;
   std::unique_ptr<InputDeviceCollection> deviceCollection;
 };
 
-Profile::Profile(const std::vector<gameinput::DeviceSpecifier>& ids)
+Profile::Profile(const std::vector<DeviceSpecifier>& ids)
   : p(new Impl {
     ids,
     std::make_unique<Mapper>(),
@@ -80,7 +80,7 @@ std::vector<std::shared_ptr<OutputDevice>> select_outputs() {
   return {};
 }
 
-void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&) {
+void fill_input_ids(std::vector<DeviceSpecifier>&) {
 }
 }// namespace detail
 
@@ -93,7 +93,7 @@ namespace fredemmott::inputmapping {
 
 namespace {
 
-using namespace fredemmott::gameinput::devicedb;
+using namespace fredemmott::inputmapping::devicedb;
 
 void static_test_vjoy() {
   // Input device is irrelevant, but we currently need one.

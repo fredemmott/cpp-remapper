@@ -18,7 +18,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 struct AxisInformation;
 
@@ -73,4 +73,4 @@ class InputDevice final {
   StateOffsets mOffsets {};
   void activate();
 };
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

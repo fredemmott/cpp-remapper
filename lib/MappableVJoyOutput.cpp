@@ -11,10 +11,6 @@
 #include "axistypes.h"
 #include "inputdevice.h"
 
-using fredemmott::gameinput::AxisType;
-using fredemmott::gameinput::InputDevice;
-using fredemmott::inputmapping::VJoyDevice;
-
 namespace fredemmott::inputmapping {
 
 MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id)

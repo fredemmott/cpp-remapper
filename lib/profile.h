@@ -20,8 +20,6 @@
 
 namespace fredemmott::inputmapping {
 
-using fredemmott::gameinput::InputDevice;
-
 class Mapper;
 struct MappableInput;
 
@@ -46,7 +44,7 @@ const detail::ViGEmX360ID VIGEM_X360_PAD;
 
 class Profile final {
  public:
-  Profile(const std::vector<gameinput::DeviceSpecifier>& ids);
+  Profile(const std::vector<DeviceSpecifier>& ids);
   Profile(Profile&& other);
   ~Profile();
   void operator=(const Profile&) = delete;
@@ -65,7 +63,7 @@ std::tuple<> get_devices(Profile*);
 template <typename... Ts>
 auto get_devices(
   Profile* p,
-  const gameinput::DeviceSpecifier& first,
+  const DeviceSpecifier& first,
   Ts... rest) {
   auto device = p->popInput();
   return std::tuple_cat(std::make_tuple(device), get_devices(p, rest...));
@@ -83,11 +81,11 @@ auto get_devices(Profile* p, const ViGEmX360ID& _first, Ts... rest) {
     std::make_tuple(MappableX360Output()), get_devices(p, rest...));
 }
 
-void fill_input_ids(std::vector<gameinput::DeviceSpecifier>&);
+void fill_input_ids(std::vector<DeviceSpecifier>&);
 
 template <typename... Rest>
 void fill_input_ids(
-  std::vector<gameinput::DeviceSpecifier>& device_ids,
+  std::vector<DeviceSpecifier>& device_ids,
   const OutputID&,
   Rest... rest) {
   fill_input_ids(device_ids, rest...);
@@ -95,11 +93,11 @@ void fill_input_ids(
 
 template <typename First, typename... Rest>
 void fill_input_ids(
-  std::vector<gameinput::DeviceSpecifier>& device_ids,
+  std::vector<DeviceSpecifier>& device_ids,
   First first,
   Rest... rest) {
 
-  if constexpr (std::derived_from<First, gameinput::DeviceSpecifier>) {
+  if constexpr (std::derived_from<First, DeviceSpecifier>) {
     device_ids.push_back(first);
   }
   fill_input_ids(device_ids, rest...);
@@ -132,8 +130,8 @@ std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
 }// namespace detail
 
 template <typename... Ts>
-auto create_profile(const gameinput::DeviceSpecifier& first, Ts... rest) {
-  std::vector<gameinput::DeviceSpecifier> input_ids;
+auto create_profile(const DeviceSpecifier& first, Ts... rest) {
+  std::vector<DeviceSpecifier> input_ids;
   detail::fill_input_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
   auto devices = detail::get_devices(&p, first, rest...);

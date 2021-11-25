@@ -11,10 +11,6 @@
 #include "axistypes.h"
 #include "inputdevice.h"
 
-using fredemmott::gameinput::AxisType;
-using fredemmott::gameinput::InputDevice;
-using fredemmott::inputmapping::X360Device;
-
 namespace fredemmott::inputmapping {
 
 MappableX360Output::MappableX360Output()

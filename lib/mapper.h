@@ -13,7 +13,7 @@
 #include <map>
 #include <vector>
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 class InputDevice;
 }
 

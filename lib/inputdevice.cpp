@@ -19,7 +19,7 @@
 #pragma comment(lib, "Cfgmgr32.lib")
 #pragma comment(lib, "SetupAPI.lib")
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 namespace {
 struct ControlInfo {
@@ -292,4 +292,4 @@ bool InputDevice::State::getButton(uint8_t i) const {
 uint16_t InputDevice::State::getHat(uint8_t i) const {
   return *(uint16_t*) &buffer[offsets.firstHat + (i * sizeof(uint16_t))];
 }
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

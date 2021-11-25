@@ -10,9 +10,6 @@
 #include "axistypes.h"
 #include "inputdevice.h"
 
-using fredemmott::gameinput::AxisType;
-using fredemmott::gameinput::InputDevice;
-
 namespace fredemmott::inputmapping {
 
 namespace {
@@ -64,7 +61,7 @@ AxisSourceRef find_axis(
       return inputs.at(i);
     }
   }
-  auto axis_name = ::fredemmott::gameinput::AxisInformation(t).name;
+  auto axis_name = AxisInformation(t).name;
   auto product_name = device->getProductName();
   return std::make_shared<MissingSource<Axis>>(product_name, axis_name);
 }

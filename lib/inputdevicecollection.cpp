@@ -11,7 +11,7 @@
 #include "inputdevice.h"
 #pragma comment(lib, "Ole32.lib")// GUID
 
-namespace fredemmott::gameinput {
+namespace fredemmott::inputmapping {
 
 namespace {
 struct DeviceEnumeratorState {
@@ -65,4 +65,4 @@ InputDeviceCollection::getAllDevices() {
 InputDeviceCollection::~InputDeviceCollection() {
 }
 
-}// namespace fredemmott::gameinput
+}// namespace fredemmott::inputmapping

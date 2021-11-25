@@ -11,7 +11,7 @@
 #include "inputdevicecollection.h"
 
 int main() {
-  fredemmott::gameinput::InputDeviceCollection idc;
+  fredemmott::inputmapping::InputDeviceCollection idc;
   for (const auto& device: idc.getAllDevices()) {
     auto name = device->getProductName();
     printf("\"%s\"\n", name.data());

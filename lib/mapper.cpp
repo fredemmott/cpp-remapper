@@ -15,8 +15,6 @@
 
 namespace fredemmott::inputmapping {
 
-using fredemmott::gameinput::InputDevice;
-
 namespace {
 struct DeviceOffsets {
   const off_t firstAxis;
