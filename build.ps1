@@ -22,7 +22,6 @@
 
 [cmdletbinding()]
 param(
-  [Parameter(Mandatory=$true)]
   [string[]] $Profiles,
   [ValidateSet('Release', 'Debug')]
   [string] $BuildMode = 'Release',
@@ -31,15 +30,15 @@ param(
   [switch] $ForceRebuild,
   [switch] $GuessIntentForIDE,
   [ValidateSet('clang', 'cl')]
-  [string] $Compiler = 'cl'
+  [string] $Compiler = 'cl',
+  [switch] $ShowExeSuffix
 )
 
-$AllProfiles = (Get-Item *.cpp).Name
-if (Test-Path profiles) {
-  $AllProfiles += Get-Item profiles\*.cpp | ForEach-Object { "profiles\$($_.Name)" }
-}
-if ($Profiles -eq @("all")) {
-  $Profiles = $AllProfiles;
+if (!$Profiles -or $Profiles -eq @("all")) {
+  $Profiles = (Get-Item *.cpp).Name
+  if (Test-Path profiles) {
+    $Profiles += Get-Item profiles\*.cpp | ForEach-Object { "profiles\$($_.Name)" }
+  }
 }
 
 if ($GuessIntentForIDE) {
@@ -53,9 +52,9 @@ if ($GuessIntentForIDE) {
   }
 }
 
+$ExeSuffix = ''
 $CWD = (Get-Item .).FullName
 $IntermediateDir = "$CWD\build\${Platform}-${Compiler}-${BuildMode}"
-$ExeSuffix = "-${BuildMode}";
 New-Item -Force -Path $IntermediateDir -ItemType Directory | Out-Null
 
 $LINKFlags = @()
@@ -76,16 +75,14 @@ $CLFlags = @(
 switch($Platform) {
   "x86" {
     $VCVarsBat = "vcvars32.bat"
-    $ExeSuffix = "$ExeSuffix-x86"
+    $ExeSuffix += "-x86"
     # VJoy SDK
     $LINKFlags += "/LIBPATH:SDK\lib"
-    $ClangArch = "i386"
   }
   "x64" {
     $VCVarsBat = "vcvars64.bat"
     # VJoy SDK
     $LINKFlags += "/LIBPATH:SDK\lib\amd64"
-    $ClangArch = "x86_64"
   }
 
   default {
@@ -102,15 +99,10 @@ switch($BuildMode) {
     if ($Compiler -eq "cl") {
       $CLFlags += "/fsanitize=address";
     }
-    # asan doesn't work with /MTd with clang :'(
-    # $LINKFlags += @(
-    #	"/LIBPATH:$(clang -print-resource-dir)\lib\windows"
-    #	"clang_rt.asan-${ClangArch}.lib"
-    # )
+    $ExeSuffix += "-Debug"
   }
   "Release" {
     $CLFlags += @("/O2", "/MT")
-    $ExeSuffix=''
   }
 
   default {
@@ -131,6 +123,11 @@ if ($Compiler -eq "clang") {
     "-Wno-pragma-once-outside-header"
   )
   $ExeSuffix += "-clang"
+}
+
+if ($ShowExeSuffix) {
+  Write-Output $ExeSuffix
+  exit
 }
 
 $LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
