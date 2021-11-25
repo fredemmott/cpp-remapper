@@ -296,14 +296,15 @@ long InputDevice::State::getAxis(uint8_t i) const {
 }
 
 bool InputDevice::State::getButton(uint8_t i) const {
-  // (bool) uint8_value -> true if the value is non-zero
-  // *(bool*) &uint8_value -> VARIES; a bool is 0 or 1; the 'non-zero'
-  // is only when converting to bool. Both MSVC and Clang /sometimes/ will
-  // convert another non-zero uint8* to true, but not always - clang is
-  // less likely to do this.
+  // The DirectInput only specifies that the high bit will/will not be set,
+  // so explicitly check it.
   //
-  // DirectInput likes to set 0x80, so use the value conversion always.
-  return (bool) buffer[offsets.firstButton + (i * sizeof(bool))];
+  // In particular, we can't just do the same pointer tricks we're using for
+  // other types as `(bool)v` isn't guaranteed to be the same as
+  // `*(bool*) &v`
+  return static_cast<bool>(
+    static_cast<uint8_t>(buffer[offsets.firstButton + (i * sizeof(bool))])
+    & 0x80);
 }
 
 uint16_t InputDevice::State::getHat(uint8_t i) const {
