@@ -74,13 +74,12 @@ int main() {
 1. Download the vJoy SDK - the version must exactly match the version of vJoy
    you're using. As of 2020-12-18, the most recent version appears to be
    available from https://github.com/njz3/vJoy/
-2. Extract it to the source directory so you have an `SDK/` subdirectory
-3. Copy the `vJoyInterface.dll` from the SDK directory to the repo root directory
+2. Extract it to the `third-party/vJoy` directory so you have an `third-party/vJoy/SDK/` subdirectory
+3. Copy the `vJoyInterface.dll` from the SDK directory to the `bin/` subdirectory
 4. Install Visual Studio 2019 or newer
 5. Open a terminal
 6. `./build.ps1 example.cpp`
-7. Run `example.exe`; run as administrator for HidHide support.
-   - If you're in powershell: `Start-Process -Verb runas example.exe`
+7. Run `bin/example.exe`
 
 # How do I use this with another device?
 
@@ -135,7 +134,7 @@ You can specify a device with:
 - `HardwareID { "HID\\VID_1234&PID_5678" }` (using exact text from
   list-devices): supported by all devices. Usually specifies the make/model of
   the device, but may not.
-- `InstanceID { "HID\\VID_1234&PID_678\somemorestuff" }`: specifies the specific
+- `InstanceID { "HID\\VID_1234&PID_678\\somemorestuff" }`: specifies the specific
   instance of a device - usually not needed, but useful if you have multiple
   identical devices, e.g. HOSAS, button boxes, MFDs.
 
