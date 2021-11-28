@@ -326,8 +326,11 @@ function Objs-Exe-Rule {
   )
 
   Rebuild-If-Outdated -Target $Target -Sources $Objects -Impl {
+    if (!(Test-Path bin)) {
+      mkdir bin
+    }
     Write-Output "  LINK: ${Target}: $Objects $LINKFlags"
-    Invoke-Exe-Checked { LINK.exe /nologo "/Out:$Target" /LTCG $LINKFlags $Objects }
+    Invoke-Exe-Checked { LINK.exe /nologo "/Out:bin/$Target" /LTCG $LINKFlags $Objects }
   }
 
 }

@@ -42,4 +42,4 @@ jobs:
             -Platform ${{matrix.platform}} `
             -Compiler ${{matrix.compiler}} `
             -ShowExeSuffix
-          & .\test${ExeSuffix}.exe
+          & .\bin\test${ExeSuffix}.exe
