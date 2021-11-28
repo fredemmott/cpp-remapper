@@ -6,18 +6,37 @@
  * in the root directory of this source tree.
  */
 
-/* This file is to:
- * - verify the header in isolation
- * - do some simple static tests
- */
 #include "CompositeSink.h"
 
 #include <concepts>
 
-#include "SinkRef.h"
+#include "tests.h"
+
+using namespace fredemmott::inputmapping;
+
+TEST_CASE("CompositeSink") {
+  TestAxis axis;
+
+  // For now, relying on static_test below
+#ifdef TODO
+  Axis::Value out1(-1), out2(-1), out3(-1);
+  // 1, 2, n are special
+  axis >> &out1;
+  axis.emit(Axis::MAX);
+  REQUIRE(out1 == Axis::MAX);
+  axis >> ::fredemmott::inputmapping::all(&out1, &out2);
+  axis.emit(Axis::MIN);
+  REQUIRE(out1 == Axis::MIN);
+  REQUIRE(out2 == Axis::MIN);
+  axis >> ::fredemmott::inputmapping::all(&out1, &out2, &out3);
+  axis.emit(Axis::MAX);
+  REQUIRE(out1 == Axis::MAX);
+  REQUIRE(out2 == Axis::MAX);
+  REQUIRE(out3 == Axis::MAX);
+#endif
+}
 
 namespace {
-using namespace fredemmott::inputmapping;
 
 void static_test() {
   ButtonSinkRef b = [](bool) {};

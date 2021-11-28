@@ -358,7 +358,17 @@ foreach ($ProfileSource in $Profiles) {
 
   Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource
 
+  $Objs = @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)
+  if ((Get-Item $ProfileSource).FullName -eq (Get-Item test.cpp).FullName) {
+    (Get-Item tests/*.cpp).FullName | ForEach-Object {
+      $Obj =Get-Cpp-Obj-Name $_
+      Cpp-Obj-Rule -Target $Obj -Cpp $_
+      $Objs += @($Obj)
+    }
+  }
+
+
   Objs-Exe-Rule `
     -Target "$((Get-Item $ProfileSource).BaseName)$ExeSuffix.exe" `
-    -Objects @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)
+    -Objects $Objs
 }

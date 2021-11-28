@@ -38,21 +38,3 @@ void AxisToHat::update() {
 }
 
 }// namespace fredemmott::inputmapping
-
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-#include "connections.h"
-
-namespace {
-using namespace fredemmott::inputmapping;
-
-void static_test() {
-  MappableInput in(nullptr);
-  MappableVJoyOutput out(nullptr);
-  AxisToHat ath;
-  // TODO: tuple assignments?
-  in.XAxis >> ath.XAxis;
-  in.YAxis >> ath.YAxis;
-  ath >> out.Hat1;
-}
-}// namespace
