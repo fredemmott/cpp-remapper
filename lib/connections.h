@@ -42,23 +42,28 @@ auto operator>>(Left left, const Right& right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
-    return ClosedPipeline(UnsafeRef<typename Left::element_type>(left));
+    return std::make_shared<ClosedPipeline>(UnsafeRef<typename Left::element_type>(left));
   }
 
   if constexpr (any_transform_ref<Left>) {
-    return TransformPipeline(left, right);
+    return std::make_shared<TransformPipeline>(left, right);
   }
 }
 
-///// SourceRef >> SinkFunc /////
+///// SourceOrTransformRef >> SinkFunc /////
 template <
-  any_source_ref Left,
+  any_source_or_transform_ref Left,
   typename OutControl = typename Left::element_type::OutControl,
   sink_invocable<OutControl> Right>
-ClosedPipeline operator>>(Left left, Right right) {
+auto operator>>(Left left, Right right) {
   auto sink = std::make_shared<FunctionSink<OutControl>>(right);
   left->setNext(sink);
-  return ClosedPipeline(UnsafeRef<typename Left::element_type>(left));
+  if constexpr (any_source_ref<Left>) {
+    return std::make_shared<ClosedPipeline>(UnsafeRef<typename Left::element_type>(left));
+  }
+  if constexpr(any_transform_ref<Left>) {
+    return std::make_shared<SinkPipeline<typename Left::element_type::OutControl>>(UnsafeRef<typename Left::element_type>(left));
+  }
 }
 
 ///// SourceOrTransformRef >> TransformRef /////
@@ -91,11 +96,11 @@ SourcePipeline<Control> operator>>(Left left, Right right) {
   return SourcePipeline<Control>(left, t);
 }
 
-///// SourceRef >> Value* (handy for testing) /////
+///// SourceOrTransformRef >> Value* (handy for testing) /////
 template <
-  any_source_ref Left,
+  any_source_or_transform_ref Left,
   std::same_as<typename Left::element_type::Out> Right>
-ClosedPipeline operator>>(Left left, Right* right) {
+auto operator>>(Left left, Right* right) {
   return left >> [right](Right value) { *right = value; };
 }
 
