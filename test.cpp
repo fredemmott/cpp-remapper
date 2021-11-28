@@ -245,9 +245,26 @@ TEST_CASE(bind_to_sink) {
 
 TEST_CASE(bind_to_multi) {
   TestAxis axis;
+
   // 1, 2, n are special
   axis >> [](long) {};
   axis >> ::fredemmott::inputmapping::all([](long) {}, [](long) {});
+#ifdef TODO
+  Axis::Value out1(-1), out2(-1), out3(-1);
+  // 1, 2, n are special
+  axis >> &out1;
+  axis.emit(Axis::MAX);
+  REQUIRE(out1 == Axis::MAX);
+  axis >> ::fredemmott::inputmapping::all(&out1, &out2);
+  axis.emit(Axis::MIN);
+  REQUIRE(out1 == Axis::MIN);
+  REQUIRE(out2 == Axis::MIN);
+  axis >> ::fredemmott::inputmapping::all(&out1, &out2, &out3);
+  axis.emit(Axis::MAX);
+  REQUIRE(out1 == Axis::MAX);
+  REQUIRE(out2 == Axis::MAX);
+  REQUIRE(out3 == Axis::MAX);
+#endif
 }
 
 TEST_CASE(axis_to_hat) {

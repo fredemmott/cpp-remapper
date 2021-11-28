@@ -49,6 +49,7 @@ concept convertible_to_sink_ref =
   sink<T, TControl>
   || sink_ref<T, TControl>
   || sink_invocable<T, TControl>;
+  // TODO: || std::is_same<T, typename TControl::Value>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping
