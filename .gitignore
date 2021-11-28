@@ -8,7 +8,8 @@
 /third-party/vJoy/
 /profiles/
 vJoyInterface.dll
+/bin/
 *~
 *.bmp
 *.exp
-build/
+/build/
