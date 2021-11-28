@@ -338,7 +338,7 @@ $ViGEmClientSources=(Get-ChildItem -Path third-party\ViGEmClient -Recurse -File 
 
 Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
   Write-Output "  MSBUILD: ViGEmClient ${BuildMode}_LIB"
-  Push-Location ViGEmClient
+  Push-Location third-party/ViGEmClient
   Invoke-Exe-Checked { msbuild -noLogo "-p:Configuration=${BuildMode}_LIB" "-p:Platform=$Platform" }
   Pop-Location
 }
