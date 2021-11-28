@@ -22,6 +22,7 @@ class AxisToButtons final : public AxisSink {
     ButtonSinkRef next;
   };
 
+  // TODO: convenience constructor deviding into equal-portion buttons.
   AxisToButtons(std::initializer_list<Range> ranges);
   void map(long value);
 
