@@ -6,10 +6,10 @@
  * in the root directory of this source tree.
  */
 
-#include "lib/easymode.h"
 #include "lib/CompositeSink.h"
 #include "lib/Sink.h"
 #include "lib/Source.h"
+#include "lib/easymode.h"
 #include "lib/render_axis.h"
 
 using namespace fredemmott::inputmapping;
@@ -20,28 +20,44 @@ using namespace fredemmott::inputmapping;
 #define REQUIRE(x) \
   if (!(x)) { \
     printf( \
-      "Expectation '%s' failed in %s() at %s:%d\n", #x, __func__, __FILE__, __LINE__); \
+      "Expectation '%s' failed in %s() at %s:%d\n", \
+      #x, \
+      __func__, \
+      __FILE__, \
+      __LINE__); \
     __debugbreak(); \
     exit(1); \
   }
 
 struct ProgressPrinter {
   ProgressPrinter(const char *name) : mName(name) {
-    printf("Starting test %s()...\n", name);
+    printf("test_%s...\n", name);
   }
 
   ~ProgressPrinter() {
     if (std::uncaught_exceptions()) {
-      printf("FAILED: %s()\n", mName);
+      printf("... FAILED!\n", mName);
     } else {
-      printf("OK: %s()\n", mName);
+      printf("... OK.\n", mName);
     }
   }
 
  private:
   const char *mName;
 };
-#define START_TEST ProgressPrinter pp_##__COUNTER__(__func__)
+
+std::map<std::string, void (*)()> registered_tests;
+class TestRegistration final {
+ public:
+	TestRegistration(const char *name, void (*impl)()) {
+		registered_tests.emplace(name, impl);
+	}
+};
+#define TEST_CASE(x) \
+	void test_##x(); \
+	TestRegistration test_##x##_reg_##__COUNTER__(#x "()", test_##x); \
+	void test_##x()
+
 
 template <typename TControl>
 class TestInput : public ::fredemmott::inputmapping::Source<TControl> {
@@ -52,8 +68,7 @@ using TestAxis = TestInput<Axis>;
 using TestButton = TestInput<Button>;
 using TestHat = TestInput<Hat>;
 
-void test_value_ptr() {
-  START_TEST;
+TEST_CASE(value_ptr) {
   long out = -1;
   TestAxis axis;
   axis >> &out;
@@ -61,8 +76,7 @@ void test_value_ptr() {
   REQUIRE(out == 123);
 }
 
-void test_lambdas() {
-  START_TEST;
+TEST_CASE(lambdas) {
   long out = -1;
   TestAxis axis;
   axis >> &out;
@@ -76,8 +90,7 @@ void test_lambdas() {
   REQUIRE(out == 456);
 }
 
-void test_source_sink_transform() {
-  START_TEST;
+TEST_CASE(source_sink_transform) {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
@@ -159,18 +172,15 @@ void test_square_deadzone_impl(uint8_t percent) {
   REQUIRE(out >= 0x7fff - 0x4000 - delta_ceil);
 }
 
-void test_small_square_deadzone() {
-  START_TEST;
+TEST_CASE(small_square_deadzone) {
   test_square_deadzone_impl(10);
 }
 
-void test_large_square_deadzone() {
-  START_TEST;
+TEST_CASE(large_square_deadzone) {
   test_square_deadzone_impl(90);
 }
 
-void test_axis_curve() {
-  START_TEST;
+TEST_CASE(axis_curve) {
   long out = -1;
 
   render_axis("linear.bmp", AxisCurve {0});
@@ -213,8 +223,7 @@ void test_axis_curve() {
   REQUIRE(out < extreme_out);
 }
 
-void test_bind_to_sink() {
-  START_TEST;
+TEST_CASE(bind_to_sink) {
   bool b1 = false, b2 = false;
   TestAxis axis;
   axis >> AxisToButtons {
@@ -234,16 +243,14 @@ void test_bind_to_sink() {
   REQUIRE(b2);
 }
 
-void test_bind_to_multi() {
-  START_TEST;
+TEST_CASE(bind_to_multi) {
   TestAxis axis;
   // 1, 2, n are special
   axis >> [](long) {};
   axis >> ::fredemmott::inputmapping::all([](long) {}, [](long) {});
 }
 
-void test_axis_to_hat() {
-  START_TEST;
+TEST_CASE(axis_to_hat) {
   TestAxis x, y;
   Hat::Value hat;
   AxisToHat ath;
@@ -254,7 +261,8 @@ void test_axis_to_hat() {
   // verify that both axis default to cente
   x.emit(Axis::MID);
   REQUIRE(hat == Hat::CENTER);
-  ath = AxisToHat(); ath >> &hat;
+  ath = AxisToHat();
+  ath >> &hat;
   x.emit(Axis::MID);
   REQUIRE(hat == Hat::CENTER);
 
@@ -288,16 +296,10 @@ void test_axis_to_hat() {
 
 int main() {
   printf("----- Starting Test Run -----\n");
-  test_value_ptr();
-  test_lambdas();
-  test_bind_to_sink();
-  test_bind_to_multi();
-  test_source_sink_transform();
-  test_small_square_deadzone();
-  test_large_square_deadzone();
-  test_axis_curve();
-  test_axis_to_hat();
-
+  for (const auto& [name, test]: registered_tests) {
+    ProgressPrinter pp(name.c_str());
+    test();
+  }
   printf("All tests passed.\n");
   return 0;
 }
