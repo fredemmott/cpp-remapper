@@ -9,7 +9,9 @@
       "type": "cppvsdbg",
       "request": "launch",
       "program": "test-debug.exe",
-      "args": [],
+      "args": [
+        "--break"
+      ],
       "stopAtEntry": false,
       "preLaunchTask": "Build (Debug)",
       "cwd": "${workspaceFolder}",

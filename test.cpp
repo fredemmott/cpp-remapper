@@ -12,52 +12,13 @@
 #include "lib/easymode.h"
 #include "lib/render_axis.h"
 
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+
 using namespace fredemmott::inputmapping;
 
 #include <cstdio>
 #include <exception>
-
-#define REQUIRE(x) \
-  if (!(x)) { \
-    printf( \
-      "Expectation '%s' failed in %s() at %s:%d\n", \
-      #x, \
-      __func__, \
-      __FILE__, \
-      __LINE__); \
-    __debugbreak(); \
-    exit(1); \
-  }
-
-struct ProgressPrinter {
-  ProgressPrinter(const char *name) : mName(name) {
-    printf("test_%s...\n", name);
-  }
-
-  ~ProgressPrinter() {
-    if (std::uncaught_exceptions()) {
-      printf("... FAILED!\n", mName);
-    } else {
-      printf("... OK.\n", mName);
-    }
-  }
-
- private:
-  const char *mName;
-};
-
-std::map<std::string, void (*)()> registered_tests;
-class TestRegistration final {
- public:
-	TestRegistration(const char *name, void (*impl)()) {
-		registered_tests.emplace(name, impl);
-	}
-};
-#define TEST_CASE(x) \
-	void test_##x(); \
-	TestRegistration test_##x##_reg_##__COUNTER__(#x "()", test_##x); \
-	void test_##x()
-
 
 template <typename TControl>
 class TestInput : public ::fredemmott::inputmapping::Source<TControl> {
@@ -68,7 +29,7 @@ using TestAxis = TestInput<Axis>;
 using TestButton = TestInput<Button>;
 using TestHat = TestInput<Hat>;
 
-TEST_CASE(value_ptr) {
+TEST_CASE("value_ptr") {
   long out = -1;
   TestAxis axis;
   axis >> &out;
@@ -76,7 +37,7 @@ TEST_CASE(value_ptr) {
   REQUIRE(out == 123);
 }
 
-TEST_CASE(lambdas) {
+TEST_CASE("lambdas") {
   long out = -1;
   TestAxis axis;
   axis >> &out;
@@ -90,7 +51,7 @@ TEST_CASE(lambdas) {
   REQUIRE(out == 456);
 }
 
-TEST_CASE(source_sink_transform) {
+TEST_CASE("source_sink_transform") {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
@@ -172,15 +133,15 @@ void test_square_deadzone_impl(uint8_t percent) {
   REQUIRE(out >= 0x7fff - 0x4000 - delta_ceil);
 }
 
-TEST_CASE(small_square_deadzone) {
+TEST_CASE("small_square_deadzone") {
   test_square_deadzone_impl(10);
 }
 
-TEST_CASE(large_square_deadzone) {
+TEST_CASE("large_square_deadzone") {
   test_square_deadzone_impl(90);
 }
 
-TEST_CASE(axis_curve) {
+TEST_CASE("axis_curve") {
   long out = -1;
 
   render_axis("linear.bmp", AxisCurve {0});
@@ -207,9 +168,9 @@ TEST_CASE(axis_curve) {
   extreme.emit(0x7fff);
   REQUIRE(out == 0x7fff);
   extreme.emit(0x4000);
-  REQUIRE(out > 0x4000 && out < 0x7fff);
+  REQUIRE((out > 0x4000 && out < 0x7fff));
   extreme.emit(0x7fff + 0x4000);
-  REQUIRE(out > 0x7fff && out < (0x7ffff + 0x4000));
+  REQUIRE((out > 0x7fff && out < (0x7ffff + 0x4000)));
 
   render_axis("gentle.bmp", AxisCurve {0.5});
   TestAxis gentle;
@@ -217,13 +178,13 @@ TEST_CASE(axis_curve) {
   extreme.emit(0x4000);
   const auto extreme_out = out;
   gentle.emit(0x4000);
-  REQUIRE(out > 0x4000 && out < 0x7fff);
+  REQUIRE((out > 0x4000 && out < 0x7fff));
   // As 0x4000 is less than the midpoint, the smaller number has the most
   // deflection
   REQUIRE(out < extreme_out);
 }
 
-TEST_CASE(bind_to_sink) {
+TEST_CASE("bind_to_sink") {
   bool b1 = false, b2 = false;
   TestAxis axis;
   axis >> AxisToButtons {
@@ -243,7 +204,7 @@ TEST_CASE(bind_to_sink) {
   REQUIRE(b2);
 }
 
-TEST_CASE(bind_to_multi) {
+TEST_CASE("bind_to_multi") {
   TestAxis axis;
 
   // 1, 2, n are special
@@ -267,7 +228,7 @@ TEST_CASE(bind_to_multi) {
 #endif
 }
 
-TEST_CASE(axis_to_hat) {
+TEST_CASE("axis_to_hat") {
   TestAxis x, y;
   Hat::Value hat;
   AxisToHat ath;
@@ -309,14 +270,4 @@ TEST_CASE(axis_to_hat) {
 
   x.emit(Axis::MAX);
   REQUIRE(hat == Hat::SOUTH_EAST);
-}
-
-int main() {
-  printf("----- Starting Test Run -----\n");
-  for (const auto& [name, test]: registered_tests) {
-    ProgressPrinter pp(name.c_str());
-    test();
-  }
-  printf("All tests passed.\n");
-  return 0;
 }

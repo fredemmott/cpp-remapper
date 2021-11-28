@@ -64,6 +64,7 @@ $CLFlags = @(
   "/I.",
   "/IViGEmClient\include",
   "/ISDK/inc",
+  "/Icatch",
   "/Ilib",
   "/EHsc",
   "/vmg",
