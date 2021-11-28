@@ -39,8 +39,8 @@ class AxisToHat final : public HatSource {
 
  private:
   uint8_t mDeadzone = DEFAULT_DEADZONE_PERCENT;
-  Axis::Value mX = 0;
-  Axis::Value mY = 0;
+  Axis::Value mX = Axis::MID;
+  Axis::Value mY = Axis::MID;
 
   void update();
 };

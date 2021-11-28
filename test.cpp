@@ -242,6 +242,50 @@ void test_bind_to_multi() {
   axis >> ::fredemmott::inputmapping::all([](long) {}, [](long) {});
 }
 
+void test_axis_to_hat() {
+  START_TEST;
+  TestAxis x, y;
+  Hat::Value hat;
+  AxisToHat ath;
+  x >> ath.XAxis;
+  y >> ath.YAxis;
+  ath >> &hat;
+
+  // verify that both axis default to cente
+  x.emit(Axis::MID);
+  REQUIRE(hat == Hat::CENTER);
+  ath = AxisToHat(); ath >> &hat;
+  x.emit(Axis::MID);
+  REQUIRE(hat == Hat::CENTER);
+
+  y.emit(Axis::MIN);
+  REQUIRE(hat == Hat::NORTH);
+
+  x.emit(Axis::MIN);
+  REQUIRE(hat == Hat::NORTH_WEST);
+
+  x.emit(Axis::MAX);
+  REQUIRE(hat == Hat::NORTH_EAST);
+
+  y.emit(Axis::MID);
+  REQUIRE(hat == Hat::EAST);
+
+  x.emit(Axis::MID);
+  REQUIRE(hat == Hat::CENTER);
+
+  x.emit(Axis::MIN);
+  REQUIRE(hat == Hat::WEST);
+
+  y.emit(Axis::MAX);
+  REQUIRE(hat == Hat::SOUTH_WEST);
+
+  x.emit(Axis::MID);
+  REQUIRE(hat == Hat::SOUTH);
+
+  x.emit(Axis::MAX);
+  REQUIRE(hat == Hat::SOUTH_EAST);
+}
+
 int main() {
   printf("----- Starting Test Run -----\n");
   test_value_ptr();
@@ -252,6 +296,7 @@ int main() {
   test_small_square_deadzone();
   test_large_square_deadzone();
   test_axis_curve();
+  test_axis_to_hat();
 
   printf("All tests passed.\n");
   return 0;

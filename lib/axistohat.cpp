@@ -13,18 +13,16 @@
 
 namespace fredemmott::inputmapping {
 
-AxisToHat::AxisToHat(uint8_t deadzone_percent)
-  : mDeadzone(deadzone_percent) {
+AxisToHat::AxisToHat(uint8_t deadzone_percent) : mDeadzone(deadzone_percent) {
 }
 
 AxisToHat::~AxisToHat() {
 }
 
 void AxisToHat::update() {
-  const auto mid = 0xffff / 2;
   // Recenter around (0, 0)
-  const auto x = mX - mid;
-  const auto y = mY - mid;
+  const auto x = mX - Axis::MID;
+  const auto y = mY - Axis::MID;
 
   // Treat deadzone as combined distance to center - same amount of
   // needed for corners.
@@ -33,10 +31,28 @@ void AxisToHat::update() {
     emit(Hat::CENTER);
     return;
   }
+
   const auto radians = atan2(y, x);
-  const auto raw_degrees = ((180 / M_PI) * radians) + 90;
-  const auto degrees = (raw_degrees < 0) ? raw_degrees + 360 : raw_degrees;
-    emit(Hat::Value(degrees * 100));
+  const auto centidegrees = std::lround((18000 * radians) / M_PI) + 9000;
+  emit(centidegrees < 0 ? centidegrees + 36000 : centidegrees);
 }
 
 }// namespace fredemmott::inputmapping
+
+#include "MappableInput.h"
+#include "MappableVJoyOutput.h"
+#include "connections.h"
+
+namespace {
+using namespace fredemmott::inputmapping;
+
+void static_test() {
+  MappableInput in(nullptr);
+  MappableVJoyOutput out(nullptr);
+  AxisToHat ath;
+  // TODO: tuple assignments?
+  in.XAxis >> ath.XAxis;
+  in.YAxis >> ath.YAxis;
+  ath >> out.Hat1;
+}
+}// namespace
