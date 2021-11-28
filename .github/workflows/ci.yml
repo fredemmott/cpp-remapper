@@ -23,7 +23,7 @@ jobs:
             -Out vJoy-SDK.zip
       - name: Extract vJoy SDK
         run: |
-          Expand-Archive vJoy-SDK.zip .
+          Expand-Archive vJoy-SDK.zip third-party\vJoy
           if ( "${{matrix.platform}}" -eq "x64" ) {
             cp SDK\lib\amd64\vJoyInterface.dll .
           } else {

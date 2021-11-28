@@ -62,9 +62,10 @@ $LINKFlags = @()
 $CLFlags = @(
   "/nologo",
   "/I.",
-  "/IViGEmClient\include",
-  "/ISDK/inc",
-  "/Icatch",
+  "/Ithird-party",
+  "/Ithird-party\ViGEmClient\include",
+  "/Ithird-party\vJoy",
+  "/Ithird-party\vJoy\SDK\inc",
   "/Ilib",
   "/EHsc",
   "/vmg",
@@ -80,12 +81,12 @@ switch($Platform) {
     $VCVarsBat = "vcvars32.bat"
     $ExeSuffix += "-x86"
     # VJoy SDK
-    $LINKFlags += "/LIBPATH:SDK\lib"
+    $LINKFlags += "/LIBPATH:third-party\vJoy\SDK\lib"
   }
   "x64" {
     $VCVarsBat = "vcvars64.bat"
     # VJoy SDK
-    $LINKFlags += "/LIBPATH:SDK\lib\amd64"
+    $LINKFlags += "/LIBPATH:third-party\vJoy\SDK\lib\amd64"
   }
 
   default {
@@ -134,7 +135,7 @@ if ($ShowExeSuffix) {
   exit
 }
 
-$LibViGEmClient="ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
+$LibViGEmClient="third-party\ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
 
 $ErrorActionPreference = "Stop"
 function Invoke-Exe-Checked-Raw{
@@ -330,7 +331,7 @@ function Objs-Exe-Rule {
   }
 
 }
-$ViGEmClientSources=(Get-ChildItem -Path ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
+$ViGEmClientSources=(Get-ChildItem -Path third-party\ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
 
 Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
   Write-Output "  MSBUILD: ViGEmClient ${BuildMode}_LIB"
@@ -344,7 +345,7 @@ $LibHidHide = Get-Relative-Name "$IntermediateDir\hidhide.lib"
 
 Cpp-StaticLib-Rule `
   -Target $LibHidHide `
-  -Sources (Get-Item HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
+  -Sources (Get-Item third-party/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
 Cpp-StaticLib-Rule `
   -Target $LibCppRemapper `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })

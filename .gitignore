@@ -5,8 +5,8 @@
 *.obj
 *.lib
 
-SDK/
-profiles/
+/third-party/vJoy/
+/profiles/
 vJoyInterface.dll
 *~
 *.bmp
