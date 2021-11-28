@@ -9,6 +9,7 @@
 
 #include "ButtonToAxis.h"
 #include "CompositeSink.h"
+#include "HatToButtons.h"
 #include "axiscurve.h"
 #include "axistobuttons.h"
 #include "axistohat.h"

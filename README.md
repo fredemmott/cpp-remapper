@@ -147,6 +147,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `AxisToButtons`
 - `AxisToHat`
 - `ButtonToAxis`
+- `HatToButtons`
 - `ShortPressLongPress`
 - `SquareDeadzone`
 
