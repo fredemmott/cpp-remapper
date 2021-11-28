@@ -343,7 +343,7 @@ $LibHidHide = Get-Relative-Name "$IntermediateDir\hidhide.lib"
 
 Cpp-StaticLib-Rule `
   -Target $LibHidHide `
-  -Sources (Get-Item lib/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
+  -Sources (Get-Item HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
 Cpp-StaticLib-Rule `
   -Target $LibCppRemapper `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
