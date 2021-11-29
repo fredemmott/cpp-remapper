@@ -36,6 +36,7 @@ class UnsafeRef {
 
   UnsafeRef() {
   }
+
   explicit UnsafeRef(T* impl) : p(impl) {
   }
 

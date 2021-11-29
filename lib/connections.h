@@ -20,10 +20,6 @@
 
 namespace fredemmott::inputmapping {
 
-// clang-format doesn't properly support C++20 "Concepts" yet.
-
-// clang-format off
-
 /* Most of the 'how to tie stuff together' stuff works on '_ref's, which is
  * essentially 'kinda looks like a `shared_ptr<>`.
  *
@@ -42,7 +38,7 @@ auto operator>>(Left left, const Right& right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
-    return std::make_shared<ClosedPipeline>(UnsafeRef<typename Left::element_type>(left));
+    return std::make_shared<ClosedPipeline>(left);
   }
 
   if constexpr (any_transform_ref<Left>) {
@@ -59,10 +55,11 @@ auto operator>>(Left left, Right right) {
   auto sink = std::make_shared<FunctionSink<OutControl>>(right);
   left->setNext(sink);
   if constexpr (any_source_ref<Left>) {
-    return std::make_shared<ClosedPipeline>(UnsafeRef<typename Left::element_type>(left));
+    return std::make_shared<ClosedPipeline>(left);
   }
-  if constexpr(any_transform_ref<Left>) {
-    return std::make_shared<SinkPipeline<typename Left::element_type::OutControl>>(UnsafeRef<typename Left::element_type>(left));
+  if constexpr (any_transform_ref<Left>) {
+    return std::make_shared<
+      SinkPipeline<typename Left::element_type::OutControl>>(left);
   }
 }
 
@@ -74,26 +71,31 @@ auto operator>>(Left left, Right right) {
   left->setNext(right);
 
   if constexpr (any_source_ref<Left>) {
-    return SourcePipeline<typename Right::element_type::OutControl>(
-      left, right);
+    return std::make_shared<
+      SourcePipeline<typename Right::element_type::OutControl>>(left, right);
   }
 
   if constexpr (any_transform_ref<Left>) {
-    return TransformPipeline<
+    return std::make_shared<TransformPipeline<
       typename Left::element_type::InControl,
-      typename Right::element_type::OutControl>(left, right);
+      typename Right::element_type::OutControl>>(left, right);
   }
 }
 
-///// SourceRef >> TransformFunc /////
+///// SourceOrTransformRef >> TransformFunc /////
 template <
-  any_source_ref Left,
+  any_source_or_transform_ref Left,
   typename Control = typename Left::element_type::OutControl,
   transform_invocable<Control, Control> Right>
-SourcePipeline<Control> operator>>(Left left, Right right) {
+auto operator>>(Left left, Right right) {
   auto t = std::make_shared<FunctionTransform<Control, Control>>(right);
   left->setNext(t);
-  return SourcePipeline<Control>(left, t);
+  if constexpr (any_source_ref<Left>) {
+    return std::make_shared<SourcePipeline<Control>>(left, t);
+  }
+  if constexpr (any_transform_ref<Left>) {
+    return std::make_shared<TransformPipeline<Control, Control>>(left, t);
+  }
 }
 
 ///// SourceOrTransformRef >> Value* (handy for testing) /////
@@ -104,33 +106,37 @@ auto operator>>(Left left, Right* right) {
   return left >> [right](Right value) { *right = value; };
 }
 
+/* Now we're onto dealing with stuff that isn't a ref.
+ *
+ * `detail::decay_equiv` means that `std::decay<T>` is the same type as `T`; for
+ * example, `detail::decay_equiv(T&)` is false, as `T&` != `T`.
+ *
+ * The idea is that:
+ * - if it's potentially stored elsewhere (e.g. in a local), keep using the
+ * original value
+ * - otherwise, consider it disposable and `std::move` it to somewhere we own.
+ *
+ * `Foo&&` is an r-value reference, a.k.a. moved value a.k.a temporary. This is
+ * supported to allow temporary transformations, e.g. `stick.XAxis >>
+ * AxisCurve(0.5) >> mysink` - in this case, the `AxisCurve` is an
+ * rvalue-reference. These are converted to refs by calling
+ * `std::make_shared<T>`.
+ *
+ * We need to be extremely careful to avoid takinng a `const T&`, as
+ * rvalue-references are convertible to const references, but not to mutable
+ * references.
+ *
+ * `Foo&` is an lvalue-reference, and needed to support `stick.XAxis` in the
+ * previous example, or anything stored in a local, e.g. `auto mytransform =
+ * [](Axis::Value value) { return Axis::MAX - value; };` - using `mytransform`
+ * requires it to be taken as a mutable reference.
+ */
+
 template <typename Left, typename Right>
 concept pipeable = requires(Left left, Right right) {
   left >> right;
 };
 
-/* Now we're onto dealing with stuff that isn't a ref.
- *
- * `detail::decay_equiv` means that `std::decay<T>` is the same type as `T`; for example,
- * `detail::decay_equiv(T&)` is false, as `T&` != `T`.
- *
- * The idea is that:
- * - if it's potentially stored elsewhere (e.g. in a local), keep using the original value
- * - otherwise, consider it disposable and `std::move` it to somewhere we own.
- *
- * `Foo&&` is an r-value reference, a.k.a. moved value a.k.a temporary. This is supported
- * to allow temporary transformations, e.g.
- * `stick.XAxis >> AxisCurve(0.5) >> mysink` - in this case, the `AxisCurve` is an
- * rvalue-reference. These are converted to refs by calling `std::make_shared<T>`.
- *
- * We need to be extremely careful to avoid takinng a `const T&`, as rvalue-references are
- * convertible to const references, but not to mutable references.
- *
- * `Foo&` is an lvalue-reference, and needed to support `stick.XAxis` in the previous
- * example, or anything stored in a local, e.g.
- * `auto mytransform = [](Axis::Value value) { return Axis::MAX - value; };` - using
- * `mytransform` requires it to be taken as a mutable reference.
- */
 
 ///// Support a ref that's stored in a local, e.g. axis >> [](){} /////
 template <any_source_or_transform Left, typename Right>
@@ -139,7 +145,6 @@ auto operator>>(Left& left, Right&& right) requires
   static_assert(pipeable<UnsafeRef<Left>, Right>);
   return UnsafeRef(&left) >> std::move(right);
 }
-
 
 ///// Support temporary/moved RHS /////
 template <any_source_or_transform_ref Left, detail::decay_equiv Right>
@@ -181,15 +186,14 @@ auto operator>>(Left&& left, Right&& right) requires
 template <detail::decay_equiv Left, detail::decay_equiv Right>
 auto operator>>(Left&& left, Right&& right) requires
   pipeable<UnsafeRef<Left>, Right> {
-  return std::make_shared<Left>(std::move(left))
-    >> std::move(right);
+  return std::make_shared<Left>(std::move(left)) >> std::move(right);
 }
 
 ///// Temporary left, const ref right, e.g. foo >> vj1.XAxis /////
 template <detail::decay_equiv Left, detail::decay_equiv Right>
-auto operator>>(Left&& left, const Right& right) requires
-  any_sink_or_transform_ref<Right>
-  && pipeable<UnsafeRef<Left>, const Right&> {
+  auto operator>>(Left&& left, const Right& right) requires
+  any_sink_or_transform_ref<Right> && pipeable < UnsafeRef<Left>,
+const Right& > {
   return std::make_shared<Left>(std::move(left)) >> right;
 }
 

@@ -28,54 +28,54 @@ TEST_CASE("operator >>(Source&, Value*)") {
 }
 
 TEST_CASE("operator >>(Source&, Sink&&)") {
-	bool b1 = false, b2 = false;
-	TestAxis axis;
-	axis >> AxisToButtons {
-		{0, 10, [&b1](bool value) { b1 = value; }},
-		{90, 100, [&b2](bool value) { b2 = value; }}};
-	axis.emit(0);
-	REQUIRE(b1);
-	REQUIRE(!b2);
-	axis.emit(Axis::MAX / 10);
-	REQUIRE(b1);
-	REQUIRE(!b2);
-	axis.emit(Axis::MAX / 2);
-	REQUIRE(!b1);
-	REQUIRE(!b2);
-	axis.emit(Axis::MAX);
-	REQUIRE(!b1);
-	REQUIRE(b2);
+  bool b1 = false, b2 = false;
+  TestAxis axis;
+  axis >> AxisToButtons {
+    {0, 10, [&b1](bool value) { b1 = value; }},
+    {90, 100, [&b2](bool value) { b2 = value; }}};
+  axis.emit(0);
+  REQUIRE(b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX / 10);
+  REQUIRE(b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX / 2);
+  REQUIRE(!b1);
+  REQUIRE(!b2);
+  axis.emit(Axis::MAX);
+  REQUIRE(!b1);
+  REQUIRE(b2);
 }
 
 TEST_CASE("operator >>(Source&, Transform*)") {
-	// Testing the plumbing of >>, not the specific transform
-	long out = -1;
-	TestAxis axis;
-	SquareDeadzone dz(10);
+  // Testing the plumbing of >>, not the specific transform
+  long out = -1;
+  TestAxis axis;
+  SquareDeadzone dz(10);
 
-	axis >> &dz >> &out;
-	axis.emit(0);
-	REQUIRE(out == 0);
-	axis.emit(Axis::MAX);
-	REQUIRE(out == Axis::MAX);
-	axis.emit(100);
-	REQUIRE(out > 100);
-	axis.emit(Axis::MAX - 100);
-	REQUIRE(out < Axis::MAX - 100);
+  axis >> &dz >> &out;
+  axis.emit(0);
+  REQUIRE(out == 0);
+  axis.emit(Axis::MAX);
+  REQUIRE(out == Axis::MAX);
+  axis.emit(100);
+  REQUIRE(out > 100);
+  axis.emit(Axis::MAX - 100);
+  REQUIRE(out < Axis::MAX - 100);
 }
 
 TEST_CASE("operator >>(Source&, Transform&&)") {
-	// Testing the plumbing of >>, not the specific transform
-	long out = -1;
-	TestAxis axis;
-	SquareDeadzone dz(10);
+  // Testing the plumbing of >>, not the specific transform
+  long out = -1;
+  TestAxis axis;
+  SquareDeadzone dz(10);
 
-	// Via temporary
-	axis >> SquareDeadzone {10} >> &out;
-	axis.emit(0);
-	REQUIRE(out == 0);
-	axis.emit(Axis::MAX);
-	REQUIRE(out == Axis::MAX);
+  // Via temporary
+  axis >> SquareDeadzone {10} >> &out;
+  axis.emit(0);
+  REQUIRE(out == 0);
+  axis.emit(Axis::MAX);
+  REQUIRE(out == Axis::MAX);
 }
 
 namespace {
@@ -83,7 +83,8 @@ namespace {
 void static_test_transform_pipelines() {
   auto x
     = std::make_shared<SquareDeadzone>(50) >> std::make_shared<AxisCurve>(0.5);
-  static_assert(std::same_as<decltype(x), TransformPipeline<Axis, Axis>>);
+  static_assert(
+    std::same_as<decltype(x), std::shared_ptr<TransformPipeline<Axis, Axis>>>);
 
   auto y = std::make_shared<SquareDeadzone>(50) >> AxisCurve(0.5);
   static_assert(std::same_as<decltype(x), decltype(y)>);

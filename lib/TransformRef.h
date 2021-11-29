@@ -55,7 +55,7 @@ concept transform_from_ref =
 template<typename T, typename TIn, typename TOut>
 concept transform_ref =
   transform_from_ref<T, TIn>
-  && std::derived_from<T, Source<TOut>>;
+  && std::derived_from<typename T::element_type, Source<TOut>>;
 
 template<typename T>
 concept any_sink_or_transform = std::derived_from<T, AnySink>;

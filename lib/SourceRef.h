@@ -33,5 +33,9 @@ concept source_ref =
   && source<typename T::element_type, TControl>;
 // clang-format on
 
+template<typename T>
+concept convertible_to_any_source_ref =
+  any_source_ref<UnsafeRef<std::decay_t<T>>>;
+
 
 }// namespace fredemmott::inputmapping

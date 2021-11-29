@@ -22,18 +22,20 @@ void render_axis(
   AxisSinkRef transform_in,
   AxisSourceRef transform_out);
 
-template <transform<Axis, Axis> T>
-void render_axis(const std::string& bmp_filename, T&& transform)
-{
-  T moved(std::move(transform));
-  render_axis(
-    bmp_filename, AxisSinkRef(&moved), AxisSourceRef(&moved));
+template<transform_ref<Axis, Axis> T>
+void render_axis(const std::string& bmp_filename, const T& transform) {
+  render_axis(bmp_filename, transform, transform);
+}
+
+template<transform<Axis, Axis> T>
+void render_axis(const std::string& bmp_filename, T&& transform) {
+  render_axis(bmp_filename, std::move(transform));
 }
 
 template <transform_invocable<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, const T& func) {
-  FunctionTransform<Axis, Axis> transform(func);
-  render_axis(bmp_filename, std::move(transform));
+  auto t = std::make_shared<FunctionTransform<Axis, Axis>>(func);
+  render_axis(bmp_filename, t);
 }
 
 }// namespace fredemmott::inputmapping
