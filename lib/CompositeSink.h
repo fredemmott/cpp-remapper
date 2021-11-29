@@ -11,13 +11,15 @@
 
 #include "Sink.h"
 #include "SinkRef.h"
+#include "connections.h"// TODO: move convert_to_any_sink_ref etc out
 
 namespace fredemmott::inputmapping {
 
 template <typename TControl>
 class CompositeSink final : public Sink<TControl> {
  public:
-  CompositeSink(std::vector<SinkRef<TControl>> sinks): mSinks(sinks) {}
+  CompositeSink(std::vector<SinkRef<TControl>> sinks) : mSinks(sinks) {
+  }
 
   virtual void map(typename TControl::Value value) override {
     for (auto& inner: mSinks) {
@@ -27,42 +29,14 @@ class CompositeSink final : public Sink<TControl> {
 
  private:
   std::vector<SinkRef<TControl>> mSinks;
-
-  template <
-    std::convertible_to<SinkRef<TControl>> TFirst,
-    std::convertible_to<SinkRef<TControl>>... TRest>
-  void fill_sinks(const TFirst& first, TRest... rest) {
-    mSinks.push_back(first);
-    if constexpr (sizeof...(rest) > 0) {
-      fill_sinks(rest...);
-    }
-  }
 };
 
-// clang-format off
-template <
-  convertible_to_sink_ref<Axis> TFirst,
-  convertible_to_sink_ref<Axis>... TRest
->
+template <convertible_to_any_sink_ref TFirst, typename... TRest>
 auto all(TFirst first, TRest... rest) {
-  return CompositeSink<Axis>({first, rest...});
+  auto first_ref = convert_to_any_sink_ref(std::forward<TFirst>(first));
+  using TControl = typename decltype(first_ref)::element_type::InControl;
+  return CompositeSink<TControl>(
+    {first_ref, convert_to_any_sink_ref(std::forward<TRest>(rest))...});
 }
-
-template <
-  convertible_to_sink_ref<Button> TFirst,
-  convertible_to_sink_ref<Button>... TRest
->
-auto all(TFirst first, TRest... rest) {
-  return CompositeSink<Button>({first, rest...});
-}
-
-template <
-  convertible_to_sink_ref<Hat> TFirst,
-  convertible_to_sink_ref<Hat>... TRest
->
-auto all(TFirst first, TRest... rest) {
-  return CompositeSink<Hat>({first, rest...});
-}
-// clang-format on
 
 }// namespace fredemmott::inputmapping

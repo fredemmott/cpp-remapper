@@ -10,11 +10,11 @@
       "request": "launch",
       "program": "test-debug.exe",
       "args": [
-        "--break"
+        //"--break"
       ],
       "stopAtEntry": false,
       "preLaunchTask": "Build (Debug)",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/bin",
       "environment": [],
       "console": "integratedTerminal"
     },
@@ -22,7 +22,7 @@
       "name": "Current Profile (Release)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${fileBasenameNoExtension}.exe",
+      "program": "bin/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "preLaunchTask": "Build (Release)",

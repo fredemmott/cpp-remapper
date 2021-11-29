@@ -17,10 +17,12 @@ template <typename T>
 concept decay_equiv = std::same_as<T, std::decay_t<T>>;
 
 template <typename T>
-  concept container = requires (T) { typename T::element_type; };
+concept container = requires(T) {
+  typename T::element_type;
+};
 
 template <typename T>
-  concept unsafe_ref_target = decay_equiv<T> && !container<T>;
+concept unsafe_ref_target = decay_equiv<T> && !container<T>;
 }// namespace detail
 
 template <detail::unsafe_ref_target T>
@@ -50,9 +52,13 @@ class UnsafeRef {
     : p(impl.p), refcounted(impl.refcounted) {
   }
 
-  template <std::derived_from<T> TConcrete>
-  UnsafeRef(TConcrete&& temporary) {
-    refcounted = std::make_shared<TConcrete>(std::move(temporary));
+  template <std::derived_from<T> TSubtype>
+  UnsafeRef(TSubtype& local) : p(&local) {
+  }
+
+  template <std::derived_from<T> TSubtype>
+  explicit UnsafeRef(TSubtype&& temporary) {
+    refcounted = std::make_shared<TSubtype>(std::move(temporary));
     p = refcounted.get();
   }
 

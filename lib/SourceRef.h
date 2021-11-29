@@ -33,9 +33,38 @@ concept source_ref =
   && source<typename T::element_type, TControl>;
 // clang-format on
 
-template<typename T>
-concept convertible_to_any_source_ref =
-  any_source_ref<UnsafeRef<std::decay_t<T>>>;
+template <typename T>
+auto convert_to_any_source_ref(T&& in) {
+  if constexpr (any_source_ref<std::decay_t<T>>) {
+    return in;
+  }
+
+  if constexpr (any_source<std::decay_t<T>>) {
+    return UnsafeRef<std::decay_t<T>>(std::forward<T>(in));
+  }
+}
+
+// clang-format off
+template <typename T>
+concept convertible_to_any_source_ref = requires(T x) {
+	{ convert_to_any_source_ref(x) } -> any_source_ref;
+};
+
+template <typename T>
+concept non_id_convertible_to_any_source_ref =
+  !any_source_ref<std::decay_t<T>>
+  && convertible_to_any_source_ref<T>;
+
+template <typename T, typename TControl>
+concept convertible_to_source_ref = requires(T x) {
+	{ convert_to_any_source_ref(x) } -> source_ref<TControl>;
+};
+
+template <typename T, typename TControl>
+concept non_id_convertible_to_source_ref =
+  !source_ref<std::decay_t<T>, TControl>
+  && convertible_to_source_ref<T, TControl>;
+// clang-format on
 
 
 }// namespace fredemmott::inputmapping
