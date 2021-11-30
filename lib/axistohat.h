@@ -14,8 +14,6 @@
 
 namespace fredemmott::inputmapping {
 
-// TODO: clearly untested, was not a HatSource
-
 /** Converts two axis to a continuous (360-degree) hat.
  *
  * Deflections > 327.67 degrees will not be shown correctly in the Windows

@@ -11,7 +11,6 @@
 
 #include "Sink.h"
 #include "SinkRef.h"
-#include "connections.h"// TODO: move convert_to_any_sink_ptr etc out
 
 namespace fredemmott::inputmapping {
 

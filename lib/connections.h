@@ -14,7 +14,6 @@
 #include "SourcePipeline.h"
 #include "TransformPipeline.h"
 #include "TransformRef.h"
-#include "maybe_shared_ptr.h"// TODO: split out decay_equiv
 
 namespace fredemmott::inputmapping {
 
