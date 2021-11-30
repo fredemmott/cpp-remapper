@@ -31,7 +31,7 @@ class CompositeSink final : public Sink<TControl> {
 };
 
 template <convertible_to_any_sink_ptr TFirst, typename... TRest>
-auto all(TFirst first, TRest... rest) {
+auto all(TFirst&& first, TRest&&... rest) {
   auto first_ptr = convert_to_any_sink_ptr(std::forward<TFirst>(first));
   using TControl = typename decltype(first_ptr)::element_type::InControl;
   return CompositeSink<TControl>(
