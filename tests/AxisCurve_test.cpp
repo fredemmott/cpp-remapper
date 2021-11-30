@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "axiscurve.h"
+#include "AxisCurve.h"
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

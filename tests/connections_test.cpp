@@ -12,9 +12,9 @@
 
 #include "MappableInput.h"
 #include "MappableVJoyOutput.h"
-#include "axiscurve.h"
+#include "AxisCurve.h"
 #include "AxisToButtons.h"
-#include "squaredeadzone.h"
+#include "SquareDeadzone.h"
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;
@@ -38,7 +38,7 @@ TEST_CASE("Source& >> Value*") {
 TEST_CASE("Source& >> Sink&&") {
   bool b1 = false, b2 = false;
   TestAxis axis;
-  axis >> AxisToButtons {
+  axis >> AxisToButtons{
     {0, 10, [&b1](bool value) { b1 = value; }},
     {90, 100, [&b2](bool value) { b2 = value; }}};
   axis.emit(0);

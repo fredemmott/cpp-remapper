@@ -9,7 +9,7 @@
 // This file is an executable, intended to generate illustrative diagrams
 // of some basic axis mapping operations
 
-#include "lib/axiscurve.h"
+#include "lib/AxisCurve.h"
 #include "lib/easymode.h"
 #include "lib/render_axis.h"
 
