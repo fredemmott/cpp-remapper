@@ -11,7 +11,7 @@
 
 #include "Sink.h"
 #include "SinkRef.h"
-#include "connections.h"// TODO: move convert_to_any_sink_ref etc out
+#include "connections.h"// TODO: move convert_to_any_sink_ptr etc out
 
 namespace fredemmott::inputmapping {
 
@@ -31,12 +31,12 @@ class CompositeSink final : public Sink<TControl> {
   std::vector<SinkRef<TControl>> mSinks;
 };
 
-template <convertible_to_any_sink_ref TFirst, typename... TRest>
+template <convertible_to_any_sink_ptr TFirst, typename... TRest>
 auto all(TFirst first, TRest... rest) {
-  auto first_ref = convert_to_any_sink_ref(std::forward<TFirst>(first));
-  using TControl = typename decltype(first_ref)::element_type::InControl;
+  auto first_ptr = convert_to_any_sink_ptr(std::forward<TFirst>(first));
+  using TControl = typename decltype(first_ptr)::element_type::InControl;
   return CompositeSink<TControl>(
-    {first_ref, convert_to_any_sink_ref(std::forward<TRest>(rest))...});
+    {first_ptr, convert_to_any_sink_ptr(std::forward<TRest>(rest))...});
 }
 
 }// namespace fredemmott::inputmapping

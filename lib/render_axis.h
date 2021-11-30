@@ -22,7 +22,7 @@ void render_axis(
   AxisSinkRef transform_in,
   AxisSourceRef transform_out);
 
-template<transform_ref<Axis, Axis> T>
+template<transform_ptr<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, const T& transform) {
   render_axis(bmp_filename, transform, transform);
 }

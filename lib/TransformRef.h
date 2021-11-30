@@ -48,44 +48,44 @@ concept transform_invocable =
   && detail::exact_return_type<T, typename TOut::Value>;
 
 template<typename T>
-concept any_transform_ref =
+concept any_transform_ptr =
   any_transform<typename T::element_type>
   && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TIn>
-concept transform_from_ref =
+concept transform_from_ptr =
   transform_from<typename T::element_type, TIn>
   && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TOut>
-concept transform_to_ref =
+concept transform_to_ptr =
   transform_to<typename T::element_type, TOut>
   && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TIn, typename TOut>
-concept transform_ref =
-  transform_from_ref<T, TIn>
+concept transform_ptr =
+  transform_from_ptr<T, TIn>
   && std::derived_from<typename T::element_type, Source<TOut>>;
 
 template<typename T>
 concept any_sink_or_transform = std::derived_from<T, AnySink>;
 
 template<typename T>
-concept any_sink_or_transform_ref =
+concept any_sink_or_transform_ptr =
   any_sink_or_transform<typename T::element_type>;
 
 template<typename T>
 concept any_source_or_transform = std::derived_from<T, AnySource>;
 
 template<typename T>
-concept any_source_or_transform_ref =
+concept any_source_or_transform_ptr =
   any_source_or_transform<typename T::element_type>;
 // clang-format on
 
 template <typename T>
-auto convert_to_any_transform_ref(T&& in) {
+auto convert_to_any_transform_ptr(T&& in) {
   using DT = std::decay_t<T>;
-	if constexpr (any_transform_ref<DT>) {
+	if constexpr (any_transform_ptr<DT>) {
 		return in;
 	}
 
@@ -112,34 +112,34 @@ auto convert_to_any_transform_ref(T&& in) {
 
 // clang-format off
 template <typename T>
-concept convertible_to_any_transform_ref = requires(T x) {
-	{ convert_to_any_transform_ref(x) } -> any_transform_ref;
+concept convertible_to_any_transform_ptr = requires(T x) {
+	{ convert_to_any_transform_ptr(x) } -> any_transform_ptr;
 };
 
 template <typename T>
-concept non_id_convertible_to_any_transform_ref =
-  !any_transform_ref<T>
-  && convertible_to_any_transform_ref<T>;
+concept non_id_convertible_to_any_transform_ptr =
+  !any_transform_ptr<T>
+  && convertible_to_any_transform_ptr<T>;
 
 template <typename T, typename TIn>
-concept convertible_to_transform_from_ref = requires(T x) {
-	{ convert_to_any_transform_ref(x) } -> transform_from_ref<TIn>;
+concept convertible_to_transform_from_ptr = requires(T x) {
+	{ convert_to_any_transform_ptr(x) } -> transform_from_ptr<TIn>;
 };
 
 template <typename T, typename TIn>
-concept non_id_convertible_to_transform_from_ref =
-  !any_transform_ref<std::decay_t<T>>
-  && convertible_to_transform_from_ref<T, TIn>;
+concept non_id_convertible_to_transform_from_ptr =
+  !any_transform_ptr<std::decay_t<T>>
+  && convertible_to_transform_from_ptr<T, TIn>;
 
 template <typename T, typename TOut>
-concept convertible_to_transform_to_ref = requires(T x) {
-	{ convert_to_any_transform_ref(x) } -> transform_to_ref<TOut>;
+concept convertible_to_transform_to_ptr = requires(T x) {
+	{ convert_to_any_transform_ptr(x) } -> transform_to_ptr<TOut>;
 };
 
 template <typename T, typename TOut>
-concept non_id_convertible_to_transform_to_ref =
-  !any_transform_ref<std::decay_t<T>>
-  && convertible_to_transform_to_ref<T, TOut>;
+concept non_id_convertible_to_transform_to_ptr =
+  !any_transform_ptr<std::decay_t<T>>
+  && convertible_to_transform_to_ptr<T, TOut>;
 // clang-format on
 
 }// namespace fredemmott::inputmapping

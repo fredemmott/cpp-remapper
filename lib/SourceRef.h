@@ -23,19 +23,19 @@ using HatSourceRef = SourceRef<Hat>;
 
 // clang-format off
 template<typename T>
-concept any_source_ref =
+concept any_source_ptr =
   any_source<typename T::element_type>
   && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TControl>
-concept source_ref =
-  any_source_ref<T>
+concept source_ptr =
+  any_source_ptr<T>
   && source<typename T::element_type, TControl>;
 // clang-format on
 
 template <typename T>
-auto convert_to_any_source_ref(T&& in) {
-  if constexpr (any_source_ref<std::decay_t<T>>) {
+auto convert_to_any_source_ptr(T&& in) {
+  if constexpr (any_source_ptr<std::decay_t<T>>) {
     return in;
   }
 
@@ -46,24 +46,24 @@ auto convert_to_any_source_ref(T&& in) {
 
 // clang-format off
 template <typename T>
-concept convertible_to_any_source_ref = requires(T x) {
-	{ convert_to_any_source_ref(x) } -> any_source_ref;
+concept convertible_to_any_source_ptr = requires(T x) {
+	{ convert_to_any_source_ptr(x) } -> any_source_ptr;
 };
 
 template <typename T>
-concept non_id_convertible_to_any_source_ref =
-  !any_source_ref<std::decay_t<T>>
-  && convertible_to_any_source_ref<T>;
+concept non_id_convertible_to_any_source_ptr =
+  !any_source_ptr<std::decay_t<T>>
+  && convertible_to_any_source_ptr<T>;
 
 template <typename T, typename TControl>
-concept convertible_to_source_ref = requires(T x) {
-	{ convert_to_any_source_ref(x) } -> source_ref<TControl>;
+concept convertible_to_source_ptr = requires(T x) {
+	{ convert_to_any_source_ptr(x) } -> source_ptr<TControl>;
 };
 
 template <typename T, typename TControl>
-concept non_id_convertible_to_source_ref =
-  !source_ref<std::decay_t<T>, TControl>
-  && convertible_to_source_ref<T, TControl>;
+concept non_id_convertible_to_source_ptr =
+  !source_ptr<std::decay_t<T>, TControl>
+  && convertible_to_source_ptr<T, TControl>;
 // clang-format on
 
 

@@ -21,21 +21,21 @@ namespace fredemmott::inputmapping {
 
 // clang-format off
 template<typename T>
-concept any_sink_ref =
+concept any_sink_ptr =
   any_sink<typename T::element_type>
   && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TControl>
-concept sink_ref =
-  any_sink_ref<T>
+concept sink_ptr =
+  any_sink_ptr<T>
   && sink<typename T::element_type, TControl>;
 // clang-format on
 
 template <typename T>
-auto convert_to_any_sink_ref(T&& in) {
+auto convert_to_any_sink_ptr(T&& in) {
   using DT = std::decay_t<T>;
 
-  if constexpr (any_sink_ref<DT>) {
+  if constexpr (any_sink_ptr<DT>) {
     return in;
   }
 
@@ -75,24 +75,24 @@ auto convert_to_any_sink_ref(T&& in) {
 
 // clang-format off
 template <typename T>
-concept convertible_to_any_sink_ref = requires(T x) {
-  { convert_to_any_sink_ref(x) } -> any_sink_ref;
+concept convertible_to_any_sink_ptr = requires(T x) {
+  { convert_to_any_sink_ptr(x) } -> any_sink_ptr;
 };
 
 template<typename T>
-concept non_id_convertible_to_any_sink_ref =
-  !any_sink_ref<std::decay_t<T>>
-  && convertible_to_any_sink_ref<T>;
+concept non_id_convertible_to_any_sink_ptr =
+  !any_sink_ptr<std::decay_t<T>>
+  && convertible_to_any_sink_ptr<T>;
 
 template <typename T, typename TControl>
-concept convertible_to_sink_ref = requires(T x) {
-  { convert_to_any_sink_ref(x) } -> sink_ref<TControl>;
+concept convertible_to_sink_ptr = requires(T x) {
+  { convert_to_any_sink_ptr(x) } -> sink_ptr<TControl>;
 };
 
 template<typename T, typename TControl>
-concept non_id_convertible_to_sink_ref =
-  !any_sink_ref<T>
-  && convertible_to_sink_ref<T, TControl>;
+concept non_id_convertible_to_sink_ptr =
+  !any_sink_ptr<T>
+  && convertible_to_sink_ptr<T, TControl>;
 // clang-format on
 
 template <std::derived_from<Control> TControl>
@@ -101,9 +101,9 @@ class SinkRef : public maybe_shared_ptr<Sink<TControl>> {
   using maybe_shared_ptr<Sink<TControl>>::maybe_shared_ptr;
 
   template<typename T>
-  requires non_id_convertible_to_sink_ref<T, TControl>
+  requires non_id_convertible_to_sink_ptr<T, TControl>
   SinkRef(T in) {
-    *this = convert_to_any_sink_ref(std::forward<T>(in));
+    *this = convert_to_any_sink_ptr(std::forward<T>(in));
   }
 };
 
