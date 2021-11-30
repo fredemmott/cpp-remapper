@@ -7,8 +7,8 @@
  */
 #include <cstdio>
 
-#include "inputdevice.h"
-#include "inputdevicecollection.h"
+#include "InputDevice.h"
+#include "InputDeviceCollection.h"
 
 int main() {
   fredemmott::inputmapping::InputDeviceCollection idc;

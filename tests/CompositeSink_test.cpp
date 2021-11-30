@@ -8,9 +8,9 @@
 
 #include "CompositeSink.h"
 
-#include "connections.h"
-#include "squaredeadzone.h"
 #include "MappableVJoyOutput.h"
+#include "SquareDeadzone.h"
+#include "connections.h"
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;
@@ -55,12 +55,12 @@ TEST_CASE("CompositeSink") {
 }
 
 namespace {
-  void static_test_ptrs() {
-    MappableVJoyOutput vj(nullptr);
-    TestAxis axis;
-    static_assert(any_sink_ptr<decltype(vj.XAxis)>);
-    static_assert(any_sink_ptr<decltype(vj.YAxis)>);
-    static_assert(any_sink_ptr<decltype(vj.ZAxis)>);
-    axis >> all(vj.XAxis, vj.YAxis, vj.ZAxis);
-  }
+void static_test_ptrs() {
+  MappableVJoyOutput vj(nullptr);
+  TestAxis axis;
+  static_assert(any_sink_ptr<decltype(vj.XAxis)>);
+  static_assert(any_sink_ptr<decltype(vj.YAxis)>);
+  static_assert(any_sink_ptr<decltype(vj.ZAxis)>);
+  axis >> all(vj.XAxis, vj.YAxis, vj.ZAxis);
 }
+}// namespace
