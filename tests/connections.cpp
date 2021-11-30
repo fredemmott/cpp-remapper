@@ -27,7 +27,7 @@ TEST_CASE("operator >>(Source&, Value*)") {
   REQUIRE(out == 123);
 }
 
-TEST_CASE("operator >>(Source&, Sink&&)") {
+TEST_CASE("Source& >> Sink&&") {
   bool b1 = false, b2 = false;
   TestAxis axis;
   axis >> AxisToButtons {
@@ -47,7 +47,7 @@ TEST_CASE("operator >>(Source&, Sink&&)") {
   REQUIRE(b2);
 }
 
-TEST_CASE("operator >>(Source&, Transform*)") {
+TEST_CASE("Source& >> Transform*") {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
@@ -64,7 +64,7 @@ TEST_CASE("operator >>(Source&, Transform*)") {
   REQUIRE(out < Axis::MAX - 100);
 }
 
-TEST_CASE("operator >>(Source&, Transform&&)") {
+TEST_CASE("Source& >> Transform&&") {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
