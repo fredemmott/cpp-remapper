@@ -15,7 +15,7 @@
 #include "Controls.h"
 #include "FunctionSink.h"
 #include "Source.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -23,7 +23,7 @@ namespace fredemmott::inputmapping {
 template<typename T>
 concept any_sink_ref =
   any_sink<typename T::element_type>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+  && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TControl>
 concept sink_ref =
@@ -40,11 +40,11 @@ auto convert_to_any_sink_ref(T&& in) {
   }
 
   if constexpr (any_sink<DT>) {
-    return UnsafeRef<DT>(std::forward<T>(in));
+    return maybe_shared_ptr<DT>(std::forward<T>(in));
   }
 
   if constexpr (any_sink<std::remove_pointer_t<DT>>) {
-    return UnsafeRef<DT>(in);
+    return maybe_shared_ptr<DT>(in);
   }
 
   // Can't infer the inner generic :(
@@ -96,9 +96,9 @@ concept non_id_convertible_to_sink_ref =
 // clang-format on
 
 template <std::derived_from<Control> TControl>
-class SinkRef : public UnsafeRef<Sink<TControl>> {
+class SinkRef : public maybe_shared_ptr<Sink<TControl>> {
  public:
-  using UnsafeRef<Sink<TControl>>::UnsafeRef;
+  using maybe_shared_ptr<Sink<TControl>>::maybe_shared_ptr;
 
   template<typename T>
   requires non_id_convertible_to_sink_ref<T, TControl>

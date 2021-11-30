@@ -26,17 +26,17 @@ class SourcePipeline final : public Source<TControl> {
   SourcePipeline() = delete;
 
   SourcePipeline(
-    const UnsafeRef<AnySource>& first,
-    const UnsafeRef<Source<TControl>>& last)
+    const maybe_shared_ptr<AnySource>& first,
+    const maybe_shared_ptr<Source<TControl>>& last)
     : mFirst(first), mLast(last) {};
 
-  virtual void setNext(const UnsafeRef<Sink<TControl>>& next) override {
+  virtual void setNext(const maybe_shared_ptr<Sink<TControl>>& next) override {
     mLast->setNext(next);
   }
 
  private:
-  UnsafeRef<AnySource> mFirst;
-  UnsafeRef<Source<TControl>> mLast;
+  maybe_shared_ptr<AnySource> mFirst;
+  maybe_shared_ptr<Source<TControl>> mLast;
 };
 
 }// namespace fredemmott::inputmapping

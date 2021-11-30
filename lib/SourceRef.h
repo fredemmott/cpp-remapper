@@ -11,12 +11,12 @@
 #include <memory>
 
 #include "Source.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
 
 template<std::derived_from<Control> TControl>
-using SourceRef = UnsafeRef<Source<TControl>>;
+using SourceRef = maybe_shared_ptr<Source<TControl>>;
 using AxisSourceRef = SourceRef<Axis>;
 using ButtonSourceRef = SourceRef<Button>;
 using HatSourceRef = SourceRef<Hat>;
@@ -25,7 +25,7 @@ using HatSourceRef = SourceRef<Hat>;
 template<typename T>
 concept any_source_ref =
   any_source<typename T::element_type>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+  && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TControl>
 concept source_ref =
@@ -40,7 +40,7 @@ auto convert_to_any_source_ref(T&& in) {
   }
 
   if constexpr (any_source<std::decay_t<T>>) {
-    return UnsafeRef<std::decay_t<T>>(std::forward<T>(in));
+    return maybe_shared_ptr<std::decay_t<T>>(std::forward<T>(in));
   }
 }
 

@@ -29,7 +29,7 @@ class MissingSource final : public Source<TControl> {
     : mDevice(device), mControl(control) {
   }
 
-  void setNext(const UnsafeRef<Sink<TControl>>&) override {
+  void setNext(const maybe_shared_ptr<Sink<TControl>>&) override {
     printf(
       "WARNING: Attempted to attach to '%s', but that does not exist on '%s'. "
       "Ignoring.\n",

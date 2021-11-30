@@ -14,7 +14,7 @@
 #include "SourcePipeline.h"
 #include "TransformPipeline.h"
 #include "TransformRef.h"
-#include "UnsafeRef.h"// TODO: split out decay_equiv
+#include "maybe_shared_ptr.h"// TODO: split out decay_equiv
 
 namespace fredemmott::inputmapping {
 
@@ -22,7 +22,7 @@ namespace fredemmott::inputmapping {
  * essentially 'kinda looks like a `shared_ptr<>`.
  *
  * We work with `shared_ptr<>` where possible, but to support working with
- * lvalues, we also have `UnsafeRef<T>`, which contains a raw pointer, and
+ * lvalues, we also have `maybe_shared_ptr<T>`, which contains a raw pointer, and
  * an optional `shared_ptr<>` that must be equal to maintain the refcount.'
  *
  * Let's start with the canonical ref-based operators:

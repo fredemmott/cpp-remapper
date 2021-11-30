@@ -50,17 +50,17 @@ concept transform_invocable =
 template<typename T>
 concept any_transform_ref =
   any_transform<typename T::element_type>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+  && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TIn>
 concept transform_from_ref =
   transform_from<typename T::element_type, TIn>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+  && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TOut>
 concept transform_to_ref =
   transform_to<typename T::element_type, TOut>
-  && std::convertible_to<T, UnsafeRef<typename T::element_type>>;
+  && std::convertible_to<T, maybe_shared_ptr<typename T::element_type>>;
 
 template<typename T, typename TIn, typename TOut>
 concept transform_ref =
@@ -90,11 +90,11 @@ auto convert_to_any_transform_ref(T&& in) {
 	}
 
 	if constexpr (any_transform<DT>) {
-		return UnsafeRef<DT>(std::forward<T>(in));
+		return maybe_shared_ptr<DT>(std::forward<T>(in));
 	}
 
 	if constexpr (any_transform<std::remove_pointer_t<DT>>) {
-		return UnsafeRef<std::remove_pointer_t<DT>>(in);
+		return maybe_shared_ptr<std::remove_pointer_t<DT>>(in);
 	}
 
 	if constexpr (transform_invocable<DT, Axis, Axis>) {

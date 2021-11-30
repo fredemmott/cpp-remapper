@@ -9,7 +9,7 @@
 
 #include "Controls.h"
 #include "Sink.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 #include <concepts>
 
@@ -31,7 +31,7 @@ class Source : public AnySource {
   using OutControl = TControl;
   using Out = typename TControl::Value;
 
-  virtual void setNext(const UnsafeRef<Sink<TControl>>& next) {
+  virtual void setNext(const maybe_shared_ptr<Sink<TControl>>& next) {
     mNext = next;
   }
 
@@ -44,7 +44,7 @@ class Source : public AnySource {
   }
 
  private:
-  UnsafeRef<Sink<TControl>> mNext;
+  maybe_shared_ptr<Sink<TControl>> mNext;
 };
 
 using AxisSource = Source<Axis>;

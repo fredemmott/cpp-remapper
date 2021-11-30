@@ -13,7 +13,7 @@
 #include "Controls.h"
 #include "Sink.h"
 #include "SinkRef.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -37,7 +37,7 @@ class SinkPipeline final : public Sink<TControl> {
   };
 
  private:
-  UnsafeRef<Sink<TControl>> mFirst;
+  maybe_shared_ptr<Sink<TControl>> mFirst;
 };
 
 }// namespace fredemmott::inputmapping

@@ -15,7 +15,7 @@
 #include "SinkRef.h"
 #include "Source.h"
 #include "SourceRef.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -35,7 +35,7 @@ class TransformPipeline final : public Sink<TIn>, public Source<TOut> {
     : mFirst(first), mLast(last) {
   }
 
-  virtual void setNext(const UnsafeRef<Sink<TIn>>& next) override {
+  virtual void setNext(const maybe_shared_ptr<Sink<TIn>>& next) override {
     mLast->setNext(next);
   }
 
@@ -44,8 +44,8 @@ class TransformPipeline final : public Sink<TIn>, public Source<TOut> {
   }
 
  private:
-  UnsafeRef<Sink<TIn>> mFirst;
-  UnsafeRef<Source<TOut>> mLast;
+  maybe_shared_ptr<Sink<TIn>> mFirst;
+  maybe_shared_ptr<Source<TOut>> mLast;
 };
 
 }// namespace fredemmott::inputmapping

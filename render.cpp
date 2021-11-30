@@ -16,7 +16,7 @@
 using fredemmott::inputmapping::render_axis;
 using fredemmott::inputmapping::Sink;
 using fredemmott::inputmapping::Source;
-using fredemmott::inputmapping::UnsafeRef;
+using fredemmott::inputmapping::maybe_shared_ptr;
 
 int main() {
   render_axis("linear.bmp", [](Axis::Value next) { return next; });

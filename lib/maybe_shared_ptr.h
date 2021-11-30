@@ -22,13 +22,13 @@ concept container = requires(T) {
 };
 
 template <typename T>
-concept unsafe_ref_target = decay_equiv<T> && !container<T>;
+concept maybe_shared_ptr_target = decay_equiv<T> && !container<T>;
 }// namespace detail
 
-template <detail::unsafe_ref_target T>
-class UnsafeRef {
-  template <detail::unsafe_ref_target U>
-  friend class UnsafeRef;
+template <detail::maybe_shared_ptr_target T>
+class maybe_shared_ptr {
+  template <detail::maybe_shared_ptr_target U>
+  friend class maybe_shared_ptr;
 
   T* p {nullptr};
   std::shared_ptr<T> refcounted;
@@ -36,28 +36,28 @@ class UnsafeRef {
  public:
   using element_type = T;
 
-  UnsafeRef() {
+  maybe_shared_ptr() {
   }
 
-  explicit UnsafeRef(T* impl) : p(impl) {
+  explicit maybe_shared_ptr(T* impl) : p(impl) {
   }
 
   template <std::derived_from<T> TSubtype>
-  UnsafeRef(const std::shared_ptr<TSubtype>& impl)
+  maybe_shared_ptr(const std::shared_ptr<TSubtype>& impl)
     : p(impl.get()), refcounted(impl) {
   }
 
   template <std::derived_from<T> TSubtype>
-  UnsafeRef(const UnsafeRef<TSubtype>& impl)
+  maybe_shared_ptr(const maybe_shared_ptr<TSubtype>& impl)
     : p(impl.p), refcounted(impl.refcounted) {
   }
 
   template <std::derived_from<T> TSubtype>
-  UnsafeRef(TSubtype& local) : p(&local) {
+  maybe_shared_ptr(TSubtype& local) : p(&local) {
   }
 
   template <std::derived_from<T> TSubtype>
-  explicit UnsafeRef(TSubtype&& temporary) {
+  explicit maybe_shared_ptr(TSubtype&& temporary) {
     refcounted = std::make_shared<TSubtype>(std::move(temporary));
     p = refcounted.get();
   }

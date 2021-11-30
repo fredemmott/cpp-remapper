@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Controls.h"
-#include "UnsafeRef.h"
+#include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -22,10 +22,10 @@ class AnySource;
 class ClosedPipeline final {
  public:
   ClosedPipeline() = delete;
-  ClosedPipeline(const UnsafeRef<AnySource>& source) : mSource(source) {
+  ClosedPipeline(const maybe_shared_ptr<AnySource>& source) : mSource(source) {
   }
 
  private:
-  UnsafeRef<AnySource> mSource;
+  maybe_shared_ptr<AnySource> mSource;
 };
 }// namespace fredemmott::inputmapping
