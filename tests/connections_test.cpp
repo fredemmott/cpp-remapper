@@ -13,7 +13,7 @@
 #include "MappableInput.h"
 #include "MappableVJoyOutput.h"
 #include "axiscurve.h"
-#include "axistobuttons.h"
+#include "AxisToButtons.h"
 #include "squaredeadzone.h"
 #include "tests.h"
 

@@ -6,9 +6,9 @@
  * in the root directory of this source tree.
  */
 #pragma once
-#include "devicespecifier.h"
+#include "DeviceSpecifier.h"
 
-#include "inputdevice.h"
+#include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
 

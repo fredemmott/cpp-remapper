@@ -16,8 +16,8 @@
 #include "MappableDS4Output.h"
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
-#include "devicespecifier.h"
-#include "mapper.h"
+#include "DeviceSpecifier.h"
+#include "Mapper.h"
 
 namespace fredemmott::inputmapping {
 

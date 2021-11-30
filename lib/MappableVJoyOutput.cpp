@@ -8,8 +8,8 @@
 #include "MappableVJoyOutput.h"
 
 #include "VJoyDevice.h"
-#include "axistypes.h"
-#include "inputdevice.h"
+#include "AxisInformation.h"
+#include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
 

@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "devicespecifier.h"
+#include "DeviceSpecifier.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>

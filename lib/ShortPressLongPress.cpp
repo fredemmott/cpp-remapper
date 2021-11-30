@@ -5,9 +5,9 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "shortpresslongpress.h"
+#include "ShortPressLongPress.h"
 
-#include "mapper.h"
+#include "Mapper.h"
 
 namespace fredemmott::inputmapping {
 

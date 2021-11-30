@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "hidhide.h"
+#include "HidHide.h"
 
 #include <cstdio>
 #include <iomanip>
@@ -15,8 +15,8 @@
 #include "HidHideCLI/stdafx.h"
 #include "HidHideCLI/FilterDriverProxy.h"
 // clang-format on
-#include "inputdevice.h"
-#include "inputdevicecollection.h"
+#include "InputDevice.h"
+#include "InputDeviceCollection.h"
 
 namespace fredemmott::inputmapping {
 HidHide::HidHide(const std::vector<DeviceSpecifier>& specifiers) {

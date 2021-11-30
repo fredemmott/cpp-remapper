@@ -5,16 +5,16 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "profile.h"
+#include "Profile.h"
 
 #include <algorithm>
 #include <cstdio>
 
 #include "VJoyDevice.h"
-#include "hidhide.h"
-#include "inputdevice.h"
-#include "inputdevicecollection.h"
-#include "mapper.h"
+#include "HidHide.h"
+#include "InputDevice.h"
+#include "InputDeviceCollection.h"
+#include "Mapper.h"
 
 using namespace fredemmott::inputmapping;
 

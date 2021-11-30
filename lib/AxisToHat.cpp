@@ -7,7 +7,7 @@
  */
 
 #define _USE_MATH_DEFINES
-#include "axistohat.h"
+#include "AxisToHat.h"
 
 #include <cmath>
 

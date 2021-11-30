@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "inputdevice.h"
+#include "InputDevice.h"
 
 namespace fredemmott::inputmapping::devicedb {
 const VIDPID TM_WARTHOG_THROTTLE {0x044f, 0x0404};

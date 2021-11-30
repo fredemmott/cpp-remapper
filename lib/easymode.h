@@ -10,8 +10,8 @@
 #include "actions.h"
 #include "connections.h"
 #include "devicedb.h"
-#include "mapper.h"
-#include "profile.h"
+#include "Mapper.h"
+#include "Profile.h"
 
 using namespace fredemmott::inputmapping::devicedb;
 using namespace fredemmott::inputmapping;

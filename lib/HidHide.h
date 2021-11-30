@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "devicespecifier.h"
+#include "DeviceSpecifier.h"
 
 namespace fredemmott::inputmapping {
 class InputDevice;

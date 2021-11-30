@@ -8,8 +8,8 @@
 #include "MappableX360Output.h"
 
 #include "X360Device.h"
-#include "axistypes.h"
-#include "inputdevice.h"
+#include "AxisInformation.h"
+#include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
 

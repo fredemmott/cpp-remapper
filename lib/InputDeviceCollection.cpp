@@ -5,10 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "inputdevicecollection.h"
+#include "InputDeviceCollection.h"
 
-#include "axistypes.h"
-#include "inputdevice.h"
+#include "AxisInformation.h"
+#include "InputDevice.h"
 #pragma comment(lib, "Ole32.lib")// GUID
 
 namespace fredemmott::inputmapping {

@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "axistobuttons.h"
+#include "AxisToButtons.h"
 
 #include "CompositeSink.h"
 #include "MappableVJoyOutput.h"

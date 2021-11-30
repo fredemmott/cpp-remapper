@@ -8,7 +8,7 @@
 
 #include "LatchedToMomentaryButton.h"
 
-#include "mapper.h"
+#include "Mapper.h"
 
 namespace fredemmott::inputmapping {
 

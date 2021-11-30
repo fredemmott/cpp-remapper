@@ -5,14 +5,14 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "inputdevice.h"
+#include "InputDevice.h"
 
 #include <Cfgmgr32.h>
 #include <devpkey.h>
 #include <initguid.h>// needed for devpkey to actually define the devpkeys :)
 #include <setupapi.h>
 
-#include "axistypes.h"
+#include "AxisInformation.h"
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
