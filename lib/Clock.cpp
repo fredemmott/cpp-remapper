@@ -33,7 +33,7 @@ std::chrono::steady_clock::time_point Clock::now() noexcept {
 
 void Clock::setTimer(
   const std::chrono::steady_clock::duration& duration,
-  const std::function<void()>& handler) {
+  const std::function<void()>& handler) noexcept {
   Mapper::inject(duration, handler);
 }
 
