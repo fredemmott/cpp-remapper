@@ -45,11 +45,5 @@ void ShortPressLongPress::map(bool pressed) {
       INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
   }
 }
-namespace {
-void static_test() {
-  ShortPressLongPress {[](bool) {}, [](bool) {}};
-  ShortPressLongPress {[](bool) {}, [](bool) {}, std::chrono::seconds(2)};
-}
-}// namespace
 
 }// namespace fredemmott::inputmapping

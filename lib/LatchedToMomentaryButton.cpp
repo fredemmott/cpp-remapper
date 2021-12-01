@@ -23,20 +23,3 @@ void LatchedToMomentaryButton::map(Button::Value value) {
 }
 
 }// namespace fredemmott::inputmapping
-
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-#include "connections.h"
-
-namespace {
-using namespace fredemmott::inputmapping;
-
-void static_test() {
-  MappableInput stick(nullptr);
-  MappableVJoyOutput vj(nullptr);
-  stick.Button1 >> LatchedToMomentaryButton() >> vj.Button1;
-  stick.Button2 >> LatchedToMomentaryButton(std::chrono::milliseconds(500))
-    >> vj.Button2;
-}
-
-}// namespace
