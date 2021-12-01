@@ -8,7 +8,7 @@
 
 #include "LatchedToMomentaryButton.h"
 
-#include "Mapper.h"
+#include "Clock.h"
 
 namespace fredemmott::inputmapping {
 
@@ -19,8 +19,9 @@ LatchedToMomentaryButton::LatchedToMomentaryButton(
 
 void LatchedToMomentaryButton::map(Button::Value value) {
   emit(true);
-  Mapper::inject(mPressDuration, [this]() { emit(false); });
+  Clock::get()->setTimer(mPressDuration, [this]() { emit(false); });
 }
+
 }// namespace fredemmott::inputmapping
 
 #include "MappableInput.h"

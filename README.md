@@ -297,11 +297,11 @@ If you want to press-and-release a button, or do multiple actions over time, you
 must inject them into the system:
 
 ```C++
-#include "mapper"
+#include "Clock.h"
 #include <chrono>
 
 void MyAction::map(bool value) {
-  Mapper::inject(
+  Clock::get()->setTimer(
     std::chrono::milliseconds(100), // how long to wait
     [=]() { do_something(value) };
   });

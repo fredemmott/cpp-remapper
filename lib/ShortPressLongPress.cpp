@@ -7,7 +7,7 @@
  */
 #include "ShortPressLongPress.h"
 
-#include "Mapper.h"
+#include "Clock.h"
 
 namespace fredemmott::inputmapping {
 
@@ -23,21 +23,26 @@ ShortPressLongPress::ShortPressLongPress(
 }
 
 void ShortPressLongPress::map(bool pressed) {
+  const auto clock = Clock::get();
+  const auto now = clock->now();
   if (pressed) {
-    mStart = std::chrono::steady_clock::now();
+    mStart = now;
     return;
   }
 
+  // Check for default-constructed invalid value
   if (mStart == std::chrono::steady_clock::time_point()) {
     return;
   }
 
-  if (std::chrono::steady_clock::now() - mStart < mLongDuration) {
+  if (now - mStart < mLongDuration) {
     mShortPress->map(true);
-    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mShortPress->map(false); });
+    clock->setTimer(
+      INJECTED_PRESS_DURATION, [=]() { mShortPress->map(false); });
   } else {
     mLongPress->map(true);
-    Mapper::inject(INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
+    clock->setTimer(
+      INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
   }
 }
 namespace {
