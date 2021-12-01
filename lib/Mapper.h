@@ -9,8 +9,8 @@
 
 #include <chrono>
 #include <functional>
-#include <memory>
 #include <map>
+#include <memory>
 #include <vector>
 
 namespace fredemmott::inputmapping {

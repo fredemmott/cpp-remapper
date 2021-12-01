@@ -7,11 +7,11 @@
  */
 #pragma once
 
+#include "Mapper.h"
+#include "Profile.h"
 #include "actions.h"
 #include "connections.h"
 #include "devicedb.h"
-#include "Mapper.h"
-#include "Profile.h"
 
 using namespace fredemmott::inputmapping::devicedb;
 using namespace fredemmott::inputmapping;

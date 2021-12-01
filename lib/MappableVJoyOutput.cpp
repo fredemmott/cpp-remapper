@@ -7,9 +7,9 @@
  */
 #include "MappableVJoyOutput.h"
 
-#include "VJoyDevice.h"
 #include "AxisInformation.h"
 #include "InputDevice.h"
+#include "VJoyDevice.h"
 
 namespace fredemmott::inputmapping {
 
@@ -18,8 +18,7 @@ MappableVJoyOutput::MappableVJoyOutput(uint8_t vjoy_id)
 }
 
 MappableVJoyOutput::MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev)
-  :
-  mDevice(dev),
+  : mDevice(dev),
 #define A(a) a([dev](long value) { dev->set##a(value); })
 #define AA(a) A(a##Axis)
     AA(X),

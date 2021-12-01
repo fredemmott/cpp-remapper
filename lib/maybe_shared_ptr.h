@@ -22,7 +22,8 @@ concept container = requires(T) {
 };
 
 template <typename T>
-concept maybe_shared_ptr_target = decay_equiv<T> && !container<T>;
+concept maybe_shared_ptr_target
+  = std::same_as<T, std::decay_t<T>> && !container<T>;
 }// namespace detail
 
 template <detail::maybe_shared_ptr_target T>

@@ -9,9 +9,9 @@
 
 #include <cstdint>
 
-#include "SourceRef.h"
 #include "AxisInformation.h"
 #include "InputDevice.h"
+#include "SourceRef.h"
 
 namespace fredemmott::inputmapping {
 

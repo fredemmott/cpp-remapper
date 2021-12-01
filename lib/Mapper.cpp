@@ -7,11 +7,11 @@
  */
 #include "Mapper.h"
 
+#include "InputDevice.h"
 #include "MappableInput.h"
 #include "MappableVJoyOutput.h"
 #include "VJoyDevice.h"
 #include "connections.h"
-#include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
 

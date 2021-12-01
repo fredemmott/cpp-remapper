@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include <cstdint>
 #include <concepts>
+#include <cstdint>
 #include <string>
 #include <tuple>
 #include <variant>
@@ -21,6 +21,7 @@ class InputDevice;
 class DeviceSpecifierBase {
  protected:
   DeviceSpecifierBase();
+
  public:
   virtual ~DeviceSpecifierBase();
   virtual bool matches(const InputDevice& device) const = 0;

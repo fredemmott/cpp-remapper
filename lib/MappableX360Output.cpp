@@ -7,9 +7,9 @@
  */
 #include "MappableX360Output.h"
 
-#include "X360Device.h"
 #include "AxisInformation.h"
 #include "InputDevice.h"
+#include "X360Device.h"
 
 namespace fredemmott::inputmapping {
 

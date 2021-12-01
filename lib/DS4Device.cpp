@@ -72,15 +72,15 @@ DS4Device* DS4Device::setButton(SpecialButton button, bool value) {
 }
 
 DS4Device* DS4Device::setDPad(DPadDirection dpad) {
-  DS4_SET_DPAD(&p->state, (DS4_DPAD_DIRECTIONS) dpad);
+  DS4_SET_DPAD(&p->state, (DS4_DPAD_DIRECTIONS)dpad);
   return this;
 }
 
 namespace {
-  inline BYTE scale_axis(long value) {
-    return (value * 255) / 65535;
-  }
+inline BYTE scale_axis(long value) {
+  return (value * 255) / 65535;
 }
+}// namespace
 
 DS4Device* DS4Device::setLXAxis(long value) {
   p->state.bThumbLX = scale_axis(value);

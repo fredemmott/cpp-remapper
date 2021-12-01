@@ -11,9 +11,9 @@
 #include <type_traits>
 
 #include "FunctionTransform.h"
-#include "TransformRef.h"
 #include "SinkRef.h"
 #include "SourceRef.h"
+#include "TransformRef.h"
 
 namespace fredemmott::inputmapping {
 
@@ -22,12 +22,12 @@ void render_axis(
   AxisSinkRef transform_in,
   AxisSourceRef transform_out);
 
-template<transform_ptr<Axis, Axis> T>
+template <transform_ptr<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, const T& transform) {
   render_axis(bmp_filename, transform, transform);
 }
 
-template<transform<Axis, Axis> T>
+template <transform<Axis, Axis> T>
 void render_axis(const std::string& bmp_filename, T&& transform) {
   render_axis(bmp_filename, std::move(transform));
 }

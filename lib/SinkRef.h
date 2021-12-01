@@ -100,11 +100,10 @@ class SinkRef : public maybe_shared_ptr<Sink<TControl>> {
  public:
   using maybe_shared_ptr<Sink<TControl>>::maybe_shared_ptr;
 
-  template<typename T>
-  requires non_id_convertible_to_sink_ptr<T, TControl>
-  SinkRef(T in) {
-    *this = convert_to_any_sink_ptr(std::forward<T>(in));
-  }
+  template <typename T>
+    requires non_id_convertible_to_sink_ptr<T, TControl> SinkRef(T in) {
+      *this = convert_to_any_sink_ptr(std::forward<T>(in));
+    }
 };
 
 using AxisSinkRef = SinkRef<Axis>;

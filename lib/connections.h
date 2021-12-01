@@ -21,8 +21,8 @@ namespace fredemmott::inputmapping {
  * essentially 'kinda looks like a `shared_ptr<>`.
  *
  * We work with `shared_ptr<>` where possible, but to support working with
- * lvalues, we also have `maybe_shared_ptr<T>`, which contains a raw pointer, and
- * an optional `shared_ptr<>` that must be equal to maintain the refcount.'
+ * lvalues, we also have `maybe_shared_ptr<T>`, which contains a raw pointer,
+ * and an optional `shared_ptr<>` that must be equal to maintain the refcount.'
  *
  * Let's start with the canonical ref-based operators:
  */
@@ -77,7 +77,8 @@ auto operator>>(Left left, Right&& right) {
 /// SourceOrTransformRef >> convertible_to_transform_ptr
 template <
   any_source_or_transform_ptr Left,
-  non_id_convertible_to_transform_from_ptr<typename Left::element_type::OutControl> Right>
+  non_id_convertible_to_transform_from_ptr<
+    typename Left::element_type::OutControl> Right>
 auto operator>>(Left left, Right&& right) {
   return left >> convert_to_any_transform_ptr(std::forward<Right>(right));
 }
@@ -85,7 +86,8 @@ auto operator>>(Left left, Right&& right) {
 /// convertible_to_source_ptr >> SinkOrTransformRef
 template <
   any_sink_or_transform_ptr Right,
-  non_id_convertible_to_source_ptr<typename Right::element_type::InControl> Left>
+  non_id_convertible_to_source_ptr<typename Right::element_type::InControl>
+    Left>
 auto operator>>(Left&& left, Right right) {
   return convert_to_any_source_ptr(std::forward<Left>(left)) >> right;
 }
@@ -93,7 +95,8 @@ auto operator>>(Left&& left, Right right) {
 /// convertible_to_transform_ptr >> SinkOrTransformRef
 template <
   any_sink_or_transform_ptr Right,
-  non_id_convertible_to_transform_to_ptr<typename Right::element_type::InControl> Left>
+  non_id_convertible_to_transform_to_ptr<
+    typename Right::element_type::InControl> Left>
 auto operator>>(Left&& left, Right right) {
   return convert_to_any_transform_ptr(std::forward<Left>(left)) >> right;
 }

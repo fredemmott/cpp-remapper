@@ -9,8 +9,8 @@
 
 #include <cstdint>
 
-#include "Source.h"
 #include "SinkRef.h"
+#include "Source.h"
 
 namespace fredemmott::inputmapping {
 
@@ -31,8 +31,7 @@ class AxisToHat final : public HatSource {
     update();
   };
 
-  AxisToHat(
-    uint8_t deadzone_percent = DEFAULT_DEADZONE_PERCENT);
+  AxisToHat(uint8_t deadzone_percent = DEFAULT_DEADZONE_PERCENT);
   ~AxisToHat();
 
  private:

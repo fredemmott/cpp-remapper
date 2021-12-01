@@ -7,8 +7,8 @@
  */
 #include "MappableDS4Output.h"
 
-#include "DS4Device.h"
 #include "AxisInformation.h"
+#include "DS4Device.h"
 #include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
@@ -67,14 +67,14 @@ MappableDS4Output::MappableDS4Output(std::shared_ptr<DS4Device> dev)
   ButtonDPad##name([dev](bool value) { \
     button_to_dpad(dev, DS4Device::DPadDirection::enum, value); \
   })
-  DP(North, NORTH),
-  DP(NorthEast, NORTHEAST),
-  DP(East, EAST),
-  DP(SouthEast, SOUTHEAST),
-  DP(South, SOUTH),
-  DP(SouthWest, SOUTHWEST),
-  DP(West, WEST),
-  DP(NorthWest, NORTHWEST),
+    DP(North, NORTH),
+    DP(NorthEast, NORTHEAST),
+    DP(East, EAST),
+    DP(SouthEast, SOUTHEAST),
+    DP(South, SOUTH),
+    DP(SouthWest, SOUTHWEST),
+    DP(West, WEST),
+    DP(NorthWest, NORTHWEST),
 #undef DP
     mDevice(dev) {
 }

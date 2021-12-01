@@ -7,12 +7,12 @@
  */
 #pragma once
 
+#include "AxisCurve.h"
+#include "AxisToButtons.h"
+#include "AxisToHat.h"
 #include "ButtonToAxis.h"
 #include "CompositeSink.h"
 #include "HatToButtons.h"
 #include "LatchedToMomentaryButton.h"
-#include "AxisCurve.h"
-#include "AxisToButtons.h"
-#include "AxisToHat.h"
 #include "ShortPressLongPress.h"
 #include "SquareDeadzone.h"

@@ -11,12 +11,12 @@
 #include <tuple>
 #include <vector>
 
+#include "DeviceSpecifier.h"
+#include "MappableDS4Output.h"
 #include "MappableInput.h"
 #include "MappableOutput.h"
-#include "MappableDS4Output.h"
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
-#include "DeviceSpecifier.h"
 #include "Mapper.h"
 
 namespace fredemmott::inputmapping {

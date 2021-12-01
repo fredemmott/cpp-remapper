@@ -54,6 +54,7 @@ class InputDevice final {
    private:
     StateOffsets offsets;
     std::vector<std::byte> buffer;
+
    public:
     State(const StateOffsets& offsets, const std::vector<std::byte>& buffer);
     ~State();

@@ -9,8 +9,8 @@
 
 #include <functional>
 
-#include "function_traits.h"
 #include "Sink.h"
+#include "function_traits.h"
 
 namespace fredemmott::inputmapping {
 

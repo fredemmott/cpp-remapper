@@ -10,11 +10,11 @@
 #include <algorithm>
 #include <cstdio>
 
-#include "VJoyDevice.h"
 #include "HidHide.h"
 #include "InputDevice.h"
 #include "InputDeviceCollection.h"
 #include "Mapper.h"
+#include "VJoyDevice.h"
 
 using namespace fredemmott::inputmapping;
 
@@ -102,7 +102,8 @@ void static_test_vjoy() {
 }
 
 void static_test_vigem() {
-  auto [p, stick, xpad, ds4] = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD, VIGEM_DS4_PAD);
+  auto [p, stick, xpad, ds4]
+    = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD, VIGEM_DS4_PAD);
   stick.Button1 >> xpad.ButtonA;
   stick.Button2 >> ds4.ButtonTriangle;
 }

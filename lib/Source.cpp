@@ -10,6 +10,7 @@
 
 namespace fredemmott::inputmapping {
 
-AnySource::~AnySource() {}
+AnySource::~AnySource() {
+}
 
 }// namespace fredemmott::inputmapping

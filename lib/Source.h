@@ -7,11 +7,11 @@
  */
 #pragma once
 
+#include <concepts>
+
 #include "Controls.h"
 #include "Sink.h"
 #include "maybe_shared_ptr.h"
-
-#include <concepts>
 
 namespace fredemmott::inputmapping {
 
@@ -26,7 +26,6 @@ class AnySource {
 
 template <std::derived_from<Control> TControl>
 class Source : public AnySource {
-
  public:
   using OutControl = TControl;
   using Out = typename TControl::Value;

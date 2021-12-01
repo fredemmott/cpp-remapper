@@ -7,6 +7,7 @@
  */
 
 #include "FunctionTransform.h"
+
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

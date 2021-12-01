@@ -9,9 +9,9 @@
 
 #include <concepts>
 
-#include "function_traits.h"
 #include "Sink.h"
 #include "Source.h"
+#include "function_traits.h"
 
 namespace fredemmott::inputmapping {
 
@@ -85,29 +85,29 @@ concept any_source_or_transform_ptr =
 template <typename T>
 auto convert_to_any_transform_ptr(T&& in) {
   using DT = std::decay_t<T>;
-	if constexpr (any_transform_ptr<DT>) {
-		return in;
-	}
+  if constexpr (any_transform_ptr<DT>) {
+    return in;
+  }
 
-	if constexpr (any_transform<DT>) {
-		return maybe_shared_ptr<DT>(std::forward<T>(in));
-	}
+  if constexpr (any_transform<DT>) {
+    return maybe_shared_ptr<DT>(std::forward<T>(in));
+  }
 
-	if constexpr (any_transform<std::remove_pointer_t<DT>>) {
-		return maybe_shared_ptr<std::remove_pointer_t<DT>>(in);
-	}
+  if constexpr (any_transform<std::remove_pointer_t<DT>>) {
+    return maybe_shared_ptr<std::remove_pointer_t<DT>>(in);
+  }
 
-	if constexpr (transform_invocable<DT, Axis, Axis>) {
-		return std::make_shared<FunctionTransform<Axis, Axis>>(in);
-	}
+  if constexpr (transform_invocable<DT, Axis, Axis>) {
+    return std::make_shared<FunctionTransform<Axis, Axis>>(in);
+  }
 
-	if constexpr (transform_invocable<DT, Button, Button>) {
-		return std::make_shared<FunctionTransform<Button, Button>>(in);
-	}
+  if constexpr (transform_invocable<DT, Button, Button>) {
+    return std::make_shared<FunctionTransform<Button, Button>>(in);
+  }
 
-	if constexpr (transform_invocable<DT, Hat, Hat>) {
-		return std::make_shared<FunctionTransform<Hat, Hat>>(in);
-	}
+  if constexpr (transform_invocable<DT, Hat, Hat>) {
+    return std::make_shared<FunctionTransform<Hat, Hat>>(in);
+  }
 }
 
 // clang-format off

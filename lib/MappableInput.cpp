@@ -301,7 +301,6 @@ void MappableInput::poll() {
   const auto axes = getAxisCount(), buttons = getButtonCount(),
              hats = getHatCount();
 
-
   for (auto i = 0; i < axes; ++i) {
     if (a.getAxis(i) != b.getAxis(i)) {
       p->axisInputs[i]->emit(b.getAxis(i));

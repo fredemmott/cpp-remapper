@@ -8,9 +8,9 @@
 
 #include "render_axis.h"
 
-#include "connections.h"
-
 #include <fstream>
+
+#include "connections.h"
 
 using std::ios;
 using std::ofstream;

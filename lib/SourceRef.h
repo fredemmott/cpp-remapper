@@ -15,7 +15,7 @@
 
 namespace fredemmott::inputmapping {
 
-template<std::derived_from<Control> TControl>
+template <std::derived_from<Control> TControl>
 using SourceRef = maybe_shared_ptr<Source<TControl>>;
 using AxisSourceRef = SourceRef<Axis>;
 using ButtonSourceRef = SourceRef<Button>;
@@ -65,6 +65,5 @@ concept non_id_convertible_to_source_ptr =
   !source_ptr<std::decay_t<T>, TControl>
   && convertible_to_source_ptr<T, TControl>;
 // clang-format on
-
 
 }// namespace fredemmott::inputmapping
