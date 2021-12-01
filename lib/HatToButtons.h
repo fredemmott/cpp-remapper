@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "Sink.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -20,13 +20,13 @@ class MappableVJoyOutput;
 
 class HatToButtons final : public Sink<Hat> {
  private:
-  std::optional<ButtonSinkRef> mCenter;
-  std::vector<ButtonSinkRef> mButtons;
+  std::optional<ButtonSinkPtr> mCenter;
+  std::vector<ButtonSinkPtr> mButtons;
 
  public:
   class CenterButton {
    private:
-    ButtonSinkRef mButton;
+    ButtonSinkPtr mButton;
 
    public:
     // clang-format off
@@ -39,7 +39,7 @@ class HatToButtons final : public Sink<Hat> {
       : mButton(convert_to_any_sink_ptr(std::forward<T>(button))) {
     }
 
-    const ButtonSinkRef& get() const;
+    const ButtonSinkPtr& get() const;
   };
   static_assert(!convertible_to_any_sink_ptr<CenterButton>);
 

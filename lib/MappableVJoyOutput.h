@@ -10,7 +10,7 @@
 #include <cstdint>
 
 #include "MappableOutput.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -26,12 +26,12 @@ class MappableVJoyOutput final : public MappableOutput {
   ~MappableVJoyOutput();
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  ButtonSinkRef button(uint8_t id) const;
-  HatSinkRef hat(uint8_t id) const;
+  ButtonSinkPtr button(uint8_t id) const;
+  HatSinkPtr hat(uint8_t id) const;
 
-  const AxisSinkRef XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
+  const AxisSinkPtr XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
 
-  const ButtonSinkRef Button1, Button2, Button3, Button4, Button5, Button6,
+  const ButtonSinkPtr Button1, Button2, Button3, Button4, Button5, Button6,
     Button7, Button8, Button9, Button10, Button11, Button12, Button13, Button14,
     Button15, Button16, Button17, Button18, Button19, Button20, Button21,
     Button22, Button23, Button24, Button25, Button26, Button27, Button28,
@@ -51,7 +51,7 @@ class MappableVJoyOutput final : public MappableOutput {
     Button120, Button121, Button122, Button123, Button124, Button125, Button126,
     Button127, Button128;
 
-  const HatSinkRef Hat1, Hat2, Hat3, Hat4;
+  const HatSinkPtr Hat1, Hat2, Hat3, Hat4;
 };
 
 }// namespace fredemmott::inputmapping

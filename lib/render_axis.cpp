@@ -53,8 +53,8 @@ namespace fredemmott::inputmapping {
 
 void render_axis(
   const std::string& bmp_filename,
-  AxisSinkRef transform_in,
-  AxisSourceRef transform_out) {
+  AxisSinkPtr transform_in,
+  AxisSourcePtr transform_out) {
   long fx = -1;
   transform_out >> &fx;
   const int step = 128;

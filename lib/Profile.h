@@ -136,7 +136,7 @@ auto create_profile(const DeviceSpecifier& first, Ts... rest) {
   auto p = Profile(input_ids);
   auto devices = detail::get_devices(&p, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
-  // an `std::function`, and we can't take a reference to a template function
+  // an `std::function`, and we can't take a Ptrerence to a template function
   p->setDevices(
     std::apply(
       [](auto&&... args) { return detail::select_inputs(args...); }, devices),

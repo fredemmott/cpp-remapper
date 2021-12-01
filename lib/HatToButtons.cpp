@@ -19,7 +19,7 @@ HatToButtons::HatToButtons(
   assignToVJoy(output, first, count);
 }
 
-const ButtonSinkRef& HatToButtons::CenterButton::get() const {
+const ButtonSinkPtr& HatToButtons::CenterButton::get() const {
   return mButton;
 }
 

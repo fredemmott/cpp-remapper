@@ -10,14 +10,14 @@
 #include <concepts>
 
 #include "Sink.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
 template <typename TControl>
 class CompositeSink final : public Sink<TControl> {
  public:
-  CompositeSink(std::vector<SinkRef<TControl>> sinks) : mSinks(sinks) {
+  CompositeSink(std::vector<SinkPtr<TControl>> sinks) : mSinks(sinks) {
   }
 
   virtual void map(typename TControl::Value value) override {
@@ -27,7 +27,7 @@ class CompositeSink final : public Sink<TControl> {
   };
 
  private:
-  std::vector<SinkRef<TControl>> mSinks;
+  std::vector<SinkPtr<TControl>> mSinks;
 };
 
 template <convertible_to_any_sink_ptr TFirst, typename... TRest>

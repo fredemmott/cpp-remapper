@@ -16,8 +16,8 @@ const std::chrono::milliseconds INJECTED_PRESS_DURATION(100);
 }
 
 ShortPressLongPress::ShortPressLongPress(
-  ButtonSinkRef s,
-  ButtonSinkRef l,
+  ButtonSinkPtr s,
+  ButtonSinkPtr l,
   std::chrono::steady_clock::duration long_duration)
   : mShortPress(s), mLongPress(l), mLongDuration(long_duration) {
 }

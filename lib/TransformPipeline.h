@@ -12,9 +12,9 @@
 
 #include "Controls.h"
 #include "Sink.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 #include "Source.h"
-#include "SourceRef.h"
+#include "SourcePtr.h"
 #include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
@@ -31,7 +31,7 @@ template <std::derived_from<Control> TIn, std::derived_from<Control> TOut>
 class TransformPipeline final : public Sink<TIn>, public Source<TOut> {
  public:
   TransformPipeline() = delete;
-  TransformPipeline(const SinkRef<TIn>& first, const SourceRef<TOut>& last)
+  TransformPipeline(const SinkPtr<TIn>& first, const SourcePtr<TOut>& last)
     : mFirst(first), mLast(last) {
   }
 

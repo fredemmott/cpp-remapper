@@ -11,7 +11,7 @@
 
 #include "AxisInformation.h"
 #include "InputDevice.h"
-#include "SourceRef.h"
+#include "SourcePtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -28,9 +28,9 @@ class MappableInput final {
   std::shared_ptr<InputDevice> getDevice() const;
   void poll();
 
-  AxisSourceRef axis(uint8_t id) const;
-  ButtonSourceRef button(uint8_t id) const;
-  HatSourceRef hat(uint8_t id) const;
+  AxisSourcePtr axis(uint8_t id) const;
+  ButtonSourcePtr button(uint8_t id) const;
+  HatSourcePtr hat(uint8_t id) const;
 
   // Convenience
 
@@ -38,10 +38,10 @@ class MappableInput final {
   size_t getButtonCount() const;
   size_t getHatCount() const;
 
-  AxisSourceRef XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider;
+  AxisSourcePtr XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider;
 
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
-  ButtonSourceRef Button1, Button2, Button3, Button4, Button5, Button6, Button7,
+  ButtonSourcePtr Button1, Button2, Button3, Button4, Button5, Button6, Button7,
     Button8, Button9, Button10, Button11, Button12, Button13, Button14,
     Button15, Button16, Button17, Button18, Button19, Button20, Button21,
     Button22, Button23, Button24, Button25, Button26, Button27, Button28,
@@ -61,6 +61,6 @@ class MappableInput final {
     Button120, Button121, Button122, Button123, Button124, Button125, Button126,
     Button127, Button128;
 
-  HatSourceRef Hat1, Hat2, Hat3, Hat4;
+  HatSourcePtr Hat1, Hat2, Hat3, Hat4;
 };
 }// namespace fredemmott::inputmapping

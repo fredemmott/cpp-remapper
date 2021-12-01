@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "MappableOutput.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -25,15 +25,15 @@ class MappableDS4Output final : public MappableOutput {
 
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  const AxisSinkRef LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
+  const AxisSinkPtr LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
 
-  const ButtonSinkRef ButtonTriangle, ButtonCircle, ButtonCross, ButtonSquare,
+  const ButtonSinkPtr ButtonTriangle, ButtonCircle, ButtonCross, ButtonSquare,
     ButtonLTrigger, ButtonRTrigger, ButtonLShoulder, ButtonRShoulder,
     ButtonOptions, ButtonShare;
 
-  const ButtonSinkRef ButtonPS, ButtonTouchPad;
+  const ButtonSinkPtr ButtonPS, ButtonTouchPad;
 
-  const ButtonSinkRef ButtonDPadNorth, ButtonDPadNorthEast, ButtonDPadEast,
+  const ButtonSinkPtr ButtonDPadNorth, ButtonDPadNorthEast, ButtonDPadEast,
     ButtonDPadSouthEast, ButtonDPadSouth, ButtonDPadSouthWest, ButtonDPadWest,
     ButtonDPadNorthWest;
 

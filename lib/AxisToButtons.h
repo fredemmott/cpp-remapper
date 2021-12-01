@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -19,7 +19,7 @@ class AxisToButtons final : public AxisSink {
   struct Range {
     uint8_t minPercent;
     uint8_t maxPercent;
-    ButtonSinkRef next;
+    ButtonSinkPtr next;
   };
 
   AxisToButtons(const std::vector<Range>& ranges);
@@ -34,7 +34,7 @@ class AxisToButtons final : public AxisSink {
     && convertible_to_sink_ptr<First, Button>
   // clang-format on
   AxisToButtons(First&& first, Rest... rest) {
-    std::vector<ButtonSinkRef> buttons {
+    std::vector<ButtonSinkPtr> buttons {
       convert_to_any_sink_ptr(std::forward<First>(first)),
       convert_to_any_sink_ptr(std::forward<Rest>(rest))...};
     const auto step = ((long double)Axis::MAX) / buttons.size();
@@ -52,7 +52,7 @@ class AxisToButtons final : public AxisSink {
   struct RawRange {
     Axis::Value min;
     Axis::Value max;
-    ButtonSinkRef next;
+    ButtonSinkPtr next;
   };
   std::vector<RawRange> mRanges;
 };

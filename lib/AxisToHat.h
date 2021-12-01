@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-#include "SinkRef.h"
+#include "SinkPtr.h"
 #include "Source.h"
 
 namespace fredemmott::inputmapping {
@@ -22,11 +22,11 @@ namespace fredemmott::inputmapping {
 class AxisToHat final : public HatSource {
  public:
   static const uint8_t DEFAULT_DEADZONE_PERCENT = 90;
-  AxisSinkRef XAxis = [this](Axis::Value x) {
+  AxisSinkPtr XAxis = [this](Axis::Value x) {
     mX = x;
     update();
   };
-  AxisSinkRef YAxis = [this](Axis::Value y) {
+  AxisSinkPtr YAxis = [this](Axis::Value y) {
     mY = y;
     update();
   };

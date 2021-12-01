@@ -12,7 +12,7 @@
 
 #include "Controls.h"
 #include "Sink.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 #include "maybe_shared_ptr.h"
 
 namespace fredemmott::inputmapping {
@@ -29,7 +29,7 @@ class SinkPipeline final : public Sink<TControl> {
 
  public:
   SinkPipeline() = delete;
-  SinkPipeline(const SinkRef<TControl>& first) : mFirst(first) {
+  SinkPipeline(const SinkPtr<TControl>& first) : mFirst(first) {
   }
 
   void map(typename TControl::Value value) override {

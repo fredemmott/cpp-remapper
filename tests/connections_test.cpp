@@ -19,7 +19,7 @@
 
 using namespace fredemmott::inputmapping;
 
-TEST_CASE("SourceRef >> Value*") {
+TEST_CASE("SourcePtr >> Value*") {
   Axis::Value out(-1);
   auto axis = std::make_shared<TestAxis>();
   axis >> &out;

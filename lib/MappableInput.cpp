@@ -51,7 +51,7 @@ std::vector<std::shared_ptr<TSource>> fill_sources(size_t count) {
   return ret;
 }
 
-AxisSourceRef find_axis(
+AxisSourcePtr find_axis(
   const std::shared_ptr<InputDevice>& device,
   std::vector<std::shared_ptr<MIAxisSource>> inputs,
   AxisType t) {
@@ -253,7 +253,7 @@ std::shared_ptr<InputDevice> MappableInput::getDevice() const {
   return p->device;
 }
 
-AxisSourceRef MappableInput::axis(uint8_t id) const {
+AxisSourcePtr MappableInput::axis(uint8_t id) const {
   if (id == 0 || id > getAxisCount()) {
     char buf[255];
     snprintf(buf, sizeof(buf), "axis number %d of %zu", id, getAxisCount());
@@ -264,7 +264,7 @@ AxisSourceRef MappableInput::axis(uint8_t id) const {
   return p->axisInputs.at(id - 1);
 }
 
-ButtonSourceRef MappableInput::button(uint8_t id) const {
+ButtonSourcePtr MappableInput::button(uint8_t id) const {
   if (id == 0 || id > getButtonCount()) {
     char buf[255];
     // TODO: snprintf -> std::format
@@ -276,7 +276,7 @@ ButtonSourceRef MappableInput::button(uint8_t id) const {
   return p->buttonInputs.at(id - 1);
 }
 
-HatSourceRef MappableInput::hat(uint8_t id) const {
+HatSourcePtr MappableInput::hat(uint8_t id) const {
   if (id == 0 || id > getHatCount()) {
     char buf[255];
     snprintf(buf, sizeof(buf), "hat number %d of %zu", id, getHatCount());

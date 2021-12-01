@@ -16,10 +16,10 @@
 namespace fredemmott::inputmapping {
 
 template <std::derived_from<Control> TControl>
-using SourceRef = maybe_shared_ptr<Source<TControl>>;
-using AxisSourceRef = SourceRef<Axis>;
-using ButtonSourceRef = SourceRef<Button>;
-using HatSourceRef = SourceRef<Hat>;
+using SourcePtr = maybe_shared_ptr<Source<TControl>>;
+using AxisSourcePtr = SourcePtr<Axis>;
+using ButtonSourcePtr = SourcePtr<Button>;
+using HatSourcePtr = SourcePtr<Hat>;
 
 // clang-format off
 template<typename T>

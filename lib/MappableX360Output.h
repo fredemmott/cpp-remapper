@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "MappableOutput.h"
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -25,9 +25,9 @@ class MappableX360Output final : public MappableOutput {
 
   std::shared_ptr<OutputDevice> getDevice() const override;
 
-  const AxisSinkRef LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
+  const AxisSinkPtr LXAxis, LYAxis, LTrigger, RXAxis, RYAxis, RTrigger;
 
-  const ButtonSinkRef ButtonA, ButtonB, ButtonX, ButtonY, ButtonBack,
+  const ButtonSinkPtr ButtonA, ButtonB, ButtonX, ButtonY, ButtonBack,
     ButtonStart, ButtonGuide, DPadUp, DPadDown, DPadLeft, DPadRight,
     ButtonLStick, ButtonRStick, ButtonLShoulder, ButtonRShoulder;
 

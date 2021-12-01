@@ -177,12 +177,12 @@ std::shared_ptr<OutputDevice> MappableVJoyOutput::getDevice() const {
   return mDevice;
 }
 
-ButtonSinkRef MappableVJoyOutput::button(uint8_t id) const {
+ButtonSinkPtr MappableVJoyOutput::button(uint8_t id) const {
   return
     [dev = mDevice, id](Button::Value value) { dev->setButton(id, value); };
 }
 
-HatSinkRef MappableVJoyOutput::hat(uint8_t id) const {
+HatSinkPtr MappableVJoyOutput::hat(uint8_t id) const {
   return [dev = mDevice, id](Hat::Value value) { dev->setHat(id, value); };
 }
 

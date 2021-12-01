@@ -13,7 +13,7 @@
 #include "SinkPipeline.h"
 #include "SourcePipeline.h"
 #include "TransformPipeline.h"
-#include "TransformRef.h"
+#include "TransformPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -22,12 +22,12 @@ namespace fredemmott::inputmapping {
  *
  * We work with `shared_ptr<>` where possible, but to support working with
  * lvalues, we also have `maybe_shared_ptr<T>`, which contains a raw pointer,
- * and an optional `shared_ptr<>` that must be equal to maintain the refcount.'
+ * and an optional `shared_ptr<>` that must be equal to maintain the Ptrcount.'
  *
- * Let's start with the canonical ref-based operators:
+ * Let's start with the canonical Ptr-based operators:
  */
 
-/// SourceOrTransformRef >> SinkRef
+/// SourceOrTransformPtr >> SinkPtr
 template <
   any_source_or_transform_ptr Left,
   sink_ptr<typename Left::element_type::OutControl> Right>
@@ -44,7 +44,7 @@ auto operator>>(Left left, const Right& right) {
   }
 }
 
-/// SourceOrTransformRef >> TransformRef
+/// SourceOrTransformPtr >> TransformPtr
 template <
   any_source_or_transform_ptr Left,
   transform_from_ptr<typename Left::element_type::OutControl> Right>
@@ -63,10 +63,10 @@ auto operator>>(Left left, Right right) {
   }
 }
 
-/* Okay, that's all combinations of 'refs' dealt with; now to wrap when
- * at least one side is not a ref */
+/* Okay, that's all combinations of Ptrs dealt with; now to wrap when
+ * at least one side is not a Ptr */
 
-/// SourceOrTransformRef >> convertible_to_sink_ptr
+/// SourceOrTransformPtr >> convertible_to_sink_ptr
 template <
   any_source_or_transform_ptr Left,
   non_id_convertible_to_sink_ptr<typename Left::element_type::OutControl> Right>
@@ -74,7 +74,7 @@ auto operator>>(Left left, Right&& right) {
   return left >> convert_to_any_sink_ptr(std::forward<Right>(right));
 }
 
-/// SourceOrTransformRef >> convertible_to_transform_ptr
+/// SourceOrTransformPtr >> convertible_to_transform_ptr
 template <
   any_source_or_transform_ptr Left,
   non_id_convertible_to_transform_from_ptr<
@@ -83,7 +83,7 @@ auto operator>>(Left left, Right&& right) {
   return left >> convert_to_any_transform_ptr(std::forward<Right>(right));
 }
 
-/// convertible_to_source_ptr >> SinkOrTransformRef
+/// convertible_to_source_ptr >> SinkOrTransformPtr
 template <
   any_sink_or_transform_ptr Right,
   non_id_convertible_to_source_ptr<typename Right::element_type::InControl>
@@ -92,7 +92,7 @@ auto operator>>(Left&& left, Right right) {
   return convert_to_any_source_ptr(std::forward<Left>(left)) >> right;
 }
 
-/// convertible_to_transform_ptr >> SinkOrTransformRef
+/// convertible_to_transform_ptr >> SinkOrTransformPtr
 template <
   any_sink_or_transform_ptr Right,
   non_id_convertible_to_transform_to_ptr<

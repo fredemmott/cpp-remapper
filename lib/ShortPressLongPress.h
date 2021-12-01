@@ -9,7 +9,7 @@
 
 #include <chrono>
 
-#include "SinkRef.h"
+#include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
 
@@ -17,15 +17,15 @@ namespace fredemmott::inputmapping {
 class ShortPressLongPress : public ButtonSink {
  public:
   ShortPressLongPress(
-    ButtonSinkRef short_handler,
-    ButtonSinkRef long_handle,
+    ButtonSinkPtr short_handler,
+    ButtonSinkPtr long_handle,
     const std::chrono::steady_clock::duration duration
     = std::chrono::milliseconds(300));
   virtual void map(Button::Value state) override;
 
  private:
-  ButtonSinkRef mShortPress;
-  ButtonSinkRef mLongPress;
+  ButtonSinkPtr mShortPress;
+  ButtonSinkPtr mLongPress;
   std::chrono::steady_clock::duration mLongDuration;
 
   std::chrono::time_point<std::chrono::steady_clock> mStart;

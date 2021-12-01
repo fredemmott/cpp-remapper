@@ -96,18 +96,18 @@ concept non_id_convertible_to_sink_ptr =
 // clang-format on
 
 template <std::derived_from<Control> TControl>
-class SinkRef : public maybe_shared_ptr<Sink<TControl>> {
+class SinkPtr : public maybe_shared_ptr<Sink<TControl>> {
  public:
   using maybe_shared_ptr<Sink<TControl>>::maybe_shared_ptr;
 
   template <typename T>
-    requires non_id_convertible_to_sink_ptr<T, TControl> SinkRef(T in) {
+    requires non_id_convertible_to_sink_ptr<T, TControl> SinkPtr(T in) {
       *this = convert_to_any_sink_ptr(std::forward<T>(in));
     }
 };
 
-using AxisSinkRef = SinkRef<Axis>;
-using ButtonSinkRef = SinkRef<Button>;
-using HatSinkRef = SinkRef<Hat>;
+using AxisSinkPtr = SinkPtr<Axis>;
+using ButtonSinkPtr = SinkPtr<Button>;
+using HatSinkPtr = SinkPtr<Hat>;
 
 }// namespace fredemmott::inputmapping
