@@ -81,6 +81,25 @@ int main() {
 6. `./build.ps1 example.cpp`
 7. Run `bin/example.exe`
 
+## Debugging
+
+### Compilation errors
+
+I strongly recommend installing
+[LLVM and Clang](https://github.com/llvm/llvm-project/releases/latest),
+and running `build.ps1 -Compiler clang`; both Clang and cl (Microsoft Visual
+C++'s compiler) are supported, however when there are issues, Clang gives
+much more detailed error messages than cl.
+
+### Runtime problems
+
+- Build with `build.ps1 -BuildMode Debug` to get a more
+  debuggable/less-optimized executable. If you are not using clang, ASAN will
+  be enabled.
+- Use your favorite debugger :) If you use VS Code, put your profile in profiles/,
+  open it, and run "Current Profile (Debug)" from the "Run and Debug" tab on the
+  left.
+
 # How do I use this with another device?
 
 Known devices are defined in [lib/devicedb.h](lib/devicedb.h). If your device
