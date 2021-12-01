@@ -9,8 +9,12 @@
 
 namespace fredemmott::inputmapping {
 
+ButtonToAxis::ButtonToAxis(Axis::Value falseValue, Axis::Value trueValue)
+  : mFalse(falseValue), mTrue(trueValue) {
+}
+
 void ButtonToAxis::map(bool value) {
-  emit(value ? 65535 : 0);
+  emit(value ? mTrue : mFalse);
 }
 
 }// namespace fredemmott::inputmapping

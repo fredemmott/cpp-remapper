@@ -12,9 +12,20 @@
 
 namespace fredemmott::inputmapping {
 
+/** Convert a button to an axis.
+ *
+ * This is useful when binding a button to a virtual X360 trigger.
+ */
 class ButtonToAxis final : public ButtonSink, public AxisSource {
+ private:
+  Axis::Value mFalse;
+  Axis::Value mTrue;
+
  public:
-  void map(Button::Value value);
+  ButtonToAxis(
+    Axis::Value falseValue = Axis::MIN,
+    Axis::Value trueValue = Axis::MAX);
+  virtual void map(Button::Value value) override;
 };
 
 }// namespace fredemmott::inputmapping
