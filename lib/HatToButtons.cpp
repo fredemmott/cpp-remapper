@@ -19,23 +19,17 @@ HatToButtons::HatToButtons(
   assignToVJoy(output, first, count);
 }
 
+const ButtonSinkRef& HatToButtons::CenterButton::get() const {
+  return mButton;
+}
+
 HatToButtons::HatToButtons(
-  const ButtonSinkRef& center,
+  const HatToButtons::CenterButton& center,
   MappableVJoyOutput* output,
   uint8_t first,
   uint8_t count)
-  : mCenter(center) {
+  : mCenter(center.get()) {
   assignToVJoy(output, first, count);
-}
-
-HatToButtons::HatToButtons(const std::vector<ButtonSinkRef>& buttons)
-  : mButtons(buttons) {
-}
-
-HatToButtons::HatToButtons(
-  const ButtonSinkRef& center,
-  const std::vector<ButtonSinkRef>& buttons)
-  : mCenter(center), mButtons(buttons) {
 }
 
 void HatToButtons::map(Hat::Value value) {
