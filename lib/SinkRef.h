@@ -44,7 +44,7 @@ auto convert_to_any_sink_ptr(T&& in) {
   }
 
   if constexpr (any_sink<std::remove_pointer_t<DT>>) {
-    return maybe_shared_ptr<DT>(in);
+    return maybe_shared_ptr<DT>(std::forward<T>(in));
   }
 
   // Can't infer the inner generic :(
