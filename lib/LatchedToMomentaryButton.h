@@ -25,7 +25,7 @@ class LatchedToMomentaryButton final : public Sink<Button>,
  public:
   LatchedToMomentaryButton(
     const std::chrono::steady_clock::duration& pressDuration
-    = std::chrono::milliseconds(20));
+    = std::chrono::milliseconds(50));
   virtual void map(Button::Value value) override;
 
  private:
