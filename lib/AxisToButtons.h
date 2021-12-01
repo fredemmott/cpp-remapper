@@ -22,9 +22,31 @@ class AxisToButtons final : public AxisSink {
     ButtonSinkRef next;
   };
 
-  // TODO: convenience constructor deviding into equal-portion buttons.
+  AxisToButtons(const std::vector<Range>& ranges);
   AxisToButtons(std::initializer_list<Range> ranges);
-  void map(long value);
+
+  // clang-format off
+  template <typename First, convertible_to_sink_ptr<Button>... Rest>
+  requires
+    // clang needs this as the first constraint on First to avoid a
+    // template/concept recursion bug
+    (!std::same_as<AxisToButtons, std::decay_t<First>>)
+    && convertible_to_sink_ptr<First, Button>
+  // clang-format on
+  AxisToButtons(First&& first, Rest... rest) {
+    std::vector<ButtonSinkRef> buttons {
+      convert_to_any_sink_ptr(std::forward<First>(first)),
+      convert_to_any_sink_ptr(std::forward<Rest>(rest))...};
+    const auto step = ((long double)Axis::MAX) / buttons.size();
+    for (auto i = 0; i < buttons.size(); ++i) {
+      mRanges.push_back(
+        {std::lround(i * step) + (i == 0 ? 0 : 1),
+         std::lround((i + 1) * step),
+         buttons[i]});
+    }
+  }
+
+  virtual void map(long value) override;
 
  private:
   struct RawRange {

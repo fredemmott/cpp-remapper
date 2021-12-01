@@ -11,7 +11,11 @@
 
 namespace fredemmott::inputmapping {
 
-AxisToButtons::AxisToButtons(std::initializer_list<Range> ranges) {
+AxisToButtons::AxisToButtons(std::initializer_list<AxisToButtons::Range> ranges)
+  : AxisToButtons(std::vector(ranges)) {
+}
+
+AxisToButtons::AxisToButtons(const std::vector<Range>& ranges) {
   const long max = Axis::MAX;
   for (const auto& range: ranges) {
     mRanges.push_back(
