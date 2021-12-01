@@ -11,6 +11,8 @@
 #include <cstdio>
 #include <stdexcept>
 
+#include "Controls.h"
+
 // clang-format off
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
@@ -59,11 +61,29 @@ struct VJoyDevice::Impl {
 VJoyDevice::VJoyDevice(uint8_t id) : p(new Impl {id, {}}) {
   init_vjoy();
   AcquireVJD(id);
+  // Just in case the state struct has been extended...
   ResetVJD(id);
-  setHat(1, 0xffff);
-  setHat(2, 0xffff);
-  setHat(3, 0xffff);
-  setHat(4, 0xffff);
+
+  // ... but we also need to manually initialize our state struct
+  // as we call UpdateVJD() rathe than SetAxis/SetButton
+  memset(&p->state, 0, sizeof(p->state));
+  p->state.bDevice = id;
+
+  setXAxis(Axis::MID);
+  setYAxis(Axis::MID);
+  setZAxis(Axis::MID);
+
+  setRXAxis(Axis::MID);
+  setRYAxis(Axis::MID);
+  setRZAxis(Axis::MID);
+
+  setSlider(Axis::MID);
+  setDial(Axis::MID);
+
+  setHat(1, Hat::CENTER);
+  setHat(2, Hat::CENTER);
+  setHat(3, Hat::CENTER);
+  setHat(4, Hat::CENTER);
 }
 
 VJoyDevice::~VJoyDevice() {
@@ -146,7 +166,7 @@ VJoyDevice *VJoyDevice::setButton(uint8_t button, bool value) {
 }
 
 VJoyDevice *VJoyDevice::setHat(uint8_t hat, uint16_t v) {
-  const long value = v == 0xffff ? -1 : v;
+  const DWORD value = v == Hat::CENTER ? DWORD(-1) : v;
   switch (hat) {
     case 1:
       p->state.bHats = value;
