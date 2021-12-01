@@ -41,8 +41,7 @@ void ShortPressLongPress::map(bool pressed) {
       INJECTED_PRESS_DURATION, [=]() { mShortPress->map(false); });
   } else {
     mLongPress->map(true);
-    clock->setTimer(
-      INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
+    clock->setTimer(INJECTED_PRESS_DURATION, [=]() { mLongPress->map(false); });
   }
 }
 

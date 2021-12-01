@@ -9,6 +9,7 @@
 
 #include <cstdint>
 
+#include "Percent.h"
 #include "Sink.h"
 #include "Source.h"
 
@@ -32,7 +33,7 @@ namespace fredemmott::inputmapping {
  */
 class SquareDeadzone : public AxisSink, public AxisSource {
  public:
-  SquareDeadzone(uint8_t percent);
+  SquareDeadzone(const Percent& percent);
   virtual ~SquareDeadzone();
   virtual void map(Axis::Value value) override;
 

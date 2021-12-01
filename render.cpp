@@ -24,13 +24,9 @@ int main() {
   render_axis("curve_0.5.bmp", AxisCurve(0.5));
   render_axis("curve_neg0.5.bmp", AxisCurve(-0.5));
   render_axis("curve_0.99.bmp", AxisCurve(0.99));
-  render_axis("dead_10.bmp", SquareDeadzone(10));
+  render_axis("dead_10.bmp", SquareDeadzone(10_percent));
 
-  auto x = std::make_shared<SquareDeadzone>(50) >> std::make_shared<AxisCurve>(0.5);
-  auto y = std::make_shared<SquareDeadzone>(50) >> AxisCurve(0.5);
-  auto z = SquareDeadzone(50) >> AxisCurve(0.5);
-
-  render_axis("dead_curve.bmp", SquareDeadzone(50) >> AxisCurve(0.5));
-  render_axis("curve_dead.bmp", AxisCurve(0.5) >> SquareDeadzone(50));
+  render_axis("dead_curve.bmp", SquareDeadzone(50_percent) >> AxisCurve(0.5));
+  render_axis("curve_dead.bmp", AxisCurve(0.5) >> SquareDeadzone(50_percent));
   return 0;
 }

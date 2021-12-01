@@ -48,7 +48,8 @@ TEST_CASE("AxisToButtons") {
 
   SECTION("Explicit ranges") {
     Button::Value b1, b2;
-    axis >> AxisToButtons {{0, 0, &b1}, {100, 100, &b2}};
+    axis >> AxisToButtons {
+      {0_percent, 0_percent, &b1}, {100_percent, 100_percent, &b2}};
     axis.emit(0);
     REQUIRE(b1);
     REQUIRE(!b2);
@@ -69,12 +70,13 @@ namespace {
 // Check that the compiler lets us call it as intended
 void static_test_real_buttons() {
   MappableVJoyOutput o(nullptr);
-  AxisToButtons::Range range1 {0, 0, o.Button1};
+  AxisToButtons::Range range1 {0_percent, 0_percent, o.Button1};
 
-  AxisToButtons::Range range2 {0, 0, all(o.Button1, o.Button2)};
+  AxisToButtons::Range range2 {0_percent, 0_percent, all(o.Button1, o.Button2)};
   AxisToButtons foo {
-    {0, 0, o.Button1}, {0, 0, all(o.Button1, o.Button2)}, {100, 100, [](bool) {
-                                                           }}};
+    {0_percent, 0_percent, o.Button1},
+    {0_percent, 0_percent, all(o.Button1, o.Button2)},
+    {100_percent, 100_percent, [](bool) {}}};
   AxisToButtons implicit_equal_spacing(o.Button1, o.Button2, o.Button3);
 }
 

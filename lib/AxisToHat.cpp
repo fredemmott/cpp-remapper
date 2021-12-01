@@ -13,7 +13,9 @@
 
 namespace fredemmott::inputmapping {
 
-AxisToHat::AxisToHat(uint8_t deadzone_percent) : mDeadzone(deadzone_percent) {
+const Percent AxisToHat::DEFAULT_DEADZONE = 90_percent;
+
+AxisToHat::AxisToHat(Percent deadzone) : mDeadzone(deadzone) {
 }
 
 AxisToHat::~AxisToHat() {
@@ -27,7 +29,7 @@ void AxisToHat::update() {
   // Treat deadzone as combined distance to center - same amount of
   // needed for corners.
   const auto distance = sqrt((x * x) + (y * y));
-  if ((distance * 100) / Hat::CENTER < mDeadzone / 2) {
+  if ((distance * 100) / Hat::CENTER < mDeadzone.value() / 2) {
     emit(Hat::CENTER);
     return;
   }

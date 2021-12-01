@@ -19,8 +19,8 @@ AxisToButtons::AxisToButtons(const std::vector<Range>& ranges) {
   const long max = Axis::MAX;
   for (const auto& range: ranges) {
     mRanges.push_back(
-      {(range.minPercent * max) / 100,
-       (range.maxPercent * max) / 100,
+      {(range.min.value() * max) / 100,
+       (range.max.value() * max) / 100,
        range.next});
   }
 }

@@ -39,8 +39,8 @@ TEST_CASE("Source& >> Sink&&") {
   bool b1 = false, b2 = false;
   TestAxis axis;
   axis >> AxisToButtons {
-    {0, 10, [&b1](bool value) { b1 = value; }},
-    {90, 100, [&b2](bool value) { b2 = value; }}};
+    {0_percent, 10_percent, [&b1](bool value) { b1 = value; }},
+    {90_percent, 100_percent, [&b2](bool value) { b2 = value; }}};
   axis.emit(0);
   REQUIRE(b1);
   REQUIRE(!b2);
@@ -59,7 +59,7 @@ TEST_CASE("Source& >> Transform*") {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
-  SquareDeadzone dz(10);
+  SquareDeadzone dz(10_percent);
 
   axis >> &dz >> &out;
   axis.emit(0);
@@ -76,10 +76,10 @@ TEST_CASE("Source& >> Transform&&") {
   // Testing the plumbing of >>, not the specific transform
   long out = -1;
   TestAxis axis;
-  SquareDeadzone dz(10);
+  SquareDeadzone dz(10_percent);
 
   // Via temporary
-  axis >> SquareDeadzone {10} >> &out;
+  axis >> SquareDeadzone {10_percent} >> &out;
   axis.emit(0);
   REQUIRE(out == 0);
   axis.emit(Axis::MAX);
@@ -89,22 +89,22 @@ TEST_CASE("Source& >> Transform&&") {
 namespace {
 
 void static_test_transform_pipelines() {
-  auto x
-    = std::make_shared<SquareDeadzone>(50) >> std::make_shared<AxisCurve>(0.5);
+  auto x = std::make_shared<SquareDeadzone>(50_percent)
+    >> std::make_shared<AxisCurve>(0.5);
   static_assert(
     std::same_as<decltype(x), std::shared_ptr<TransformPipeline<Axis, Axis>>>);
 
-  auto y = std::make_shared<SquareDeadzone>(50) >> AxisCurve(0.5);
+  auto y = std::make_shared<SquareDeadzone>(50_percent) >> AxisCurve(0.5);
   static_assert(std::same_as<decltype(x), decltype(y)>);
 
-  auto z = SquareDeadzone(50) >> AxisCurve(0.5);
+  auto z = SquareDeadzone(50_percent) >> AxisCurve(0.5);
   static_assert(std::same_as<decltype(x), decltype(z)>);
 }
 
 void static_test_transfomed_source_pipelines() {
   MappableInput stick(nullptr);
   MappableVJoyOutput vj(nullptr);
-  stick.XAxis >> SquareDeadzone(10) >> AxisCurve(-0.5) >> vj.XAxis;
+  stick.XAxis >> SquareDeadzone(10_percent) >> AxisCurve(-0.5) >> vj.XAxis;
 }
 
 }// namespace

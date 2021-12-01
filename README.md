@@ -51,8 +51,8 @@ int main() {
   // into 4-way buttons
   throttle.XAxis >>
     AxisToButtons {
-      { 0, 0, vj1.button(throttle.getButtonCount() + 1) },
-      { 100, 100, vj1.button(throttle.getButtonCount()  + 2) }
+      { 0_percent, 0_percent, vj1.button(throttle.getButtonCount() + 1) },
+      { 100_percent, 100_percent, vj1.button(throttle.getButtonCount()  + 2) }
     }
   );
 
@@ -202,7 +202,7 @@ It used like this:
 
 ```C++
 AxisToHat myFirstHat(vjoy1.Hat1); // default deadzone
-AxisToHat myHat(vjoy1.Hat1, 90); // custom deadzone, in percent
+AxisToHat myHat(vjoy1.Hat1, 90_percent); // custom deadzone
 device.XAxis >> &myHat.XAxis;
 device.YAxis >> &myHat.YAxis;
 myHat >> vjoy1.Hat1;
@@ -225,6 +225,58 @@ This converts a button to an axis; this axis is always either 0 (if the button i
 
 ```C++
 stick.Button1 >> ButtonToAxis() >> x360.RTrigger;
+```
+
+## HatToButtons
+
+Some games treat hat directions as if they were buttons; this can be problematic if they support N/E/S/W bindings, but don't understand that a hat set to North-East should be treated as if the north + east buttons were pressed. In this situation, an 8-way hat only gives you 4 directions, but if you map it to buttons and bind them instead, you get 8-way control.
+
+There are two ways to use this:
+
+```C++
+// Explicitly specify buttons:
+stick.Hat1 >> HatToButtons(vj.Button1, vj.Button2, vj.Button3, vj.Button4);
+// easy mode:
+stick.Hat1 >> HatToButtons(
+  &vj,
+  stick.getButtonCount() + 1 // first button number
+  4 // number of buttons
+);
+```
+
+Additionally, a button can be pressed when the hat is centered:
+
+```C++
+stick.Hat1 >> HatToButtons(HatToButtons::CenterButton(vj.Button1), vj.Button2, vj.Button3, vj.Button4, vj.Button5);
+stick.Hat1 >> HatToButtons(
+  HatToButton::CenterButton(vj.button(stick.getButtonCount() + 1)),
+  &vj,
+  stick.getButtonCount() + 2 // first button number
+  4 // number of buttons
+);
+```
+
+## LatchedToMomentaryButton
+
+Some controllers have buttons that 'latch' or maintain their state, such as toggle switches that stay in position, or
+flip-up safeties/triggers that are reported as a continuously held button.
+
+Some games require a toggle on/off input instead of a continuous press - this allows that conversion.
+
+```C++
+stick.Button1 >> LatchedToMomentaryButton() >> vj.Button1;
+```
+
+## ShortPressLongPress
+
+This divides a button into two, depending on if a button is pressed and quickly released, or held for a moment.
+
+This will always delay input, as when the button is pressed, we can't tell if it will be a short press or a long press - so, the output device (e.g. vjoy) will not indicate that a button has been pressed until the physical button has been released. The button release will be artificially delayed by 100ms, as some games will only respond to presses/releases that last multiple frames.
+
+```C++
+stick.Button1 >> ShortPressLongPress(vj.Button1, vj.Button2);
+// Require a /really/ long press
+stick.Button1 >> ShortPressLongPress(vj.Button1, vj.Button2, std::chrono::seconds(2));
 ```
 
 ## Using a lambda or function
@@ -294,7 +346,7 @@ vj1.Button1.set(false); // ... because this happened after
 ```
 
 If you want to press-and-release a button, or do multiple actions over time, you
-must inject them into the system:
+must set a timer:
 
 ```C++
 #include "Clock.h"

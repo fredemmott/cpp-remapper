@@ -10,7 +10,8 @@
 
 namespace fredemmott::inputmapping {
 
-SquareDeadzone::SquareDeadzone(uint8_t percent) : mPercent(percent) {
+SquareDeadzone::SquareDeadzone(const Percent& percent)
+  : mPercent(percent.value()) {
 }
 
 SquareDeadzone::~SquareDeadzone() {

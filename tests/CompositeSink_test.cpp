@@ -41,7 +41,8 @@ TEST_CASE("CompositeSink") {
 
   SECTION("Pipelines") {
     Axis::Value out1(-1), out2(-1);
-    axis >> all(SquareDeadzone(10) >> &out1, SquareDeadzone(20) >> &out2);
+    axis >> all(
+      SquareDeadzone(10_percent) >> &out1, SquareDeadzone(20_percent) >> &out2);
     axis.emit(Axis::MID + 1);
     REQUIRE(out1 == Axis::MID);
     REQUIRE(out2 == Axis::MID);

@@ -13,7 +13,7 @@
 using namespace fredemmott::inputmapping;
 
 TEST_CASE("SquareDeadzone") {
-  const auto percent = GENERATE(10, 90);
+  const auto percent = GENERATE(10_percent, 90_percent);
 
   long out = -1;
   TestAxis axis;
@@ -35,7 +35,7 @@ TEST_CASE("SquareDeadzone") {
   axis.emit(0x80ff);
   REQUIRE(out == 0x7fff);
 
-  const long dz_size = round(0x8000 * percent / 100.0);
+  const long dz_size = round(0x8000 * percent.value() / 100.0);
   // 1 change in input produces this size change in output...
   const double out_delta = 0x8000 * 1.0 / (0x8000 - dz_size);
   // ... but as we're using < and > constraints with a input of 1, we always

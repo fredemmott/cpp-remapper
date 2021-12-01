@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "Percent.h"
 #include "SinkPtr.h"
 
 namespace fredemmott::inputmapping {
@@ -17,8 +18,8 @@ namespace fredemmott::inputmapping {
 class AxisToButtons final : public AxisSink {
  public:
   struct Range {
-    uint8_t minPercent;
-    uint8_t maxPercent;
+    Percent min;
+    Percent max;
     ButtonSinkPtr next;
   };
 
