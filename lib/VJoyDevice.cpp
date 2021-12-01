@@ -115,7 +115,7 @@ VJoyDevice *VJoyDevice::setSlider(long value) {
 }
 
 VJoyDevice *VJoyDevice::setDial(long value) {
-  p->state.wSlider = normalize_axis(value);
+  p->state.wDial = normalize_axis(value);
   return this;
 }
 
