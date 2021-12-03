@@ -20,20 +20,12 @@ using namespace fredemmott::inputmapping;
 
 namespace fredemmott::inputmapping {
 struct Profile::Impl {
-  std::vector<DeviceSpecifier> ids;
   std::unique_ptr<Mapper> mapper;
   std::unique_ptr<HidHide> guardian;
-  std::unique_ptr<InputDeviceCollection> deviceCollection;
 };
 
 Profile::Profile(const std::vector<DeviceSpecifier>& ids)
-  : p(new Impl {
-    ids,
-    std::make_unique<Mapper>(),
-    std::make_unique<HidHide>(ids),
-    std::make_unique<InputDeviceCollection>(),
-  }) {
-  std::reverse(p->ids.begin(), p->ids.end());
+  : p(new Impl {std::make_unique<Mapper>(), std::make_unique<HidHide>(ids)}) {
 }
 
 Profile::Profile(Profile&& moved) : p(std::move(moved.p)) {
@@ -42,10 +34,16 @@ Profile::Profile(Profile&& moved) : p(std::move(moved.p)) {
 Profile::~Profile() {
 }
 
-MappableInput Profile::popInput() {
-  const auto id = p->ids.back();
-  p->ids.pop_back();
-  auto device = p->deviceCollection->get(id);
+Mapper* Profile::operator->() const {
+  return p->mapper.get();
+}
+
+}// namespace fredemmott::inputmapping
+
+namespace fredemmott::inputmapping::detail {
+
+MappableInput get_device(InputDeviceCollection* c, const DeviceSpecifier& id) {
+  auto device = c->get(id);
   if (!device) {
     auto desc = id.getHumanReadable();
     printf("ERROR: Failed to find device '%s'\n", desc.c_str());
@@ -63,15 +61,7 @@ MappableInput Profile::popInput() {
   return ret;
 }
 
-Mapper* Profile::operator->() const {
-  return p->mapper.get();
-}
-
-}// namespace fredemmott::inputmapping
-
-namespace fredemmott::inputmapping::detail {
-
-std::tuple<> get_devices(Profile*) {
+std::tuple<> get_devices(Profile*, InputDeviceCollection*) {
   return std::make_tuple();
 }
 

@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "DeviceSpecifier.h"
+#include "InputDeviceCollection.h"
 #include "MappableDS4Output.h"
 #include "MappableInput.h"
 #include "MappableOutput.h"
@@ -48,7 +49,6 @@ class Profile final {
   Profile(Profile&& other);
   ~Profile();
   void operator=(const Profile&) = delete;
-  MappableInput popInput();
   Mapper* operator->() const;
 
  private:
@@ -58,30 +58,49 @@ class Profile final {
 
 // Implementation details to make your eyes bleed.
 namespace detail {
-std::tuple<> get_devices(Profile*);
+std::tuple<> get_devices(Profile*, InputDeviceCollection*);
+
+MappableInput get_device(InputDeviceCollection*, const DeviceSpecifier&);
 
 template <typename... Ts>
-auto get_devices(Profile* p, const DeviceSpecifier& first, Ts... rest) {
-  auto device = p->popInput();
-  return std::tuple_cat(std::make_tuple(device), get_devices(p, rest...));
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
+  const DeviceSpecifier& first,
+  Ts... rest) {
+  auto device = get_device(c, first);
+  return std::tuple_cat(std::make_tuple(device), get_devices(p, c, rest...));
 }
 
 template <typename... Ts>
-auto get_devices(Profile* p, const VJoyID& first, Ts... rest) {
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
+  const VJoyID& first,
+  Ts... rest) {
   return std::tuple_cat(
-    std::make_tuple(MappableVJoyOutput(first.value)), get_devices(p, rest...));
+    std::make_tuple(MappableVJoyOutput(first.value)),
+    get_devices(p, c, rest...));
 }
 
 template <typename... Ts>
-auto get_devices(Profile* p, const ViGEmX360ID& _first, Ts... rest) {
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
+  const ViGEmX360ID& _first,
+  Ts... rest) {
   return std::tuple_cat(
-    std::make_tuple(MappableX360Output()), get_devices(p, rest...));
+    std::make_tuple(MappableX360Output()), get_devices(p, c, rest...));
 }
 
 template <typename... Ts>
-auto get_devices(Profile* p, const ViGEmDS4ID& _first, Ts... rest) {
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
+  const ViGEmDS4ID& _first,
+  Ts... rest) {
   return std::tuple_cat(
-    std::make_tuple(MappableDS4Output()), get_devices(p, rest...));
+    std::make_tuple(MappableDS4Output()), get_devices(p, c, rest...));
 }
 
 void fill_input_ids(std::vector<DeviceSpecifier>&);
@@ -121,7 +140,7 @@ std::vector<MappableInput> select_inputs();
 template <typename First, typename... Rest>
 std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
   auto ret = select_inputs(rest...);
-  if constexpr (std::derived_from<First, MappableInput>) {
+  if constexpr (std::convertible_to<First, MappableInput>) {
     ret.push_back(first);
   }
   return ret;
@@ -131,10 +150,11 @@ std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
 
 template <typename... Ts>
 auto create_profile(const DeviceSpecifier& first, Ts... rest) {
+  InputDeviceCollection device_collection;
   std::vector<DeviceSpecifier> input_ids;
   detail::fill_input_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
-  auto devices = detail::get_devices(&p, first, rest...);
+  auto devices = detail::get_devices(&p, &device_collection, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
   // an `std::function`, and we can't take a Ptrerence to a template function
   p->setDevices(
