@@ -8,6 +8,7 @@
 #include "MappableInput.h"
 
 #include "AxisInformation.h"
+#include "EventSource.h"
 #include "InputDevice.h"
 
 namespace fredemmott::inputmapping {
@@ -67,7 +68,7 @@ AxisSourcePtr find_axis(
 }
 }// namespace
 
-class MappableInput::Impl {
+class MappableInput::Impl : public EventSource {
  public:
   std::shared_ptr<InputDevice> device;
   InputDevice::State state;
@@ -82,6 +83,12 @@ class MappableInput::Impl {
       buttonInputs(fill_sources<MIButtonSource>(dev->getButtonCount())),
       hatInputs(fill_sources<MIHatSource>(dev->getAxisCount())) {
   }
+
+  virtual HANDLE getHandle() override {
+    return device->getEvent();
+  }
+
+  virtual void poll() override;
 };
 
 MappableInput::MappableInput(const std::shared_ptr<InputDevice>& dev)
@@ -249,8 +256,8 @@ size_t MappableInput::getHatCount() const {
   return p->device->getHatCount();
 }
 
-std::shared_ptr<InputDevice> MappableInput::getDevice() const {
-  return p->device;
+std::shared_ptr<EventSource> MappableInput::getEventSource() const {
+  return p;
 }
 
 AxisSourcePtr MappableInput::axis(uint8_t id) const {
@@ -258,7 +265,7 @@ AxisSourcePtr MappableInput::axis(uint8_t id) const {
     char buf[255];
     snprintf(buf, sizeof(buf), "axis number %d of %zu", id, getAxisCount());
     return std::make_shared<MissingSource<Axis>>(
-      getDevice()->getProductName(), buf);
+      p->device->getProductName(), buf);
   }
 
   return p->axisInputs.at(id - 1);
@@ -270,7 +277,7 @@ ButtonSourcePtr MappableInput::button(uint8_t id) const {
     // TODO: snprintf -> std::format
     snprintf(buf, sizeof(buf), "button number %d of %zu", id, getButtonCount());
     return std::make_shared<MissingSource<Button>>(
-      getDevice()->getProductName(), buf);
+      p->device->getProductName(), buf);
   }
 
   return p->buttonInputs.at(id - 1);
@@ -281,15 +288,15 @@ HatSourcePtr MappableInput::hat(uint8_t id) const {
     char buf[255];
     snprintf(buf, sizeof(buf), "hat number %d of %zu", id, getHatCount());
     return std::make_shared<MissingSource<Hat>>(
-      getDevice()->getProductName(), buf);
+      p->device->getProductName(), buf);
   }
   return p->hatInputs.at(id - 1);
 }
 
-void MappableInput::poll() {
-  auto a = p->state;
-  auto b = p->device->getState();
-  p->state = b;
+void MappableInput::Impl::poll() {
+  auto a = state;
+  auto b = device->getState();
+  state = b;
 
 #ifdef VERBOSE_INPUT_DEBUG
   printf("-");
@@ -298,24 +305,24 @@ void MappableInput::poll() {
   b.dump();
 #endif
 
-  const auto axes = getAxisCount(), buttons = getButtonCount(),
-             hats = getHatCount();
+  const auto axes = axisInputs.size(), buttons = buttonInputs.size(),
+             hats = hatInputs.size();
 
   for (auto i = 0; i < axes; ++i) {
     if (a.getAxis(i) != b.getAxis(i)) {
-      p->axisInputs[i]->emit(b.getAxis(i));
+      axisInputs[i]->emit(b.getAxis(i));
     }
   }
 
   for (auto i = 0; i < buttons; ++i) {
     if (a.getButton(i) != b.getButton(i)) {
-      p->buttonInputs[i]->emit(b.getButton(i));
+      buttonInputs[i]->emit(b.getButton(i));
     }
   }
 
   for (auto i = 0; i < hats; ++i) {
     if (a.getHat(i) != b.getHat(i)) {
-      p->hatInputs[i]->emit(b.getHat(i));
+      hatInputs[i]->emit(b.getHat(i));
     }
   }
 }

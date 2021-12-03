@@ -15,7 +15,9 @@
 
 namespace fredemmott::inputmapping {
 
-class MappableInput final {
+class EventSource;
+
+class MappableInput final  {
  private:
   class Impl;
   std::shared_ptr<Impl> p;
@@ -25,8 +27,7 @@ class MappableInput final {
   MappableInput(const MappableInput& other) = default;
   ~MappableInput();
 
-  std::shared_ptr<InputDevice> getDevice() const;
-  void poll();
+  std::shared_ptr<EventSource> getEventSource() const;
 
   AxisSourcePtr axis(uint8_t id) const;
   ButtonSourcePtr button(uint8_t id) const;

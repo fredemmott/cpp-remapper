@@ -7,6 +7,7 @@
  */
 #include "Mapper.h"
 
+#include "EventSource.h"
 #include "InputDevice.h"
 #include "MappableInput.h"
 #include "MappableVJoyOutput.h"
@@ -106,7 +107,7 @@ void Mapper::run() {
 
   std::map<HANDLE, MappableInput> devices;
   for (const auto &input: mInputs) {
-    auto event = input.getDevice()->getEvent();
+    auto event = input.getEventSource()->getHandle();
     fixed_events.push_back(event);
     devices.insert({event, input});
   }
@@ -138,7 +139,7 @@ void Mapper::run() {
     }
 
     auto device = devices.at(event);
-    device.poll();
+    device.getEventSource()->poll();
     gActiveInstance = nullptr;
 
     flush();
