@@ -34,16 +34,22 @@ class Source : public AnySource {
     mNext = next;
   }
 
+  Out value() const {
+    return mValue;
+  }
+
  protected:
   void emit(Out value) {
     if (!mNext.isValid()) {
       return;
     }
+    mValue = value;
     mNext->map(value);
   }
 
  private:
   maybe_shared_ptr<Sink<TControl>> mNext;
+  Out mValue;
 };
 
 using AxisSource = Source<Axis>;
