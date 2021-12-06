@@ -35,12 +35,17 @@ concept source_ptr =
 
 template <typename T>
 auto convert_to_any_source_ptr(T&& in) {
-  if constexpr (any_source_ptr<std::decay_t<T>>) {
+  using DT = std::decay_t<T>;
+  if constexpr (any_source_ptr<DT>) {
     return in;
   }
 
-  if constexpr (any_source<std::decay_t<T>>) {
+  if constexpr (any_source<DT>) {
     return maybe_shared_ptr<std::decay_t<T>>(std::forward<T>(in));
+  }
+
+  if constexpr (any_source<std::remove_pointer_t<DT>>) {
+    return maybe_shared_ptr<std::remove_pointer_t<DT>>(in);
   }
 }
 
