@@ -289,10 +289,15 @@ function Cpp-Obj-Rule {
     }
   }
 
+  $TargetFlags = @()
+  if (!$Cpp.StartsWith("third-party")) {
+    $TargetFlags += "/DWIN32_LEAN_AND_MEAN"
+  }
+
   Rebuild-If-Outdated -Target $Target -Sources (@($Cpp) + $Headers) -Impl {
     Write-Output "  CXX ($Compiler): ${Target}: $Cpp"
     Invoke-Exe-Checked {
-      & $CL $CLFlags $DepsCLFlags /c "/Fo$Target" (Get-Item $Cpp).FullName
+      & $CL $CLFlags $DepsCLFlags $TargetFlags /c "/Fo$Target" (Get-Item $Cpp).FullName
     }
   }
 }
