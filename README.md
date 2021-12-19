@@ -76,10 +76,12 @@ int main() {
    available from https://github.com/njz3/vJoy/
 2. Extract it to the `third-party/vJoy` directory so you have an `third-party/vJoy/SDK/` subdirectory
 3. Copy the `vJoyInterface.dll` from the SDK directory to the `bin/` subdirectory
-4. Install Visual Studio 2019 or newer
+4. Install Visual Studio 2019 and `vswhere`
 5. Open a terminal
 6. `./build.ps1 example.cpp`
 7. Run `bin/example.exe`
+
+The ViGEM client build currently requires Visual Studio 2019; `cpp-remapper` itself can be built with VS2019, clang, or VS2022.
 
 ## Debugging
 
