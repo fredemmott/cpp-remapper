@@ -10,6 +10,7 @@
 #include "AxisCurve.h"
 #include "AxisToButtons.h"
 #include "AxisToHat.h"
+#include "AxisTrimmer.h"
 #include "ButtonToAxis.h"
 #include "CompositeSink.h"
 #include "EventLoop.h"

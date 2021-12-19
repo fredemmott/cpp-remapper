@@ -166,6 +166,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `AxisCurve`
 - `AxisToButtons`
 - `AxisToHat`
+- `AxisTrimmer`
 - `ButtonToAxis`
 - `HatToButtons`
 - `LatchedToMomentaryButton`
@@ -220,6 +221,33 @@ that:
 - if the deadzone is 100%, it will require a full deflection for
   North, East, South, or West, but only a 71% deflection for NE, SE, SW, or SW,
   as (100%, 100%) is 141% the distance from center of (100%, 0%) or (0%, 100%).
+
+## AxisTrimmer
+
+Trim (recenter) an axis by pressing and holding a button.
+
+Any movement is ignored while the button is pressed; trim is adjusted by the
+position difference between where the button was pressed and where it was
+released.
+
+For example, if you move the joystick to (100, 100), press the button, center
+the stick, then release the button, when centered, the joystick will report
+(100, 100); if you then move to (100, 100), it will report (200, 200).
+
+- a separate trimmer is needed for each axis
+- trim is limited to half of the axis range
+- a reset button is also supported
+
+It is used like this:
+
+```c++
+AxisTrimmer xtrim, ytrim;
+cyclic.XAxis >> &xtrim >> vj.XAxis;
+cyclic.YAxis >> &ytrim >> vj.YAxis;
+
+cyclic.Button21 >> all(xtrim.TrimButton, ytrim.TrimButton);
+cyclic.Button19 >> all(xtrim.ResetButton, ytrim.ResetButton);
+```
 
 ## ButtonToAxis
 
