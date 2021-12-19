@@ -17,7 +17,7 @@ namespace fredemmott::inputmapping {
 class EventSink;
 class EventSource;
 
-class EventLoop {
+class EventLoop final {
  public:
   void setEventSinks(const std::vector<std::shared_ptr<EventSink>>& sinks);
   void setEventSources(
