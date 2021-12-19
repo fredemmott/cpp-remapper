@@ -27,9 +27,9 @@ int main() {
     VIGEM_DS4_PAD,
   );
 
-  // Copy all inputs to outputs
-  p->passthrough(throttle, vj1);
-  p->passthrough(stick, vj2);
+  // Copy all inputs to outputs (only supported for VJoy outputs)
+  throttle >> vj1;
+  stick >> vj2;
 
   // Map a button
   throttle.Button1 >> vj1.Button1;
@@ -63,7 +63,7 @@ int main() {
     >> AxisCurve(0.5)
     >> vj1.YAxis;
 
-  p->run();
+  p.run();
   return 0;
 }
 ```

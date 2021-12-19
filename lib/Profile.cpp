@@ -13,20 +13,23 @@
 #include "HidHide.h"
 #include "InputDevice.h"
 #include "InputDeviceCollection.h"
+#include "MappableInput.h"
+#include "MappableVJoyOutput.h"
 #include "Mapper.h"
 #include "VJoyDevice.h"
+#include "connections.h"
 
 using namespace fredemmott::inputmapping;
 
 namespace fredemmott::inputmapping {
 struct Profile::Impl {
-  std::unique_ptr<Mapper> mapper;
+  std::shared_ptr<Mapper> mapper;
   std::unique_ptr<HidHide> guardian;
 };
 
 Profile::Profile(const std::vector<HiddenDevice>& ids)
   : p(new Impl {
-    std::make_unique<Mapper>(),
+    std::make_shared<Mapper>(),
     std::make_unique<HidHide>(
       std::vector<DeviceSpecifier>(ids.begin(), ids.end()))}) {
 }
@@ -37,8 +40,12 @@ Profile::Profile(Profile&& moved) : p(std::move(moved.p)) {
 Profile::~Profile() {
 }
 
-Mapper* Profile::operator->() const {
-  return p->mapper.get();
+std::shared_ptr<Mapper> Profile::getEventLoop() const {
+  return p->mapper;
+}
+
+void Profile::run() {
+  getEventLoop()->run();
 }
 
 DeviceWithVisibility::DeviceWithVisibility(const DeviceSpecifier& ds)

@@ -73,7 +73,9 @@ class Profile final {
   Profile(Profile&& other);
   ~Profile();
   void operator=(const Profile&) = delete;
-  Mapper* operator->() const;
+
+  std::shared_ptr<Mapper> getEventLoop() const;
+  void run();
 
  private:
   struct Impl;
@@ -180,10 +182,11 @@ auto create_profile(const DeviceSpecifier& first, Ts... rest) {
   auto devices = detail::get_devices(&p, &device_collection, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
   // an `std::function`, and we can't take a reference to a template function
-  p->setEventSources(std::apply(
+  auto event_loop = p.getEventLoop();
+  event_loop->setEventSources(std::apply(
     [](auto&&... args) { return detail::get_event_sources(args...); },
     devices));
-  p->setEventSinks(std::apply(
+  event_loop->setEventSinks(std::apply(
     [](auto&&... args) { return detail::get_event_sinks(args...); }, devices));
   return std::tuple_cat(std::make_tuple(std::move(p)), devices);
 }

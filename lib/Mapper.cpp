@@ -7,38 +7,13 @@
  */
 #include "Mapper.h"
 
+#include "EventSink.h"
 #include "EventSource.h"
 #include "InputDevice.h"
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-#include "VJoyDevice.h"
-#include "connections.h"
 
 namespace fredemmott::inputmapping {
 
 namespace {
-struct DeviceOffsets {
-  const off_t firstAxis;
-  const off_t firstHat;
-  const off_t firstButton;
-  DeviceOffsets(InputDevice* dev)
-    : firstAxis(0),
-      firstHat(firstAxis + (sizeof(long) * dev->getAxisCount())),
-      firstButton(firstHat + sizeof(int32_t) * dev->getHatCount()) {
-  }
-};
-
-struct DeviceState {
-  const long* const axes;
-  const bool* const buttons;
-  const int32_t* const hats;
-
-  DeviceState(const uint8_t* data, const DeviceOffsets& offsets)
-    : axes((long*)(data + offsets.firstAxis)),
-      buttons((bool*)(data + offsets.firstButton)),
-      hats((int32_t*)(data + offsets.firstHat)) {
-  }
-};
 
 HANDLE gExitEvent;
 BOOL WINAPI exit_event_handler(DWORD dwCtrlType) {
@@ -58,28 +33,14 @@ struct ActiveInstanceGuard {
 };
 }// namespace
 
-void Mapper::setEventSinks(const std::vector<std::shared_ptr<EventSink>>& sinks) {
+void Mapper::setEventSinks(
+  const std::vector<std::shared_ptr<EventSink>>& sinks) {
   mEventSinks = sinks;
 }
 
-void Mapper::setEventSources(const std::vector<std::shared_ptr<EventSource>>& sources) {
+void Mapper::setEventSources(
+  const std::vector<std::shared_ptr<EventSource>>& sources) {
   mEventSources = sources;
-}
-
-void Mapper::passthrough(MappableInput& s, const MappableVJoyOutput& t) {
-  s.XAxis >> t.XAxis;
-  s.YAxis >> t.YAxis;
-  s.ZAxis >> t.ZAxis;
-  s.RXAxis >> t.RXAxis;
-  s.RYAxis >> t.RYAxis;
-  s.RZAxis >> t.RZAxis;
-  s.Slider >> t.RZAxis;
-  for (int i = 1; i <= s.getButtonCount(); ++i) {
-    s.button(i) >> t.button(i);
-  }
-  for (int i = 1; i <= s.getHatCount(); ++i) {
-    s.hat(i) >> t.hat(i);
-  }
 }
 
 void Mapper::run() {

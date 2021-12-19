@@ -14,24 +14,16 @@
 #include <vector>
 
 namespace fredemmott::inputmapping {
-class InputDevice;
-}
-
-namespace fredemmott::inputmapping {
 class EventSink;
 class EventSource;
-class MappableInput;
-class MappableVJoyOutput;
-class OutputDevice;
 
 class Mapper {
  public:
   void setEventSinks(const std::vector<std::shared_ptr<EventSink>>& sinks);
-  void setEventSources(const std::vector<std::shared_ptr<EventSource>>& sources);
+  void setEventSources(
+    const std::vector<std::shared_ptr<EventSource>>& sources);
 
   void run();
-
-  void passthrough(MappableInput&, const MappableVJoyOutput&);
 
   static void inject(
     const std::chrono::steady_clock::duration& delay,

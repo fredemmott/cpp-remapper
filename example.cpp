@@ -17,8 +17,8 @@ int main() {
     VIGEM_DS4_PAD);
 
   // Copy all inputs to outputs
-  p->passthrough(throttle, vj1);
-  p->passthrough(stick, vj2);
+  throttle >> vj1;
+  stick >> vj2;
 
   // Copy axis to virtual gamepads: throttle and twist on left stick, stick xy
   // on right stick
@@ -30,6 +30,6 @@ int main() {
 
   // Test at least one button works :)
   stick.Button3 >> all(vj1.Button1, x360.ButtonA, ds4.ButtonCross);
-  p->run();
+  p.run();
   return 0;
 }
