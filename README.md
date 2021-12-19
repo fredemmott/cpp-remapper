@@ -94,6 +94,8 @@ auto [p, throttle, vj1] = create_profile(
 );
 ```
 
+This can be useful if you don't actually want to modify a device, but instead want to use it as a modifier for another device.
+
 # How do I use this with another device?
 
 Known devices are defined in [lib/devicedb.h](lib/devicedb.h). If your device
