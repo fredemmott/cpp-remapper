@@ -7,9 +7,17 @@
  */
 #pragma once
 
+#include "AxisCurve.h"
+#include "AxisToButtons.h"
+#include "AxisToHat.h"
+#include "ButtonToAxis.h"
+#include "CompositeSink.h"
 #include "EventLoop.h"
+#include "HatToButtons.h"
+#include "LatchedToMomentaryButton.h"
 #include "Profile.h"
-#include "actions.h"
+#include "ShortPressLongPress.h"
+#include "SquareDeadzone.h"
 #include "connections.h"
 #include "devicedb.h"
 
