@@ -261,7 +261,7 @@ void InputDevice::activate() {
   printf("----- DEBUG '%s' -----\n", name.c_str());
   printf(
     "  Counts: a: %d, b: %d, h: %d\n",
-    controls.axes.size(),
+    (int) controls.axes.size(),
     controls.buttons,
     controls.hats);
   printf(
