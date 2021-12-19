@@ -11,7 +11,6 @@
 
 namespace fredemmott::inputmapping {
 
-class OutputDevice : public EventSink {
-};
+class OutputDevice : public EventSink {};
 
 }// namespace fredemmott::inputmapping

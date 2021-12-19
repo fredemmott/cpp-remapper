@@ -13,10 +13,10 @@
 #include "lib/easymode.h"
 #include "lib/render_axis.h"
 
+using fredemmott::inputmapping::maybe_shared_ptr;
 using fredemmott::inputmapping::render_axis;
 using fredemmott::inputmapping::Sink;
 using fredemmott::inputmapping::Source;
-using fredemmott::inputmapping::maybe_shared_ptr;
 
 int main() {
   render_axis("linear.bmp", [](Axis::Value next) { return next; });

@@ -17,7 +17,7 @@ namespace fredemmott::inputmapping {
 
 class EventSource;
 
-class MappableInput final  {
+class MappableInput final {
  private:
   class Impl;
   std::shared_ptr<Impl> p;

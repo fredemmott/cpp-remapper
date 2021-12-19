@@ -44,25 +44,26 @@ const detail::ViGEmX360ID VIGEM_X360_PAD;
 const detail::ViGEmDS4ID VIGEM_DS4_PAD;
 
 class DeviceWithVisibility {
-  private:
-    DeviceSpecifier impl;
-  public:
-    explicit DeviceWithVisibility(const DeviceSpecifier& ds);
-    operator const DeviceSpecifier& () const;
+ private:
+  DeviceSpecifier impl;
+
+ public:
+  explicit DeviceWithVisibility(const DeviceSpecifier& ds);
+  operator const DeviceSpecifier&() const;
 };
 
 class UnhiddenDevice final : public DeviceWithVisibility {
-  public:
-    using DeviceWithVisibility::DeviceWithVisibility;
+ public:
+  using DeviceWithVisibility::DeviceWithVisibility;
 };
 
 class HiddenDevice final : public DeviceWithVisibility {
-  public:
-// clang-format off
+ public:
+  // clang-format off
     template<std::convertible_to<DeviceSpecifier> T>
     requires (!std::convertible_to<T, UnhiddenDevice>)
     HiddenDevice(const T& ds): DeviceWithVisibility(DeviceSpecifier(ds)) {}
-// clang-format on
+  // clang-format on
 };
 
 class Profile final {
@@ -132,7 +133,7 @@ void fill_hidden_ids(
   std::vector<HiddenDevice>& hidden_devices,
   const First& first,
   Rest... rest) {
-  if constexpr(std::convertible_to<First, HiddenDevice>) {
+  if constexpr (std::convertible_to<First, HiddenDevice>) {
     hidden_devices.push_back(first);
   }
 

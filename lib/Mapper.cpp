@@ -21,7 +21,7 @@ struct DeviceOffsets {
   const off_t firstAxis;
   const off_t firstHat;
   const off_t firstButton;
-  DeviceOffsets(InputDevice *dev)
+  DeviceOffsets(InputDevice* dev)
     : firstAxis(0),
       firstHat(firstAxis + (sizeof(long) * dev->getAxisCount())),
       firstButton(firstHat + sizeof(int32_t) * dev->getHatCount()) {
@@ -29,14 +29,14 @@ struct DeviceOffsets {
 };
 
 struct DeviceState {
-  const long *const axes;
-  const bool *const buttons;
-  const int32_t *const hats;
+  const long* const axes;
+  const bool* const buttons;
+  const int32_t* const hats;
 
-  DeviceState(const uint8_t *data, const DeviceOffsets &offsets)
-    : axes((long *)(data + offsets.firstAxis)),
-      buttons((bool *)(data + offsets.firstButton)),
-      hats((int32_t *)(data + offsets.firstHat)) {
+  DeviceState(const uint8_t* data, const DeviceOffsets& offsets)
+    : axes((long*)(data + offsets.firstAxis)),
+      buttons((bool*)(data + offsets.firstButton)),
+      hats((int32_t*)(data + offsets.firstHat)) {
   }
 };
 
@@ -46,10 +46,10 @@ BOOL WINAPI exit_event_handler(DWORD dwCtrlType) {
   return true;
 }
 
-Mapper *gActiveInstance = nullptr;
+Mapper* gActiveInstance = nullptr;
 
 struct ActiveInstanceGuard {
-  ActiveInstanceGuard(Mapper *active) {
+  ActiveInstanceGuard(Mapper* active) {
     gActiveInstance = active;
   }
   ~ActiveInstanceGuard() {
@@ -59,16 +59,16 @@ struct ActiveInstanceGuard {
 }// namespace
 
 void Mapper::setDevices(
-  const std::vector<MappableInput> &inputs,
-  const std::vector<std::shared_ptr<OutputDevice>> &outputs) {
-  for (const auto &input: inputs) {
+  const std::vector<MappableInput>& inputs,
+  const std::vector<std::shared_ptr<OutputDevice>>& outputs) {
+  for (const auto& input: inputs) {
     mEventSources.push_back(input.getEventSource());
   }
   mEventSinks
     = std::vector<std::shared_ptr<EventSink>>(outputs.begin(), outputs.end());
 }
 
-void Mapper::passthrough(MappableInput &s, const MappableVJoyOutput &t) {
+void Mapper::passthrough(MappableInput& s, const MappableVJoyOutput& t) {
   s.XAxis >> t.XAxis;
   s.YAxis >> t.YAxis;
   s.ZAxis >> t.ZAxis;
@@ -109,7 +109,7 @@ void Mapper::run() {
   std::vector<HANDLE> fixed_events {gExitEvent};
 
   std::map<HANDLE, std::shared_ptr<EventSource>> handle_to_source;
-  for (const auto &source: mEventSources) {
+  for (const auto& source: mEventSources) {
     auto handle = source->getHandle();
     fixed_events.push_back(handle);
     handle_to_source.insert({handle, source});
@@ -117,7 +117,7 @@ void Mapper::run() {
   printf("---\nProfile running, hit Ctrl-C to exit and clean up HidHide.\n");
   while (true) {
     auto events = fixed_events;
-    for (const auto &[event, _]: mInjected) {
+    for (const auto& [event, _]: mInjected) {
       events.push_back(event);
     }
     const auto res
@@ -150,7 +150,7 @@ void Mapper::run() {
 }
 
 void Mapper::flush() {
-  for (const auto &output: mEventSinks) {
+  for (const auto& output: mEventSinks) {
     output->flush();
   }
 }
@@ -163,18 +163,18 @@ typedef std::chrono::
 }
 
 void Mapper::inject(
-  const std::chrono::steady_clock::duration &delay,
-  const std::function<void()> &handler) {
+  const std::chrono::steady_clock::duration& delay,
+  const std::function<void()>& handler) {
   if (!gActiveInstance) {
     return;
   }
   int64_t target_time;
-  GetSystemTimeAsFileTime((FILETIME *)&target_time);
+  GetSystemTimeAsFileTime((FILETIME*)&target_time);
   target_time += std::chrono::duration_cast<FILETIME_RESOLUTION>(delay).count();
 
   auto timer = CreateWaitableTimer(nullptr, true, nullptr);
   SetWaitableTimer(
-    timer, (LARGE_INTEGER *)&target_time, 0, nullptr, nullptr, false);
+    timer, (LARGE_INTEGER*)&target_time, 0, nullptr, nullptr, false);
   gActiveInstance->mInjected.emplace(timer, handler);
 }
 }// namespace fredemmott::inputmapping

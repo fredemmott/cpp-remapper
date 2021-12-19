@@ -17,6 +17,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 ConstructorInitializerIndentWidth: '2'
 ContinuationIndentWidth: '2'
 DeriveLineEnding: false
+DerivePointerAlignment: false
 IndentRequires: true
 IndentWidth: '2'
 MaxEmptyLinesToKeep: '1'

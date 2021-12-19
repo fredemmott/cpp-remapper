@@ -99,52 +99,52 @@ long normalize_axis(long dx) {
 }
 }// namespace
 
-VJoyDevice *VJoyDevice::setXAxis(long value) {
+VJoyDevice* VJoyDevice::setXAxis(long value) {
   p->state.wAxisX = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setYAxis(long value) {
+VJoyDevice* VJoyDevice::setYAxis(long value) {
   p->state.wAxisY = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setZAxis(long value) {
+VJoyDevice* VJoyDevice::setZAxis(long value) {
   p->state.wAxisZ = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setRXAxis(long value) {
+VJoyDevice* VJoyDevice::setRXAxis(long value) {
   p->state.wAxisXRot = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setRYAxis(long value) {
+VJoyDevice* VJoyDevice::setRYAxis(long value) {
   p->state.wAxisYRot = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setRZAxis(long value) {
+VJoyDevice* VJoyDevice::setRZAxis(long value) {
   p->state.wAxisZRot = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setSlider(long value) {
+VJoyDevice* VJoyDevice::setSlider(long value) {
   p->state.wSlider = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setDial(long value) {
+VJoyDevice* VJoyDevice::setDial(long value) {
   p->state.wDial = normalize_axis(value);
   return this;
 }
 
-VJoyDevice *VJoyDevice::setButton(uint8_t button, bool value) {
+VJoyDevice* VJoyDevice::setButton(uint8_t button, bool value) {
   button--;
   off_t offset = button % 32;
   auto mask = 1 << offset;
 
-  LONG *data = nullptr;
+  LONG* data = nullptr;
   if (button < 32) {
     data = &p->state.lButtons;
   } else if (button < 64) {
@@ -165,7 +165,7 @@ VJoyDevice *VJoyDevice::setButton(uint8_t button, bool value) {
   return this;
 }
 
-VJoyDevice *VJoyDevice::setHat(uint8_t hat, uint16_t v) {
+VJoyDevice* VJoyDevice::setHat(uint8_t hat, uint16_t v) {
   const DWORD value = v == Hat::CENTER ? DWORD(-1) : v;
   switch (hat) {
     case 1:
