@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include "AnyOfButton.h"
 #include "AxisCurve.h"
 #include "AxisToButtons.h"
 #include "AxisToHat.h"

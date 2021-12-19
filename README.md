@@ -176,6 +176,11 @@ These can then be added to your code, as shown in `devicedb.h`.
 There are two ways to do more: defining an action, or using
 a lambda/function.
 
+Additionally, there are two helpers for combining/splitting controls:
+
+- `all(output1, output2[, ...])`: create a new output that copies its' input to all of the provided outputs.
+- `any(button1, button2[, ...])`: create a virtual button that is pressed when any of the specified buttons are pressed, and released when all are released. If multiple buttons are pressed, it will only emit 1 pressed event. This can be useful if a hat is exposed as multiple buttons, and you want to treat it as a single button.
+
 ## AxisCurve
 
 This applies an S-shaped curve to an axis.
