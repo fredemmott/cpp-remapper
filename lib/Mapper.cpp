@@ -61,8 +61,11 @@ struct ActiveInstanceGuard {
 void Mapper::setDevices(
   const std::vector<MappableInput> &inputs,
   const std::vector<std::shared_ptr<OutputDevice>> &outputs) {
-  mInputs = inputs;
-  mOutputs = outputs;
+  for (const auto &input: inputs) {
+    mEventSources.push_back(input.getEventSource());
+  }
+  mEventSinks
+    = std::vector<std::shared_ptr<EventSink>>(outputs.begin(), outputs.end());
 }
 
 void Mapper::passthrough(MappableInput &s, const MappableVJoyOutput &t) {
@@ -82,7 +85,7 @@ void Mapper::passthrough(MappableInput &s, const MappableVJoyOutput &t) {
 }
 
 void Mapper::run() {
-  if (mInputs.empty()) {
+  if (mEventSources.empty()) {
     printf(
       "---\n"
       "!!! WARNING !!!\n"
@@ -90,7 +93,7 @@ void Mapper::run() {
       "manually polled.\n"
       "---\n");
   }
-  if (mOutputs.empty()) {
+  if (mEventSinks.empty()) {
     printf(
       "---\n"
       "!!! WARNING !!!\n"
@@ -105,11 +108,11 @@ void Mapper::run() {
   SetConsoleCtrlHandler(&exit_event_handler, true);
   std::vector<HANDLE> fixed_events {gExitEvent};
 
-  std::map<HANDLE, MappableInput> devices;
-  for (const auto &input: mInputs) {
-    auto event = input.getEventSource()->getHandle();
-    fixed_events.push_back(event);
-    devices.insert({event, input});
+  std::map<HANDLE, std::shared_ptr<EventSource>> handle_to_source;
+  for (const auto &source: mEventSources) {
+    auto handle = source->getHandle();
+    fixed_events.push_back(handle);
+    handle_to_source.insert({handle, source});
   }
   printf("---\nProfile running, hit Ctrl-C to exit and clean up HidHide.\n");
   while (true) {
@@ -138,8 +141,8 @@ void Mapper::run() {
       continue;
     }
 
-    auto device = devices.at(event);
-    device.getEventSource()->poll();
+    auto source = handle_to_source.at(event);
+    source->poll();
     gActiveInstance = nullptr;
 
     flush();
@@ -147,7 +150,7 @@ void Mapper::run() {
 }
 
 void Mapper::flush() {
-  for (const auto &output: mOutputs) {
+  for (const auto &output: mEventSinks) {
     output->flush();
   }
 }

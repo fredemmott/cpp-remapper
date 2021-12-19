@@ -18,6 +18,8 @@ class InputDevice;
 }
 
 namespace fredemmott::inputmapping {
+class EventSink;
+class EventSource;
 class MappableInput;
 class MappableOutput;
 class MappableVJoyOutput;
@@ -39,8 +41,8 @@ class Mapper {
     const std::function<void()>& handler);
 
  private:
-  std::vector<MappableInput> mInputs;
-  std::vector<std::shared_ptr<OutputDevice>> mOutputs;
+  std::vector<std::shared_ptr<EventSource>> mEventSources;
+  std::vector<std::shared_ptr<EventSink>> mEventSinks;
   std::map<void*, std::function<void()>> mInjected;
 
   void flush();
