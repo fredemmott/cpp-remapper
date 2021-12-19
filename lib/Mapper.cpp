@@ -58,14 +58,12 @@ struct ActiveInstanceGuard {
 };
 }// namespace
 
-void Mapper::setDevices(
-  const std::vector<MappableInput>& inputs,
-  const std::vector<std::shared_ptr<OutputDevice>>& outputs) {
-  for (const auto& input: inputs) {
-    mEventSources.push_back(input.getEventSource());
-  }
-  mEventSinks
-    = std::vector<std::shared_ptr<EventSink>>(outputs.begin(), outputs.end());
+void Mapper::setEventSinks(const std::vector<std::shared_ptr<EventSink>>& sinks) {
+  mEventSinks = sinks;
+}
+
+void Mapper::setEventSources(const std::vector<std::shared_ptr<EventSource>>& sources) {
+  mEventSources = sources;
 }
 
 void Mapper::passthrough(MappableInput& s, const MappableVJoyOutput& t) {

@@ -19,6 +19,7 @@
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
 #include "Mapper.h"
+#include "OutputDevice.h"
 
 namespace fredemmott::inputmapping {
 
@@ -140,26 +141,28 @@ void fill_hidden_ids(
   fill_hidden_ids(hidden_devices, rest...);
 }
 
-using OutputPtr = std::shared_ptr<OutputDevice>;
-
-std::vector<OutputPtr> select_outputs();
+std::vector<std::shared_ptr<EventSink>> get_event_sinks();
 
 template <typename First, typename... Rest>
-std::vector<OutputPtr> select_outputs(const First& first, Rest... rest) {
-  auto ret = select_outputs(rest...);
+std::vector<std::shared_ptr<EventSink>> get_event_sinks(
+  const First& first,
+  Rest... rest) {
+  auto ret = get_event_sinks(rest...);
   if constexpr (std::derived_from<First, MappableOutput>) {
     ret.push_back(first.getDevice());
   }
   return ret;
 }
 
-std::vector<MappableInput> select_inputs();
+std::vector<std::shared_ptr<EventSource>> get_event_sources();
 
 template <typename First, typename... Rest>
-std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
-  auto ret = select_inputs(rest...);
+std::vector<std::shared_ptr<EventSource>> get_event_sources(
+  const First& first,
+  Rest... rest) {
+  auto ret = get_event_sources(rest...);
   if constexpr (std::convertible_to<First, MappableInput>) {
-    ret.push_back(first);
+    ret.push_back(first.getEventSource());
   }
   return ret;
 }
@@ -168,18 +171,20 @@ std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
 
 template <typename... Ts>
 auto create_profile(const DeviceSpecifier& first, Ts... rest) {
-  InputDeviceCollection device_collection;
   std::vector<HiddenDevice> input_ids;
   detail::fill_hidden_ids(input_ids, first, rest...);
+
   auto p = Profile(input_ids);
+
+  InputDeviceCollection device_collection;
   auto devices = detail::get_devices(&p, &device_collection, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
-  // an `std::function`, and we can't take a Ptrerence to a template function
-  p->setDevices(
-    std::apply(
-      [](auto&&... args) { return detail::select_inputs(args...); }, devices),
-    std::apply(
-      [](auto&&... args) { return detail::select_outputs(args...); }, devices));
+  // an `std::function`, and we can't take a reference to a template function
+  p->setEventSources(std::apply(
+    [](auto&&... args) { return detail::get_event_sources(args...); },
+    devices));
+  p->setEventSinks(std::apply(
+    [](auto&&... args) { return detail::get_event_sinks(args...); }, devices));
   return std::tuple_cat(std::make_tuple(std::move(p)), devices);
 }
 

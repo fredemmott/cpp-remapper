@@ -76,11 +76,11 @@ std::tuple<> get_devices(Profile*, InputDeviceCollection*) {
   return std::make_tuple();
 }
 
-std::vector<MappableInput> select_inputs() {
+std::vector<std::shared_ptr<EventSource>> get_event_sources() {
   return {};
 }
 
-std::vector<std::shared_ptr<OutputDevice>> select_outputs() {
+std::vector<std::shared_ptr<EventSink>> get_event_sinks() {
   return {};
 }
 

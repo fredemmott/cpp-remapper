@@ -21,17 +21,14 @@ namespace fredemmott::inputmapping {
 class EventSink;
 class EventSource;
 class MappableInput;
-class MappableOutput;
 class MappableVJoyOutput;
 class OutputDevice;
 
 class Mapper {
  public:
-  void setDevices(
-    const std::vector<MappableInput>& inputs,
-    const std::vector<std::shared_ptr<OutputDevice>>& outputs);
+  void setEventSinks(const std::vector<std::shared_ptr<EventSink>>& sinks);
+  void setEventSources(const std::vector<std::shared_ptr<EventSource>>& sources);
 
-  /// Call setDevices first
   void run();
 
   void passthrough(MappableInput&, const MappableVJoyOutput&);
