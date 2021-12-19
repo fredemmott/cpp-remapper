@@ -426,6 +426,8 @@ For example, you may want the same VJoy button for 'push to talk' on an A-10C th
 
 When picking a button, keep in mind that while most games and software support 32 joystick buttons, some supports 64, and some supports 128. For common utilities, it's generally best to select the highest button number that it supports - for example, if you are not currently using vjoy button 128, start with that, otherwise 127 etc. If 128 is otherwise unused but not recognized by your software, try 64 - and finally, button 32.
 
+If you fly multiple aircraft in DCS World, this can also be useful for 'UI layer' features; for example, you might want to bind 'vjoy 1 button 128' to 'recenter VR headset' in all profiles.
+
 ## Debugging
 
 ### Compilation errors
