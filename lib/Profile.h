@@ -43,9 +43,31 @@ const detail::VJoyID VJOY_1 {1}, VJOY_2 {2}, VJOY_3 {3}, VJOY_4 {4}, VJOY_5 {5},
 const detail::ViGEmX360ID VIGEM_X360_PAD;
 const detail::ViGEmDS4ID VIGEM_DS4_PAD;
 
+class DeviceWithVisibility {
+  private:
+    DeviceSpecifier impl;
+  public:
+    explicit DeviceWithVisibility(const DeviceSpecifier& ds);
+    operator const DeviceSpecifier& () const;
+};
+
+class UnhiddenDevice final : public DeviceWithVisibility {
+  public:
+    using DeviceWithVisibility::DeviceWithVisibility;
+};
+
+class HiddenDevice final : public DeviceWithVisibility {
+  public:
+// clang-format off
+    template<std::convertible_to<DeviceSpecifier> T>
+    requires (!std::convertible_to<T, UnhiddenDevice>)
+    HiddenDevice(const T& ds): DeviceWithVisibility(DeviceSpecifier(ds)) {}
+// clang-format on
+};
+
 class Profile final {
  public:
-  Profile(const std::vector<DeviceSpecifier>& ids);
+  Profile(const std::vector<HiddenDevice>& hidden_ids);
   Profile(Profile&& other);
   ~Profile();
   void operator=(const Profile&) = delete;
@@ -103,23 +125,18 @@ auto get_devices(
     std::make_tuple(MappableDS4Output()), get_devices(p, c, rest...));
 }
 
-void fill_input_ids(std::vector<DeviceSpecifier>&);
+void fill_hidden_ids(std::vector<HiddenDevice>&);
 
-template <typename... Rest>
-void fill_input_ids(
-  std::vector<DeviceSpecifier>& device_ids,
-  const OutputID&,
+template <typename First, typename... Rest>
+void fill_hidden_ids(
+  std::vector<HiddenDevice>& hidden_devices,
+  const First& first,
   Rest... rest) {
-  fill_input_ids(device_ids, rest...);
-}
+  if constexpr(std::convertible_to<First, HiddenDevice>) {
+    hidden_devices.push_back(first);
+  }
 
-template <typename... Rest>
-void fill_input_ids(
-  std::vector<DeviceSpecifier>& device_ids,
-  const DeviceSpecifier& first,
-  Rest... rest) {
-  device_ids.push_back(first);
-  fill_input_ids(device_ids, rest...);
+  fill_hidden_ids(hidden_devices, rest...);
 }
 
 using OutputPtr = std::shared_ptr<OutputDevice>;
@@ -151,8 +168,8 @@ std::vector<MappableInput> select_inputs(const First& first, Rest... rest) {
 template <typename... Ts>
 auto create_profile(const DeviceSpecifier& first, Ts... rest) {
   InputDeviceCollection device_collection;
-  std::vector<DeviceSpecifier> input_ids;
-  detail::fill_input_ids(input_ids, first, rest...);
+  std::vector<HiddenDevice> input_ids;
+  detail::fill_hidden_ids(input_ids, first, rest...);
   auto p = Profile(input_ids);
   auto devices = detail::get_devices(&p, &device_collection, first, rest...);
   // Lambda needed as the thing we're calling is a template: std::apply needs

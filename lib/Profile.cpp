@@ -24,8 +24,11 @@ struct Profile::Impl {
   std::unique_ptr<HidHide> guardian;
 };
 
-Profile::Profile(const std::vector<DeviceSpecifier>& ids)
-  : p(new Impl {std::make_unique<Mapper>(), std::make_unique<HidHide>(ids)}) {
+Profile::Profile(const std::vector<HiddenDevice>& ids)
+  : p(new Impl {
+    std::make_unique<Mapper>(),
+    std::make_unique<HidHide>(
+      std::vector<DeviceSpecifier>(ids.begin(), ids.end()))}) {
 }
 
 Profile::Profile(Profile&& moved) : p(std::move(moved.p)) {
@@ -36,6 +39,14 @@ Profile::~Profile() {
 
 Mapper* Profile::operator->() const {
   return p->mapper.get();
+}
+
+DeviceWithVisibility::DeviceWithVisibility(const DeviceSpecifier& ds)
+  : impl(ds) {
+}
+
+DeviceWithVisibility::operator const DeviceSpecifier&() const {
+  return impl;
 }
 
 }// namespace fredemmott::inputmapping
@@ -73,31 +84,7 @@ std::vector<std::shared_ptr<OutputDevice>> select_outputs() {
   return {};
 }
 
-void fill_input_ids(std::vector<DeviceSpecifier>&) {
+void fill_hidden_ids(std::vector<HiddenDevice>&) {
 }
+
 }// namespace fredemmott::inputmapping::detail
-
-#include "connections.h"
-#include "devicedb.h"
-
-namespace fredemmott::inputmapping {
-
-namespace {
-
-using namespace fredemmott::inputmapping::devicedb;
-
-void static_test_vjoy() {
-  auto [p, stick, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
-  stick.Button1 >> vj1.Button1;
-}
-
-void static_test_vigem() {
-  auto [p, stick, xpad, ds4]
-    = create_profile(VPC_RIGHT_WARBRD, VIGEM_X360_PAD, VIGEM_DS4_PAD);
-  stick.Button1 >> xpad.ButtonA;
-  stick.Button2 >> ds4.ButtonTriangle;
-}
-
-}// namespace
-
-}// namespace fredemmott::inputmapping
