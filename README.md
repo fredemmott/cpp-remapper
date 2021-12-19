@@ -83,24 +83,16 @@ int main() {
 
 The ViGEM client build currently requires Visual Studio 2019; `cpp-remapper` itself can be built with VS2019, clang, or VS2022.
 
-## Debugging
+# HidHide
 
-### Compilation errors
+By default, all input devices that are used will be hidden from other programs. You can override this by wrapping the device specifier in `UnhiddenDevice`:
 
-I strongly recommend installing
-[LLVM and Clang](https://github.com/llvm/llvm-project/releases/latest),
-and running `build.ps1 -Compiler clang`; both Clang and cl (Microsoft Visual
-C++'s compiler) are supported, however when there are issues, Clang gives
-much more detailed error messages than cl.
-
-### Runtime problems
-
-- Build with `build.ps1 -BuildMode Debug` to get a more
-  debuggable/less-optimized executable. If you are not using clang, ASAN will
-  be enabled.
-- Use your favorite debugger :) If you use VS Code, put your profile in profiles/,
-  open it, and run "Current Profile (Debug)" from the "Run and Debug" tab on the
-  left.
+```c++
+auto [p, throttle, vj1] = create_profile(
+  UnhiddenDevice(TM_WARTHOG_THROTTLE),
+  VJOY_1
+);
+```
 
 # How do I use this with another device?
 
@@ -412,6 +404,47 @@ hat values greater than 327.67 degrees. When testing your profile, use alternati
 - "Monitor vJoy"
 - "VPC Joystick Tester"
 - https://gamepad-tester.com for X360 outputs
+
+# Combining with programmable firmware (e.g. Virpil) or drivers (e.g. Thrustmaster TARGET)
+
+It is up to you how much you want to do in vendor software vs in C++. I prefer to do as much as possible in C++ to:
+- minimize the number of firmware reflashes
+- avoid tieing my profiles to a particular vendor more than necessary
+
+If you feel similarly, I recommend setting the vendor software/firmware to provide as much information as possible; if this causes problems with games, simplify it in C++. For example:
+- set any flip-up triggers, safeties, or other latching buttons so that the 'real' button press indicates their state; for example, 'safety on' = pressed, 'safety off' = unpressed. If the game only supports 'toggle safety on/off' (e.g. the flip-up trigger in DCS Ka-50), use `LatchedToMomentaryButton` instead of changing the firwmware.
+- set any hats either as true continuous (360-degree) hats, or 8-way hats.
+	 - use `HatToButtons` if you have a discrete hat, but software requries buttons
+	 - if the game requires a single button, use `any(HatButton1, HatButton2, ...) >> vjoy.Button123`
+	 - if hats support 8-way, it is easy to accidentally get to an 'unpressed' state - for example, if you're pushing North East, this will report as unpressed. If set as an 8-way button-based hat, borth 'North' and 'East' buttons should be reported as pressed.
+
+# Interacting with common utilities
+
+If you use utilities (e.g. VoiceAttack, SRS, TeamSpeak) with multiple devices and multiple profiles/games, it can be helpful to remap to a consistent VJoy device and button for every profile where you want to use that functionality.
+
+For example, you may want the same VJoy button for 'push to talk' on an A-10C throttle profile, and on a Ka-50 cyclic profile.
+
+When picking a button, keep in mind that while most games and software support 32 joystick buttons, some supports 64, and some supports 128. For common utilities, it's generally best to select the highest button number that it supports - for example, if you are not currently using vjoy button 128, start with that, otherwise 127 etc. If 128 is otherwise unused but not recognized by your software, try 64 - and finally, button 32.
+
+## Debugging
+
+### Compilation errors
+
+I strongly recommend installing
+[LLVM and Clang](https://github.com/llvm/llvm-project/releases/latest),
+and running `build.ps1 -Compiler clang`; both Clang and cl (Microsoft Visual
+C++'s compiler) are supported, however when there are issues, Clang gives
+much more detailed error messages than cl.
+
+### Runtime problems
+
+- Build with `build.ps1 -BuildMode Debug` to get a more
+  debuggable/less-optimized executable. If you are not using clang, ASAN will
+  be enabled.
+- Use your favorite debugger :) If you use VS Code, put your profile in profiles/,
+  open it, and run "Current Profile (Debug)" from the "Run and Debug" tab on the
+  left.
+
 
 # What support is available?
 
