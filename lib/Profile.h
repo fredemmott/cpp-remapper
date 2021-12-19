@@ -18,7 +18,7 @@
 #include "MappableOutput.h"
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
-#include "Mapper.h"
+#include "EventLoop.h"
 #include "OutputDevice.h"
 
 namespace fredemmott::inputmapping {
@@ -74,7 +74,7 @@ class Profile final {
   ~Profile();
   void operator=(const Profile&) = delete;
 
-  std::shared_ptr<Mapper> getEventLoop() const;
+  std::shared_ptr<EventLoop> getEventLoop() const;
   void run();
 
  private:

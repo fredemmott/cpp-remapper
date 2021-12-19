@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "Mapper.h"
+#include "EventLoop.h"
 
 #include "EventSink.h"
 #include "EventSource.h"
@@ -21,10 +21,10 @@ BOOL WINAPI exit_event_handler(DWORD dwCtrlType) {
   return true;
 }
 
-Mapper* gActiveInstance = nullptr;
+EventLoop* gActiveInstance = nullptr;
 
 struct ActiveInstanceGuard {
-  ActiveInstanceGuard(Mapper* active) {
+  ActiveInstanceGuard(EventLoop* active) {
     gActiveInstance = active;
   }
   ~ActiveInstanceGuard() {
@@ -33,17 +33,17 @@ struct ActiveInstanceGuard {
 };
 }// namespace
 
-void Mapper::setEventSinks(
+void EventLoop::setEventSinks(
   const std::vector<std::shared_ptr<EventSink>>& sinks) {
   mEventSinks = sinks;
 }
 
-void Mapper::setEventSources(
+void EventLoop::setEventSources(
   const std::vector<std::shared_ptr<EventSource>>& sources) {
   mEventSources = sources;
 }
 
-void Mapper::run() {
+void EventLoop::run() {
   if (mEventSources.empty()) {
     printf(
       "---\n"
@@ -108,7 +108,7 @@ void Mapper::run() {
   }
 }
 
-void Mapper::flush() {
+void EventLoop::flush() {
   for (const auto& output: mEventSinks) {
     output->flush();
   }
@@ -121,7 +121,7 @@ typedef std::chrono::
     FILETIME_RESOLUTION;
 }
 
-void Mapper::inject(
+void EventLoop::inject(
   const std::chrono::steady_clock::duration& delay,
   const std::function<void()>& handler) {
   if (!gActiveInstance) {
