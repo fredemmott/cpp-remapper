@@ -164,6 +164,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `ButtonToAxis`
 - `HatToButtons`
 - `LatchedToMomentaryButton`
+- `MomentaryToLatchedButton`
 - `ShortPressLongPress`
 - `SquareDeadzone`
 
@@ -294,6 +295,14 @@ Some games require a toggle on/off input instead of a continuous press - this al
 
 ```C++
 stick.Button1 >> LatchedToMomentaryButton() >> vj.Button1;
+```
+
+## MomentaryToLatchedButton
+
+Does the exact opposite of `LatchedToMomentaryButton`: it converts a short press into a toggle.
+
+```C++
+stick.Button1 >> MomentaryToLatchedButton() >> vj.Button1;
 ```
 
 ## ShortPressLongPress
