@@ -17,6 +17,9 @@ LatchedToMomentaryButton::LatchedToMomentaryButton(
   : mPressDuration(pressDuration) {
 }
 
+LatchedToMomentaryButton::~LatchedToMomentaryButton() {
+}
+
 void LatchedToMomentaryButton::map(Button::Value value) {
   emit(true);
   Clock::get()->setTimer(mPressDuration, [this]() { emit(false); });
