@@ -17,6 +17,7 @@
 #include "EventLoop.h"
 #include "HatToButtons.h"
 #include "LatchedToMomentaryButton.h"
+#include "MomentaryToLatchedButton.h"
 #include "Profile.h"
 #include "ShortPressLongPress.h"
 #include "SquareDeadzone.h"
