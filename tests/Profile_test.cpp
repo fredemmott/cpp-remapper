@@ -37,8 +37,10 @@ static void static_test_unhiddendevice() {
 
 TEST_CASE("TestFillHiddenIDs") {
   static_assert(std::convertible_to<decltype(VIDPID(0, 0)), DeviceSpecifier>);
-  static_assert(std::convertible_to<decltype(VIDPID(0, 0)), HiddenDevice>);
+  static_assert(!std::convertible_to<decltype(VIDPID(0, 0)), HiddenDevice>);
   static_assert(!std::convertible_to<decltype(VIDPID(0, 0)), UnhiddenDevice>);
+  static_assert(std::is_constructible_v<HiddenDevice, VIDPID>);
+  static_assert(!std::is_constructible_v<HiddenDevice, UnhiddenDevice>);
 
   std::vector<HiddenDevice> hidden;
   detail::fill_hidden_ids(

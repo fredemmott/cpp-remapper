@@ -10,12 +10,12 @@
 #include <algorithm>
 #include <cstdio>
 
+#include "EventLoop.h"
 #include "HidHide.h"
 #include "InputDevice.h"
 #include "InputDeviceCollection.h"
 #include "MappableInput.h"
 #include "MappableVJoyOutput.h"
-#include "EventLoop.h"
 #include "VJoyDevice.h"
 #include "connections.h"
 
@@ -27,11 +27,15 @@ struct Profile::Impl {
   std::unique_ptr<HidHide> guardian;
 };
 
-Profile::Profile(const std::vector<HiddenDevice>& ids)
-  : p(new Impl {
+Profile::Profile(const std::vector<HiddenDevice>& ids) : p(std::make_unique<Impl>()) {
+  std::vector<DeviceSpecifier> specifiers;
+  std::ranges::transform(ids, std::back_inserter(specifiers), [](auto it) {
+    return it.getSpecifier();
+  });
+  *p = {
     std::make_shared<EventLoop>(),
-    std::make_unique<HidHide>(
-      std::vector<DeviceSpecifier>(ids.begin(), ids.end()))}) {
+    std::make_unique<HidHide>(specifiers),
+  };
 }
 
 Profile::Profile(Profile&& moved) : p(std::move(moved.p)) {
@@ -52,7 +56,7 @@ DeviceWithVisibility::DeviceWithVisibility(const DeviceSpecifier& ds)
   : impl(ds) {
 }
 
-DeviceWithVisibility::operator const DeviceSpecifier&() const {
+DeviceSpecifier DeviceWithVisibility::getSpecifier() const {
   return impl;
 }
 

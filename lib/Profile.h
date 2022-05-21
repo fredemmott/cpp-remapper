@@ -12,13 +12,13 @@
 #include <vector>
 
 #include "DeviceSpecifier.h"
+#include "EventLoop.h"
 #include "InputDeviceCollection.h"
 #include "MappableDS4Output.h"
 #include "MappableInput.h"
 #include "MappableOutput.h"
 #include "MappableVJoyOutput.h"
 #include "MappableX360Output.h"
-#include "EventLoop.h"
 #include "OutputDevice.h"
 
 namespace fredemmott::inputmapping {
@@ -50,7 +50,7 @@ class DeviceWithVisibility {
 
  public:
   explicit DeviceWithVisibility(const DeviceSpecifier& ds);
-  operator const DeviceSpecifier&() const;
+  DeviceSpecifier getSpecifier() const;
 };
 
 class UnhiddenDevice final : public DeviceWithVisibility {
@@ -65,6 +65,7 @@ class HiddenDevice final : public DeviceWithVisibility {
     requires (!std::convertible_to<T, UnhiddenDevice>)
     explicit HiddenDevice(const T& ds): DeviceWithVisibility(DeviceSpecifier(ds)) {}
   // clang-format on
+  HiddenDevice(const UnhiddenDevice&) = delete;
 };
 
 class Profile final {
@@ -95,6 +96,16 @@ auto get_devices(
   const DeviceSpecifier& first,
   Ts... rest) {
   auto device = get_device(c, first);
+  return std::tuple_cat(std::make_tuple(device), get_devices(p, c, rest...));
+}
+
+template <typename... Ts>
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
+  const DeviceWithVisibility& first,
+  Ts... rest) {
+  auto device = get_device(c, first.getSpecifier());
   return std::tuple_cat(std::make_tuple(device), get_devices(p, c, rest...));
 }
 
@@ -136,8 +147,8 @@ void fill_hidden_ids(
   std::vector<HiddenDevice>& hidden_devices,
   const First& first,
   Rest... rest) {
-  if constexpr (std::convertible_to<First, HiddenDevice>) {
-    hidden_devices.push_back(first);
+  if constexpr (std::is_constructible_v<HiddenDevice, First>) {
+    hidden_devices.push_back(HiddenDevice {first});
   }
 
   fill_hidden_ids(hidden_devices, rest...);
@@ -172,14 +183,14 @@ std::vector<std::shared_ptr<EventSource>> get_event_sources(
 }// namespace detail
 
 template <typename... Ts>
-auto create_profile(const DeviceSpecifier& first, Ts... rest) {
+auto create_profile(Ts... specifiers) {
   std::vector<HiddenDevice> input_ids;
-  detail::fill_hidden_ids(input_ids, first, rest...);
+  detail::fill_hidden_ids(input_ids, specifiers...);
 
   auto p = Profile(input_ids);
 
   InputDeviceCollection device_collection;
-  auto devices = detail::get_devices(&p, &device_collection, first, rest...);
+  auto devices = detail::get_devices(&p, &device_collection, specifiers...);
   // Lambda needed as the thing we're calling is a template: std::apply needs
   // an `std::function`, and we can't take a reference to a template function
   auto event_loop = p.getEventLoop();
