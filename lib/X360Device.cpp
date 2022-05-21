@@ -54,9 +54,9 @@ void X360Device::flush() {
 
 X360Device* X360Device::setButton(Button button, bool value) {
   if (value) {
-    p->state.wButtons |= (USHORT)button;
+    p->state.wButtons |= static_cast<USHORT>(button);
   } else {
-    p->state.wButtons ^= (USHORT)button;
+    p->state.wButtons &= ~static_cast<USHORT>(button);
   }
   return this;
 }

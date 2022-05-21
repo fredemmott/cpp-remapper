@@ -55,18 +55,18 @@ void DS4Device::flush() {
 
 DS4Device* DS4Device::setButton(Button button, bool value) {
   if (value) {
-    p->state.wButtons |= (USHORT)button;
+    p->state.wButtons |= static_cast<USHORT>(button);
   } else {
-    p->state.wButtons ^= (USHORT)button;
+    p->state.wButtons &= ~static_cast<USHORT>(button);
   }
   return this;
 }
 
 DS4Device* DS4Device::setButton(SpecialButton button, bool value) {
   if (value) {
-    p->state.bSpecial |= (BYTE)button;
+    p->state.bSpecial |= static_cast<BYTE>(button);
   } else {
-    p->state.bSpecial ^= (BYTE)button;
+    p->state.bSpecial &= ~static_cast<BYTE>(button);
   }
   return this;
 }
