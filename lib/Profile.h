@@ -63,7 +63,7 @@ class HiddenDevice final : public DeviceWithVisibility {
   // clang-format off
     template<std::convertible_to<DeviceSpecifier> T>
     requires (!std::convertible_to<T, UnhiddenDevice>)
-    HiddenDevice(const T& ds): DeviceWithVisibility(DeviceSpecifier(ds)) {}
+    explicit HiddenDevice(const T& ds): DeviceWithVisibility(DeviceSpecifier(ds)) {}
   // clang-format on
 };
 
