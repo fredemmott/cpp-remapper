@@ -95,7 +95,7 @@ concept non_id_convertible_to_sink_ptr =
   && convertible_to_sink_ptr<T, TControl>;
 // clang-format on
 
-template <std::derived_from<Control> TControl>
+template <control TControl>
 class SinkPtr : public maybe_shared_ptr<Sink<TControl>> {
  public:
   using maybe_shared_ptr<Sink<TControl>>::maybe_shared_ptr;
