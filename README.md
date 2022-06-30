@@ -286,6 +286,19 @@ stick.Hat1 >> HatToButtons(
 );
 ```
 
+Finally, interpolation can be disabled so that buttons are only pressed when the
+hat is pointing *exactly* at them - for example, with an 8 way hat with 4 buttons,
+NE on the hat will not trigger N or E buttons:
+
+```C++
+stick.Hat1 >> HatToButtons(
+  HatToButtons::Interpolation::None,
+  vj.Button2,
+  vj.Button3,
+  vj.Button4,
+  vj.Button5);
+```
+
 ## LatchedToMomentaryButton
 
 Some controllers have buttons that 'latch' or maintain their state, such as toggle switches that stay in position, or

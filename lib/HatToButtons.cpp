@@ -44,12 +44,22 @@ void HatToButtons::map(Hat::Value value) {
   }
 
   const auto step = 36000 / mButtons.size();
+
+  if (mInterpolation == Interpolation::None) {
+    auto offset = 0;
+    for (auto i = 0; i < mButtons.size(); ++i) {
+      mButtons[i]->map(value == offset);
+      offset += step;
+    }
+    return;
+  }
+
   // Let's say we have 4 buttons: N, E, S, W
   // If the hat is at NE, we want both N and E on, so there's an area that's
   // "NE" - which goes half way from true NE to E - in another words, the N
   // button is pressed when the hat is between WNW and ENE, and covers 3/8ths
   // of the area
-  const auto range = (36000 * 3) / (mButtons.size() * 2);
+  const auto range = ((36000 * 3) / (mButtons.size() * 2));
   // first one is special, as North should be on for a bit both sides of 0
   auto offset = range / 2;
   mButtons[0]->map(value <= offset || value > 36000 - offset);

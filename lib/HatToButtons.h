@@ -19,11 +19,16 @@ namespace fredemmott::inputmapping {
 class MappableVJoyOutput;
 
 class HatToButtons final : public Sink<Hat> {
- private:
-  std::optional<ButtonSinkPtr> mCenter;
-  std::vector<ButtonSinkPtr> mButtons;
-
  public:
+  enum class Interpolation {
+    // divide range by number of buttons, only press button when hat is pointing
+    // *exactly* at it - e.g. 0 degrees == press button 1, 1 degree and 359 degrees
+    // == press nothing
+    None,
+    // fill the range, and interpolate. e.g. if there are 4 buttons, if hat is
+    // pointing North East, press both buttons 1 and 2
+    MultiPress,
+  };
   class CenterButton {
    private:
     ButtonSinkPtr mButton;
@@ -75,9 +80,19 @@ class HatToButtons final : public Sink<Hat> {
       convert_to_any_sink_ptr(std::forward<Rest>(rest))...};
   }
 
+  template <class... Rest>
+  HatToButtons(Interpolation interpolation, Rest&&... rest)
+    : HatToButtons(std::forward<Rest>(rest)...) {
+    mInterpolation = interpolation;
+  }
+
   virtual void map(Hat::Value value) override;
 
  private:
+  Interpolation mInterpolation = Interpolation::MultiPress;
+  std::optional<ButtonSinkPtr> mCenter;
+  std::vector<ButtonSinkPtr> mButtons;
+
   void assignToVJoy(MappableVJoyOutput* output, uint8_t first, uint8_t count);
 };
 

@@ -133,6 +133,31 @@ TEST_CASE("HatToButtons") {
     REQUIRE(!s);
     REQUIRE(!w);
   }
+
+  SECTION("Without Interpolation") {
+    hat >> HatToButtons(HatToButtons::Interpolation::None, &n, &e, &s, &w);
+    hat.emit(Hat::NORTH);
+    REQUIRE(n);
+    REQUIRE(!e);
+    REQUIRE(!s);
+    REQUIRE(!w);
+    hat.emit(Hat::NORTH + 1);
+    REQUIRE(!n);
+    REQUIRE(!e);
+    hat.emit(Hat::MAX - 1);
+    REQUIRE(!n);
+    REQUIRE(!w);
+    hat.emit(Hat::EAST);
+    REQUIRE(!n);
+    REQUIRE(!w);
+    REQUIRE(!s);
+    hat.emit(Hat::EAST - 1);
+    REQUIRE(!n);
+    REQUIRE(!e);
+    hat.emit(Hat::EAST + 1);
+    REQUIRE(!e);
+    REQUIRE(!s);
+  }
 }
 
 namespace {
