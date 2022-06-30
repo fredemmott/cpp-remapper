@@ -19,6 +19,7 @@
 #include "LatchedToMomentaryButton.h"
 #include "MomentaryToLatchedButton.h"
 #include "Profile.h"
+#include "Shift.h"
 #include "ShortPressLongPress.h"
 #include "SquareDeadzone.h"
 #include "connections.h"

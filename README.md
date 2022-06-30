@@ -165,6 +165,7 @@ These can then be added to your code, as shown in `devicedb.h`.
 - `HatToButtons`
 - `LatchedToMomentaryButton`
 - `MomentaryToLatchedButton`
+- `Shift`
 - `ShortPressLongPress`
 - `SquareDeadzone`
 
@@ -316,6 +317,20 @@ Does the exact opposite of `LatchedToMomentaryButton`: it converts a short press
 
 ```C++
 stick.Button1 >> MomentaryToLatchedButton() >> vj.Button1;
+```
+
+## Shift
+
+Switches between actions, depending on an on/off state:
+
+```C++
+bool shifted = false;
+stick.Button15 >> &shifted;
+stick.Button16 >> Shift {
+  &shifted,
+  /* normal behavior */ vj.Button1,
+  /* shifted behavior */ vj.Button2,
+};
 ```
 
 ## ShortPressLongPress
