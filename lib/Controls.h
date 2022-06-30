@@ -45,4 +45,8 @@ class Hat final : public Control {
   static const Value NORTH_WEST = 31500;
 };
 
+template <class T>
+concept control
+  = std::same_as<Axis, T> || std::same_as<Button, T> || std::same_as<Hat, T>;
+
 }// namespace fredemmott::inputmapping
