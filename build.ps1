@@ -147,7 +147,8 @@ function Invoke-Exe-Checked-Raw{
 }
 
 # Using vcvars[64].bat as Enter-VsDevShell does not reliably get an x64 environment
-$VSPATH=vswhere -property installationPath -version '16' -latest
+$VSPATH=vswhere -property installationPath -version '[16,17)' -latest
+echo $VSPATH
 $VCVars=New-TemporaryFile
 Invoke-Exe-Checked-Raw { cmd.exe /c "call `"$VSPATH\VC\Auxiliary\Build\$VCVarsBat`" && set > $VCVars" }
 
