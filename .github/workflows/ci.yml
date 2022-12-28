@@ -18,10 +18,10 @@ jobs:
           $CMakeArgs = @()
 
           if ("${{matrix.compiler}}" -eq "clang") {
-            $CMakeArgs += @("-T" "ClangCL")
+            $CMakeArgs += @("-T","ClangCL")
           }
           if ("${{matrix.platform}}" -eq "x86") {
-            $CMakeArgs += @("-A" "Win32")
+            $CMakeArgs += @("-A","Win32")
           }
           mkdir build
           cd build
