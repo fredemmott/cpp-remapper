@@ -5,7 +5,6 @@
 *.obj
 *.lib
 
-/third-party/vJoy/
 /profiles/
 vJoyInterface.dll
 /bin/

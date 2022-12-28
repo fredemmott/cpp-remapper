@@ -1,15 +1,24 @@
-add_library(
-  ThirdParty-VJoy
-  SHARED IMPORTED GLOBAL
-)
+include(FetchContent)
 
-set(VJoy_LIBDIR "${CMAKE_CURRENT_SOURCE_DIR}/vJoy/SDK/lib")
+FetchContent_Declare(
+  fcvjoysdk
+  URL "https://github.com/njz3/vJoy/releases/download/v2.2.1.1/vJoy-2.2.1.1-SDK.zip"
+  URL_HASH "SHA256=49afe972e4ecddde86736ccb17463095fb10faea484d40349b88d5e4f416398f"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+)
+FetchContent_MakeAvailable(fcvjoysdk)
+
+set(VJoy_LIBDIR "${fcvjoysdk_SOURCE_DIR}/lib")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(VJoy_LIBDIR "${VJoy_LIBDIR}/amd64")
 else()
   message(WARNING "Use 64-bit builds, it's 2022")
 endif()
+
+add_library(ThirdParty-VJoy SHARED IMPORTED GLOBAL)
 
 set_target_properties(
   ThirdParty-VJoy
@@ -21,6 +30,5 @@ set_target_properties(
 target_include_directories(
   ThirdParty-VJoy
   INTERFACE
-  "${CMAKE_CURRENT_SOURCE_DIR}/vJoy"
-  "${CMAKE_CURRENT_SOURCE_DIR}/vJoy/SDK/inc"
+  "${fcvjoysdk_SOURCE_DIR}/inc"
 )

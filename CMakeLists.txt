@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+cmake_policy(SET CMP0135 NEW)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 

@@ -16,11 +16,9 @@
 // clang-format off
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
-#include "SDK/inc/public.h"
-#include "SDK/inc/vjoyinterface.h"
+#include "public.h"
+#include "vjoyinterface.h"
 // clang-format on
-
-#pragma comment(lib, "vJoyInterface.lib")
 
 namespace fredemmott::inputmapping {
 namespace {
