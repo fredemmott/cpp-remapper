@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+add_compile_options(
+  "$<$<CONFIG:Debug>:/fsanitize=address>"
+)
+
 function(add_cppremapper_executable TARGET)
   add_executable(${TARGET} ${ARGN})
   target_link_libraries(
