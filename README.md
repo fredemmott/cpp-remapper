@@ -475,15 +475,14 @@ If you fly multiple aircraft in DCS World, this can also be useful for 'UI layer
 ### Compilation errors
 
 I strongly recommend building with clang instead of MSVC for debugging; clang gives much more detailed error messages for C++ templates and concepts:
-
 Either pass `-T ClangCL` to `cmake`, or use `build.ps1 -Clang -Config Debug`
 
 ### Runtime problems
 
-- Pass `-DASAN=ON` to CMake
 - Use your favorite debugger :) If you use VS Code, put your profile in profiles/,
   open it, and run "Current Profile (Debug)" from the "Run and Debug" tab on the
   left.
+- Make an MSVC Debug build with CMake, or use `build.ps1 -ConfigDebug`; ASAN is enabled in MSVC Debug builds.
 
 
 # What support is available?

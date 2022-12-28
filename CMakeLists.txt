@@ -12,10 +12,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # - Use ASAN for debug builds
 # - statically link to statically link the ASAN runtime
-add_compile_options(
-  "$<$<CONFIG:Debug>:/fsanitize=address>"
-  "$<$<CONFIG:Debug>:/MTd>"
-)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  add_compile_options(
+    "$<$<CONFIG:Debug>:/fsanitize=address>"
+    "$<$<CONFIG:Debug>:/MTd>"
+  )
+endif()
 
 function(add_cppremapper_executable TARGET)
   add_executable(${TARGET} ${ARGN})
