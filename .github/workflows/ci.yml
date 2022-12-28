@@ -25,6 +25,7 @@ jobs:
           }
           mkdir build
           cd build
+          Write-Output("Running: cmake .. @CMakeArgs")
           cmake .. @CMakeArgs
       - name: Build
         working-directory: build
