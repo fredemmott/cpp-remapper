@@ -8,14 +8,24 @@ jobs:
       fail-fast: false
       matrix:
         mode: [ RelWithDebInfo, Debug ]
+        compiler: [ cl, clang]
+        platform: [ x86, x64 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Configure
         run: |
+          $CMakeArgs = @()
+
+          if ($Compiler -eq clang) {
+            $CMakeArgs += @(-T ClangCL)
+          }
+          if ($Platform -eq x86) {
+            $CMakeArgs += @(-A Win32)
+          }
           mkdir build
           cd build
-          cmake ..
+          cmake .. @CMakeArgs
       - name: Build
         working-directory: build
         run: cmake --build . --config ${{matrix.mode}} --parallel
