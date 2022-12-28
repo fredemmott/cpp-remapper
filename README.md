@@ -470,7 +470,9 @@ If you fly multiple aircraft in DCS World, this can also be useful for 'UI layer
 
 ### Compilation errors
 
-I strongly recommend building with clang instead of MSVC for debugging; clang gives much more detailed error messages for C++ templates and concepts.
+I strongly recommend building with clang instead of MSVC for debugging; clang gives much more detailed error messages for C++ templates and concepts:
+
+Either pass `-T ClangCL` to `cmake`, or use `build.ps1 -Clang -Config Debug`
 
 ### Runtime problems
 
