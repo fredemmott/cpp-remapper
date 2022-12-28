@@ -1,0 +1,29 @@
+add_cppremapper_executable(
+  test
+  AnyOfButton_test.cpp
+  AxisCurve_test.cpp
+  AxisToButtons_test.cpp
+  AxisToHat_test.cpp
+  AxisTrimmer_test.cpp
+  ButtonToAxis_test.cpp
+  CompositeSink_test.cpp
+  FakeClock.cpp
+  FunctionSink_test.cpp
+  FunctionTransform_test.cpp
+  HatToButtons_test.cpp
+  LatchedToMomentaryButton_test.cpp
+  MomentaryToLatchedButton_test.cpp
+  Profile_test.cpp
+  Shift_test.cpp
+  ShortPressLongPress_test.cpp
+  SquareDeadzone_test.cpp
+  connections_test.cpp
+  test.cpp
+)
+
+target_link_libraries(
+  test
+  PRIVATE
+  ThirdParty-Catch2
+  LibCppRemapper
+)

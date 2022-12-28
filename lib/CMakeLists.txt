@@ -1,0 +1,49 @@
+add_library(
+  LibCppRemapper
+  STATIC
+  AnyOfButton.cpp
+  AxisCurve.cpp
+  AxisInformation.cpp
+  AxisToButtons.cpp
+  AxisToHat.cpp
+  AxisTrimmer.cpp
+  ButtonToAxis.cpp
+  Clock.cpp
+  DS4Device.cpp
+  DeviceSpecifier.cpp
+  EventLoop.cpp
+  EventSink.cpp
+  EventSource.cpp
+  HatToButtons.cpp
+  HidHide.cpp
+  InputDevice.cpp
+  InputDeviceCollection.cpp
+  LatchedToMomentaryButton.cpp
+  MappableDS4Output.cpp
+  MappableInput.cpp
+  MappableOutput.cpp
+  MappableVJoyOutput.cpp
+  MappableX360Output.cpp
+  MomentaryToLatchedButton.cpp
+  Percent.cpp
+  Profile.cpp
+  ShortPressLongPress.cpp
+  Source.cpp
+  SquareDeadzone.cpp
+  VJoyDevice.cpp
+  ViGEmClient.cpp
+  X360Device.cpp
+  connections.cpp
+  render_axis.cpp
+)
+target_link_libraries(
+  LibCppRemapper
+  PRIVATE
+  ThirdParty-ViGEmClient
+  ThirdParty-VJoy
+)
+target_include_directories(
+  LibCppRemapper
+  PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+)
