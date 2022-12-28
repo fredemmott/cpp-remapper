@@ -53,12 +53,8 @@ target_include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-install(
-  TARGETS
-  LibCppRemapper
-  LIBRARY
-)
-
+install(TARGETS LibCppRemapper LIBRARY)
+install(DIRECTORY include/cpp-remapper TYPE INCLUDE)
 add_library(LibCppRemapper-compat INTERFACE)
 target_link_libraries(LibCppRemapper-compat INTERFACE LibCppRemapper)
 target_include_directories(
