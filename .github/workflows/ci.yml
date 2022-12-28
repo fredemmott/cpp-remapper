@@ -16,7 +16,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -A ${{matrix.platform}
+          cmake .. -A ${{matrix.platform}}
       - name: Build
         working_directory: build
         run: cmake --build . --config ${{matrix.mode}} --parallel
