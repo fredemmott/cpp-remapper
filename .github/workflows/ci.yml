@@ -7,7 +7,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ Win32, Win64 ]
         mode: [ RelWithDebInfo, Debug ]
     steps:
       - name: Checkout
@@ -16,7 +15,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -A ${{matrix.platform}}
+          cmake ..
       - name: Build
         working-directory: build
         run: cmake --build . --config ${{matrix.mode}} --parallel
