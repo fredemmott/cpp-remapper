@@ -22,7 +22,7 @@ $CMakeArgs = @();
 
 if ($Clang) {
   $Compiler = "clang";
-  $CMakeArgs += @("-T ClangCL")
+  $CMakeArgs += @("-T", "ClangCL")
 }
 
 $BuildDir = "build/${Compiler}"
