@@ -18,10 +18,10 @@ jobs:
           cd build
           cmake .. -A ${{matrix.platform}}
       - name: Build
-        working_directory: build
+        working-directory: build
         run: cmake --build . --config ${{matrix.mode}} --parallel
       - name: Install
-        working_directory: build
+        working-directory: build
         run: cmake --install . --config ${{matrix.mode}} --prefix ${{runner.temp}}/install
       - name: Run tests
         working-directory: ${{runner.temp}}/install
