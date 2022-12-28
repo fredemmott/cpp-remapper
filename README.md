@@ -4,13 +4,17 @@ This project provides a concise API for remapping input devices (e.g.
 joysticks) in C++.
 
 It aims to:
-- use modern standard C++ wherever possible; C++20 is required.
+- use modern standard C++ wherever possible; C++20 is required
 - have minimum dependencies
 
 It integrates with:
 - vJoy for virtual DirectInput controllers
 - [ViGEmBus](https://github.com/ViGEm/ViGEmBus) for virtual XBox 360 and DualShock 4 controllers
 - [HidHide](https://github.com/ViGEm/HidHide) for automatically hiding remapped controllers from games
+
+# Requirements
+
+Visual Studio 2022 is required.
 
 # What does a profile look like?
 
