@@ -14,23 +14,43 @@ add_compile_options(
   "$<$<CONFIG:Debug>:/fsanitize=address>"
 )
 
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+#include <winrt/base.h>
+int main() { return 0; }"
+  CAN_INCLUDE_CPPWINRT)
+
+if(NOT CAN_INCLUDE_CPPWINRT)
+  add_compile_options("/await")
+  check_cxx_source_compiles("
+#include <winrt/base.h>
+int main() { return 0; }"
+    CAN_INCLUDE_CPPWINRT_WITH_AWAIT)
+
+  if(NOT CAN_INCLUDE_CPPWINRT_WITH_AWAIT)
+    message(FATAL_ERROR "Can't figure out build options for C++/Winrt")
+  endif()
+
+  message(WARNING "Using C++/WinRT from old Windows SDK; requires pre-C++20 coroutines (/await)")
+endif()
+
 function(add_cppremapper_executable TARGET)
   add_executable(${TARGET} ${ARGN})
   target_link_libraries(
-    "${TARGET}"
+    " ${TARGET} "
     PRIVATE
     LibCppRemapper
   )
   add_custom_command(
-    TARGET "${TARGET}"
+    TARGET " ${TARGET} "
     POST_BUILD
     COMMAND
-    "${CMAKE_COMMAND}"
+    " ${CMAKE_COMMAND} "
     -E copy
-    "$<TARGET_RUNTIME_DLLS:${TARGET}>"
-    "$<TARGET_FILE_DIR:${TARGET}>"
+    " $<TARGET_RUNTIME_DLLS:${TARGET}> "
+    " $<TARGET_FILE_DIR:${TARGET}> "
   )
-  install(TARGETS "${TARGET}")
+  install(TARGETS " ${TARGET} ")
 endfunction()
 
 add_subdirectory(third-party)
