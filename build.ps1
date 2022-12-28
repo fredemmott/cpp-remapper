@@ -46,9 +46,11 @@ if ($GuessIntentForIDE) {
   $IDEFile = $Profiles[0];
   if ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item profiles).FullName) {
     $Profiles = @($IDEFile)
-  } elseif ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEFile.endsWith('.cpp')) {
+  }
+  elseif ((Get-Item $IDEFile).Directory.FullName -eq (Get-Item .).FullName -and $IDEFile.endsWith('.cpp')) {
     $Profiles = $($IDEFile)
-  } else {
+  }
+  else {
     $Profiles = $AllProfiles
   }
 }
@@ -76,7 +78,7 @@ $CLFlags = @(
   "/DProjectDirLength=$((Get-Location).Path.Length)" # Needed by HidHideCli
 )
 
-switch($Platform) {
+switch ($Platform) {
   "x86" {
     $VCVarsBat = "vcvars32.bat"
     $ExeSuffix += "-x86"
@@ -95,7 +97,7 @@ switch($Platform) {
   }
 }
 
-switch($BuildMode) {
+switch ($BuildMode) {
   "Debug" {
     $CLFlags += @("/Zi", "/MTd")
     $LINKFlags += @("/DEBUG:FULL")
@@ -135,10 +137,10 @@ if ($ShowExeSuffix) {
   exit
 }
 
-$LibViGEmClient="third-party\ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
+$LibViGEmClient = "third-party\ViGEmClient\lib\$BuildMode\$Platform\ViGEmClient.lib"
 
 $ErrorActionPreference = "Stop"
-function Invoke-Exe-Checked-Raw{
+function Invoke-Exe-Checked-Raw {
   param ( [scriptblock] $Block )
   &$Block
   if ($LASTEXITCODE -ne 0) {
@@ -147,9 +149,9 @@ function Invoke-Exe-Checked-Raw{
 }
 
 # Using vcvars[64].bat as Enter-VsDevShell does not reliably get an x64 environment
-$VSPATH=vswhere -property installationPath -version '[16,17)' -latest
+$VSPATH = vswhere -property installationPath -version '[16,17)' -latest
 echo $VSPATH
-$VCVars=New-TemporaryFile
+$VCVars = New-TemporaryFile
 Invoke-Exe-Checked-Raw { cmd.exe /c "call `"$VSPATH\VC\Auxiliary\Build\$VCVarsBat`" && set > $VCVars" }
 
 # With MSVC Env
@@ -173,11 +175,11 @@ function Invoke-Exe-Checked {
 
 function Rebuild-If-Outdated {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Target,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string[]] $Sources,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [scriptblock] $Impl
   )
   if (Split-Path $Target -Parent) {
@@ -194,7 +196,7 @@ function Rebuild-If-Outdated {
     return
   }
 
-  $TargetMTime=$(Get-Item $Target).LastWriteTime
+  $TargetMTime = $(Get-Item $Target).LastWriteTime
   foreach ($Source in $Sources) {
     if (!(Test-Path $Source)) {
       &$Wrap
@@ -209,35 +211,36 @@ function Rebuild-If-Outdated {
   Write-Output "[$Target] Up to date."
 }
 
-function Get-Relative-Directory{
+function Get-Relative-Directory {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $FilePath
   )
-  $Directory=Split-Path $FilePath -Parent
+  $Directory = Split-Path $FilePath -Parent
   if ($Directory -eq $CWD -or $Directory -eq "") {
     return "";
-  } elseif ($Directory.ToLower().StartsWith("$CWD\".ToLower())) {
-     return $Directory.Substring($CWD.Length + 1) + "\";
   }
-  return $Directory+"\";
+  elseif ($Directory.ToLower().StartsWith("$CWD\".ToLower())) {
+    return $Directory.Substring($CWD.Length + 1) + "\";
+  }
+  return $Directory + "\";
 }
 
 function Get-Relative-Name {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $FilePath
   )
 
-  $Directory=(Get-Relative-Directory $FilePath)
+  $Directory = (Get-Relative-Directory $FilePath)
   return "$Directory$(Split-Path $FilePath -Leaf)"
 }
 
 function Swap-Extension {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Path,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $NewExtension
   )
   $File = (Get-Item $Path)
@@ -247,7 +250,7 @@ function Swap-Extension {
 
 function Get-Cpp-Obj-Name {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Cpp
   )
 
@@ -256,9 +259,9 @@ function Get-Cpp-Obj-Name {
 
 function Cpp-Obj-Rule {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Target,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Cpp
   )
 
@@ -283,9 +286,9 @@ function Cpp-Obj-Rule {
       $Str = $Str.Substring($Str.IndexOf(':') + 2);
       $Headers = (
         $Str `
-        -Replace " \\`r`n", "`r`n" `
-        -Replace "([^\\]) ", "`$1`r`n" `
-        -Replace "\\ ", " "
+          -Replace " \\`r`n", "`r`n" `
+          -Replace "([^\\]) ", "`$1`r`n" `
+          -Replace "\\ ", " "
       ).Trim() -Split "`r`n" | ForEach-Object { $_.Trim() }
     }
   }
@@ -305,17 +308,17 @@ function Cpp-Obj-Rule {
 
 function Cpp-StaticLib-Rule {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Target,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string[]] $Sources
   )
 
-  foreach($Source in $Sources) {
+  foreach ($Source in $Sources) {
     Cpp-Obj-Rule -Target (Get-Cpp-Obj-Name $Source) -Cpp $Source
   }
 
-  $Objs=$Sources | ForEach-Object { Get-Cpp-Obj-Name $_ }
+  $Objs = $Sources | ForEach-Object { Get-Cpp-Obj-Name $_ }
 
   Rebuild-If-Outdated -Target $Target -Sources $Objs -Impl {
     Write-Output "  LIB: ${Target}: $Objs "
@@ -325,9 +328,9 @@ function Cpp-StaticLib-Rule {
 
 function Objs-Exe-Rule {
   param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $Target,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string[]] $Objects
   )
 
@@ -340,7 +343,7 @@ function Objs-Exe-Rule {
   }
 
 }
-$ViGEmClientSources=(Get-ChildItem -Path third-party\ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
+$ViGEmClientSources = (Get-ChildItem -Path third-party\ViGEmClient -Recurse -File -Include @("*.cpp", "*.h")).FullName
 
 Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
   Write-Output "  MSBUILD: ViGEmClient ${BuildMode}_LIB"
@@ -350,11 +353,7 @@ Rebuild-If-Outdated -Target $LibViGEmClient -Sources $ViGEmClientSources -Impl {
 }
 
 $LibCppRemapper = Get-Relative-Name "$IntermediateDir\cpp-remapper.lib"
-$LibHidHide = Get-Relative-Name "$IntermediateDir\hidhide.lib"
 
-Cpp-StaticLib-Rule `
-  -Target $LibHidHide `
-  -Sources (Get-Item third-party/HidHideCLI/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
 Cpp-StaticLib-Rule `
   -Target $LibCppRemapper `
   -Sources (Get-Item lib/*.cpp | ForEach-Object { Get-Relative-Name $_.FullName })
@@ -364,14 +363,14 @@ if (!$Profiles) {
 }
 
 foreach ($ProfileSource in $Profiles) {
-  $ProfileObj=Get-Cpp-Obj-Name $ProfileSource
+  $ProfileObj = Get-Cpp-Obj-Name $ProfileSource
 
   Cpp-Obj-Rule -Target $ProfileObj -Cpp $ProfileSource
 
-  $Objs = @($ProfileObj, $LibCppRemapper, $LibHidHide, $LibViGEmClient)
+  $Objs = @($ProfileObj, $LibCppRemapper, $LibViGEmClient)
   if ((Get-Item $ProfileSource).FullName -eq (Get-Item test.cpp).FullName) {
     (Get-Item tests/*.cpp).FullName | ForEach-Object {
-      $Obj =Get-Cpp-Obj-Name $_
+      $Obj = Get-Cpp-Obj-Name $_
       Cpp-Obj-Rule -Target $Obj -Cpp $_
       $Objs += @($Obj)
     }

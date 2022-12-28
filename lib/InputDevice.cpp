@@ -7,9 +7,13 @@
  */
 #include "InputDevice.h"
 
-#include <Cfgmgr32.h>
+// clang-format off
+// Order here matters for devpkey to actually define the devpkeys :)
+#include <initguid.h>
 #include <devpkey.h>
-#include <initguid.h>// needed for devpkey to actually define the devpkeys :)
+// clang-format on
+
+#include <Cfgmgr32.h>
 #include <setupapi.h>
 
 #include "AxisInformation.h"

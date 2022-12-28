@@ -72,7 +72,19 @@
     "xstring": "cpp",
     "xutility": "cpp",
     "any": "cpp",
-    "*.rh": "cpp"
+    "*.rh": "cpp",
+    "codecvt": "cpp",
+    "condition_variable": "cpp",
+    "coroutine": "cpp",
+    "deque": "cpp",
+    "resumable": "cpp",
+    "future": "cpp",
+    "mutex": "cpp",
+    "numeric": "cpp",
+    "random": "cpp",
+    "regex": "cpp",
+    "stack": "cpp"
   },
-  "C_Cpp.default.cppStandard": "c++20"
+  "C_Cpp.default.cppStandard": "c++20",
+  "editor.formatOnSave": true
 }
