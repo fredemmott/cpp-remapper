@@ -20,5 +20,9 @@ jobs:
       - name: Build
         working_directory: build
         run: cmake --build . --config ${{matrix.mode}} --parallel
+      - name: Install
+        working_directory: build
+        run: cmake --install . --config ${{matrix.mode}} --prefix ${{runner.temp}}/install
       - name: Run tests
-        run: build/tests/${{matrix.config}}/test.exe
+        working-directory: ${{runner.temp}}/install
+        run: test.exe

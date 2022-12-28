@@ -32,3 +32,5 @@ target_include_directories(
   INTERFACE
   "${fcvjoysdk_SOURCE_DIR}/inc"
 )
+
+install(IMPORTED_RUNTIME_ARTIFACTS ThirdParty-VJoy)

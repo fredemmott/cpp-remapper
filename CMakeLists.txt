@@ -26,6 +26,7 @@ function(add_cppremapper_executable TARGET)
     "$<TARGET_RUNTIME_DLLS:${TARGET}>"
     "$<TARGET_FILE_DIR:${TARGET}>"
   )
+  install(TARGETS "${TARGET}")
 endfunction()
 
 add_subdirectory(third-party)
