@@ -10,7 +10,7 @@ jobs:
         mode: [ RelWithDebInfo, Debug ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Configure
         run: |
           mkdir build
