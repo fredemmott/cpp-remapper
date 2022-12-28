@@ -42,17 +42,22 @@ target_link_libraries(
   ThirdParty-ViGEmClient
   ThirdParty-VJoy
 )
+target_link_libraries(
+  LibCppRemapper
+  PUBLIC
+  ThirdParty-CppWinRT
+)
 target_include_directories(
   LibCppRemapper
   PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
-target_compile_options(
+
+install(
+  TARGETS
   LibCppRemapper
-  PRIVATE
-  /await:strict # C++20 standard-compliant
+  LIBRARY
 )
-install(TARGETS LibCppRemapper)
 
 add_library(LibCppRemapper-compat INTERFACE)
 target_link_libraries(LibCppRemapper-compat INTERFACE LibCppRemapper)
