@@ -7,42 +7,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ x86, x64 ]
-        mode: [ Release, Debug ]
-        compiler: [ clang, cl ]
-        exclude:
-          - compiler: clang
-            platform: x86
+        platform: [ Win32, Win64 ]
+        mode: [ RelWithDebInfo, Debug ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Fetch vJoy SDK
+      - name: Configure
         run: |
-          Invoke-WebRequest `
-            "https://github.com/njz3/vJoy/releases/download/v2.2.1.1/vJoy-2.2.1.1-SDK.zip" `
-            -Out vJoy-SDK.zip
-      - name: Extract vJoy SDK
-        run: |
-          Expand-Archive vJoy-SDK.zip third-party\vJoy
-          if (!(Test-Path bin)) {
-            mkdir bin
-          }
-          if ( "${{matrix.platform}}" -eq "x64" ) {
-            cp third-party\vJoy\SDK\lib\amd64\vJoyInterface.dll bin\
-          } else {
-            cp third-party\vJoy\SDK\lib\vJoyInterface.dll bin\
-          }
+          mkdir build
+          cd build
+          cmake .. -A ${{matrix.platform}
       - name: Build
-        run: |
-          .\build.ps1 all `
-            -BuildMode ${{matrix.mode}} `
-            -Platform ${{matrix.platform}} `
-            -Compiler ${{matrix.compiler}}
+        working_directory: build
+        run: cmake --build . --config ${{matrix.mode}} --parallel
       - name: Run tests
-        run: |
-          $ExeSuffix = .\build.ps1 all `
-            -BuildMode ${{matrix.mode}} `
-            -Platform ${{matrix.platform}} `
-            -Compiler ${{matrix.compiler}} `
-            -ShowExeSuffix
-          & .\bin\test${ExeSuffix}.exe
+        run: build/tests/${{matrix.config}}/test.exe
