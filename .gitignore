@@ -12,3 +12,4 @@ vJoyInterface.dll
 *.bmp
 *.exp
 /build/
+/out/

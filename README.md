@@ -15,7 +15,7 @@ It integrates with:
 # What does a profile look like?
 
 ``` C++
-#include "easymode.h"
+#include <cpp-remapper/easymode.h>
 
 int main() {
   auto [p, throttle, stick, vj1, vj2, x360, ds4] = create_profile(
@@ -71,17 +71,16 @@ int main() {
 
 # How do I use this?
 
-1. Download the vJoy SDK - the version must exactly match the version of vJoy
-   you're using. As of 2020-12-18, the most recent version appears to be
-   available from https://github.com/njz3/vJoy/
-2. Extract it to the `third-party/vJoy` directory so you have an `third-party/vJoy/SDK/` subdirectory
-3. Copy the `vJoyInterface.dll` from the SDK directory to the `bin/` subdirectory
-4. Install Visual Studio 2019 and `vswhere`
-5. Open a terminal
-6. `./build.ps1 example.cpp`
-7. Run `bin/example.exe`
+If you're familiar with CMake, it's best to:
+- use `FetchContent`
+- use `add_cppremapper_executable()` instead of `add_executable()`
 
-The ViGEM client build currently requires Visual Studio 2019; `cpp-remapper` itself can be built with VS2019, clang, or VS2022.
+Alternatively, put your profiles in a `profiles/` subdirectory, then:
+
+```
+PS > build.ps1
+PS > out\bin\MYPROFILE.exe
+```
 
 # HidHide
 
@@ -103,8 +102,8 @@ isn't listed there, you'll need it's ID; build `list-devices.exe` like the
 example above:
 
 ```
-PS > ./build.ps1 list-devices.cpp
-PS > ./list-devices
+PS > build.ps1
+PS > out\bin\list-devices
 "vJoy Device"
   Axes: 9
   Buttons: 64
@@ -415,7 +414,7 @@ If you want to press-and-release a button, or do multiple actions over time, you
 must set a timer:
 
 ```C++
-#include "Clock.h"
+#include <cpp-remapper/Clock.h>
 #include <chrono>
 
 void MyAction::map(bool value) {
@@ -453,9 +452,9 @@ It is up to you how much you want to do in vendor software vs in C++. I prefer t
 If you feel similarly, I recommend setting the vendor software/firmware to provide as much information as possible; if this causes problems with games, simplify it in C++. For example:
 - set any flip-up triggers, safeties, or other latching buttons so that the 'real' button press indicates their state; for example, 'safety on' = pressed, 'safety off' = unpressed. If the game only supports 'toggle safety on/off' (e.g. the flip-up trigger in DCS Ka-50), use `LatchedToMomentaryButton` instead of changing the firwmware.
 - set any hats either as true continuous (360-degree) hats, or 8-way hats.
-	 - use `HatToButtons` if you have a discrete hat, but software requries buttons
-	 - if the game requires a single button, use `any(HatButton1, HatButton2, ...) >> vjoy.Button123`
-	 - if hats support 8-way, it is easy to accidentally get to an 'unpressed' state - for example, if you're pushing North East, this will report as unpressed. If set as an 8-way button-based hat, borth 'North' and 'East' buttons should be reported as pressed.
+   - use `HatToButtons` if you have a discrete hat, but software requries buttons
+   - if the game requires a single button, use `any(HatButton1, HatButton2, ...) >> vjoy.Button123`
+   - if hats support 8-way, it is easy to accidentally get to an 'unpressed' state - for example, if you're pushing North East, this will report as unpressed. If set as an 8-way button-based hat, borth 'North' and 'East' buttons should be reported as pressed.
 
 # Interacting with common utilities
 
@@ -471,17 +470,11 @@ If you fly multiple aircraft in DCS World, this can also be useful for 'UI layer
 
 ### Compilation errors
 
-I strongly recommend installing
-[LLVM and Clang](https://github.com/llvm/llvm-project/releases/latest),
-and running `build.ps1 -Compiler clang`; both Clang and cl (Microsoft Visual
-C++'s compiler) are supported, however when there are issues, Clang gives
-much more detailed error messages than cl.
+I strongly recommend building with clang instead of MSVC for debugging; clang gives much more detailed error messages for C++ templates and concepts.
 
 ### Runtime problems
 
-- Build with `build.ps1 -BuildMode Debug` to get a more
-  debuggable/less-optimized executable. If you are not using clang, ASAN will
-  be enabled.
+- Pass `-DASAN=ON` to CMake
 - Use your favorite debugger :) If you use VS Code, put your profile in profiles/,
   open it, and run "Current Profile (Debug)" from the "Run and Debug" tab on the
   left.
