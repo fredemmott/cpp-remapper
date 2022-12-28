@@ -6,15 +6,15 @@
  * in the root directory of this source tree.
  */
 
-#include "connections.h"
+#include <cpp-remapper/connections.h>
 
 #include <concepts>
 
-#include "AxisCurve.h"
-#include "AxisToButtons.h"
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-#include "SquareDeadzone.h"
+#include <cpp-remapper/AxisCurve.h>
+#include <cpp-remapper/AxisToButtons.h>
+#include <cpp-remapper/MappableInput.h>
+#include <cpp-remapper/MappableVJoyOutput.h>
+#include <cpp-remapper/SquareDeadzone.h>
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

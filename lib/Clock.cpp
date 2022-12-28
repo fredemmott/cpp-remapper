@@ -5,9 +5,9 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "Clock.h"
+#include <cpp-remapper/Clock.h>
 
-#include "EventLoop.h"
+#include <cpp-remapper/EventLoop.h>
 
 namespace fredemmott::inputmapping {
 

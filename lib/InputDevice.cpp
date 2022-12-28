@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "InputDevice.h"
+#include <cpp-remapper/InputDevice.h>
 
 // clang-format off
 // Order here matters for devpkey to actually define the devpkeys :)
@@ -16,7 +16,7 @@
 #include <Cfgmgr32.h>
 #include <setupapi.h>
 
-#include "AxisInformation.h"
+#include <cpp-remapper/AxisInformation.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")

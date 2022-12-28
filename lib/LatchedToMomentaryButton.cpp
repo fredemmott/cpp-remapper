@@ -6,9 +6,9 @@
  * in the root directory of this source tree.
  */
 
-#include "LatchedToMomentaryButton.h"
+#include <cpp-remapper/LatchedToMomentaryButton.h>
 
-#include "Clock.h"
+#include <cpp-remapper/Clock.h>
 
 namespace fredemmott::inputmapping {
 

@@ -5,19 +5,19 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "VJoyDevice.h"
+#include <cpp-remapper/Controls.h>
+#include <cpp-remapper/VJoyDevice.h>
 
 #include <cassert>
 #include <cstdio>
 #include <stdexcept>
 
-#include "Controls.h"
-
 // clang-format off
 #define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#include "public.h"
-#include "vjoyinterface.h"
+#include <windows.h>
+// vjoy:
+#include <public.h>
+#include <vjoyinterface.h>
 // clang-format on
 
 namespace fredemmott::inputmapping {

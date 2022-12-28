@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "LatchedToMomentaryButton.h"
+#include <cpp-remapper/LatchedToMomentaryButton.h>
 
 #include "FakeClock.h"
 #include "tests.h"

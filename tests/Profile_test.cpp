@@ -6,11 +6,11 @@
  * in the root directory of this source tree.
  */
 
-#include "Profile.h"
+#include <cpp-remapper/OutputDevice.h>
+#include <cpp-remapper/Profile.h>
+#include <cpp-remapper/connections.h>
+#include <cpp-remapper/devicedb.h>
 
-#include "OutputDevice.h"
-#include "connections.h"
-#include "devicedb.h"
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

@@ -7,4 +7,4 @@
  */
 
 // This file exists just to give clear compile errors
-#include "AxisInformation.h"
+#include <cpp-remapper/AxisInformation.h>

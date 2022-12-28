@@ -5,12 +5,12 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "X360Device.h"
+#include <cpp-remapper/X360Device.h>
 
 #include <iostream>
 
-#include "ViGEmClient.h"
-#include "ViGEmTarget.h"
+#include <cpp-remapper/ViGEmClient.h>
+#include <cpp-remapper/ViGEmTarget.h>
 
 namespace fredemmott::inputmapping {
 

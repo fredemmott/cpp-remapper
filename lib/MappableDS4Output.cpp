@@ -5,11 +5,11 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "MappableDS4Output.h"
+#include <cpp-remapper/MappableDS4Output.h>
 
-#include "AxisInformation.h"
-#include "DS4Device.h"
-#include "InputDevice.h"
+#include <cpp-remapper/AxisInformation.h>
+#include <cpp-remapper/DS4Device.h>
+#include <cpp-remapper/InputDevice.h>
 
 namespace fredemmott::inputmapping {
 

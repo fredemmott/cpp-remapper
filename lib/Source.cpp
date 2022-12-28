@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "Source.h"
+#include <cpp-remapper/Source.h>
 
 namespace fredemmott::inputmapping {
 

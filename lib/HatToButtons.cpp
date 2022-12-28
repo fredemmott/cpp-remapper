@@ -6,9 +6,8 @@
  * in the root directory of this source tree.
  */
 
-#include "HatToButtons.h"
-
-#include "MappableVJoyOutput.h"
+#include <cpp-remapper/HatToButtons.h>
+#include <cpp-remapper/MappableVJoyOutput.h>
 
 namespace fredemmott::inputmapping {
 

@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "ButtonToAxis.h"
+#include <cpp-remapper/ButtonToAxis.h>
 
 namespace fredemmott::inputmapping {
 

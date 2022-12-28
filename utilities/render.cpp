@@ -9,9 +9,9 @@
 // This file is an executable, intended to generate illustrative diagrams
 // of some basic axis mapping operations
 
-#include "AxisCurve.h"
-#include "easymode.h"
-#include "render_axis.h"
+#include <cpp-remapper/AxisCurve.h>
+#include <cpp-remapper/easymode.h>
+#include <cpp-remapper/render_axis.h>
 
 using fredemmott::inputmapping::maybe_shared_ptr;
 using fredemmott::inputmapping::render_axis;

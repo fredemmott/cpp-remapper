@@ -6,9 +6,9 @@
  * in the root directory of this source tree.
  */
 
-#include "Shift.h"
+#include <cpp-remapper/Shift.h>
 
-#include "MappableVJoyOutput.h"
+#include <cpp-remapper/MappableVJoyOutput.h>
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

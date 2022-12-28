@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "Clock.h"
+#include <cpp-remapper/Clock.h>
 #include <map>
 
 namespace fredemmott::inputmapping {

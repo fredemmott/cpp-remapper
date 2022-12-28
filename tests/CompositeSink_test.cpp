@@ -6,11 +6,11 @@
  * in the root directory of this source tree.
  */
 
-#include "CompositeSink.h"
+#include <cpp-remapper/CompositeSink.h>
 
-#include "MappableVJoyOutput.h"
-#include "SquareDeadzone.h"
-#include "connections.h"
+#include <cpp-remapper/MappableVJoyOutput.h>
+#include <cpp-remapper/SquareDeadzone.h>
+#include <cpp-remapper/connections.h>
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

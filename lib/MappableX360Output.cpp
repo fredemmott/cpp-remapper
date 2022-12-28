@@ -5,11 +5,11 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "MappableX360Output.h"
+#include <cpp-remapper/MappableX360Output.h>
 
-#include "AxisInformation.h"
-#include "InputDevice.h"
-#include "X360Device.h"
+#include <cpp-remapper/AxisInformation.h>
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/X360Device.h>
 
 namespace fredemmott::inputmapping {
 

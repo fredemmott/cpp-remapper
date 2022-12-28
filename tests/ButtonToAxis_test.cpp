@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "ButtonToAxis.h"
+#include <cpp-remapper/ButtonToAxis.h>
 
 #include "tests.h"
 

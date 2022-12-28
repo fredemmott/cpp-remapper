@@ -45,6 +45,14 @@ target_link_libraries(
 target_include_directories(
   LibCppRemapper
   PUBLIC
-  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 install(TARGETS LibCppRemapper)
+
+add_library(LibCppRemapper-compat INTERFACE)
+target_link_libraries(LibCppRemapper-compat INTERFACE LibCppRemapper)
+target_include_directories(
+  LibCppRemapper-compat
+  INTERFACE
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/cpp-remapper"
+)

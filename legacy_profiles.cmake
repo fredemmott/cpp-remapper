@@ -23,4 +23,5 @@ foreach(PROFILE_SOURCE IN LISTS LEGACY_PROFILES)
     PROPERTIES
     OUTPUT_NAME "${PROFILE_NAME}"
   )
+  target_link_libraries("${TARGET}" PRIVATE LibCppRemapper-compat)
 endforeach()

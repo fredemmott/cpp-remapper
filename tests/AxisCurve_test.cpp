@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "AxisCurve.h"
+#include <cpp-remapper/AxisCurve.h>
 
 #include "tests.h"
 

@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 #define _NO_MIN_MAX
-#include "SquareDeadzone.h"
+#include <cpp-remapper/SquareDeadzone.h>
 
 namespace fredemmott::inputmapping {
 

@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "AxisToHat.h"
+#include <cpp-remapper/AxisToHat.h>
 
 #include "tests.h"
 

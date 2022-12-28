@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "AxisTrimmer.h"
+#include <cpp-remapper/AxisTrimmer.h>
 
 #include "tests.h"
 

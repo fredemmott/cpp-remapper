@@ -5,11 +5,11 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "MappableVJoyOutput.h"
+#include <cpp-remapper/MappableVJoyOutput.h>
 
-#include "AxisInformation.h"
-#include "InputDevice.h"
-#include "VJoyDevice.h"
+#include <cpp-remapper/AxisInformation.h>
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/VJoyDevice.h>
 
 namespace fredemmott::inputmapping {
 

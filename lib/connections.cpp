@@ -5,10 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "connections.h"
+#include <cpp-remapper/connections.h>
 
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
+#include <cpp-remapper/MappableInput.h>
+#include <cpp-remapper/MappableVJoyOutput.h>
 
 namespace fredemmott::inputmapping {
 

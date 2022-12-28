@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "SquareDeadzone.h"
+#include <cpp-remapper/SquareDeadzone.h>
 
 #include "tests.h"
 

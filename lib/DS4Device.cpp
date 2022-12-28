@@ -5,13 +5,12 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "DS4Device.h"
+#include <cpp-remapper/Controls.h>
+#include <cpp-remapper/DS4Device.h>
+#include <cpp-remapper/ViGEmClient.h>
+#include <cpp-remapper/ViGEmTarget.h>
 
 #include <iostream>
-
-#include "Controls.h"
-#include "ViGEmClient.h"
-#include "ViGEmTarget.h"
 
 namespace fredemmott::inputmapping {
 

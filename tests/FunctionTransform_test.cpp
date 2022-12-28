@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "FunctionTransform.h"
+#include <cpp-remapper/FunctionTransform.h>
 
 #include "tests.h"
 

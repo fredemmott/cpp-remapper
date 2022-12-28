@@ -7,7 +7,7 @@
  */
 
 #define _USE_MATH_DEFINES
-#include "AxisToHat.h"
+#include <cpp-remapper/AxisToHat.h>
 
 #include <cmath>
 

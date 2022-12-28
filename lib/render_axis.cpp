@@ -6,11 +6,11 @@
  * in the root directory of this source tree.
  */
 
-#include "render_axis.h"
+#include <cpp-remapper/render_axis.h>
 
 #include <fstream>
 
-#include "connections.h"
+#include <cpp-remapper/connections.h>
 
 using std::ios;
 using std::ofstream;

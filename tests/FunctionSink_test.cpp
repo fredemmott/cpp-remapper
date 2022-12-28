@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "FunctionSink.h"
+#include <cpp-remapper/FunctionSink.h>
 
 #include "tests.h"
 

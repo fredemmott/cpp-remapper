@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "AnyOfButton.h"
+#include <cpp-remapper/AnyOfButton.h>
 
 namespace fredemmott::inputmapping {
 

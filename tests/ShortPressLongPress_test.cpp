@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "ShortPressLongPress.h"
+#include <cpp-remapper/ShortPressLongPress.h>
 
 #include "FakeClock.h"
 #include "tests.h"

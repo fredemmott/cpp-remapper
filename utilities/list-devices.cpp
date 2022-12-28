@@ -5,10 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include <cstdio>
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/InputDeviceCollection.h>
 
-#include "InputDevice.h"
-#include "InputDeviceCollection.h"
+#include <cstdio>
 
 int main() {
   fredemmott::inputmapping::InputDeviceCollection idc;

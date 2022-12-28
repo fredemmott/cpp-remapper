@@ -6,7 +6,7 @@
  * in the root directory of this source tree.
  */
 
-#include "MappableOutput.h"
+#include <cpp-remapper/MappableOutput.h>
 
 namespace fredemmott::inputmapping {
 

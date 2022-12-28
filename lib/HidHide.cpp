@@ -5,7 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "HidHide.h"
+#include <cpp-remapper/HidHide.h>
 
 #include <Windows.h>
 #include <winioctl.h>
@@ -16,8 +16,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "InputDevice.h"
-#include "InputDeviceCollection.h"
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/InputDeviceCollection.h>
 
 #pragma comment(lib, "Ole32")
 #pragma comment(lib, "WindowsApp")

@@ -6,10 +6,10 @@
  * in the root directory of this source tree.
  */
 
-#include "AxisToButtons.h"
+#include <cpp-remapper/AxisToButtons.h>
 
-#include "CompositeSink.h"
-#include "MappableVJoyOutput.h"
+#include <cpp-remapper/CompositeSink.h>
+#include <cpp-remapper/MappableVJoyOutput.h>
 #include "tests.h"
 
 using namespace fredemmott::inputmapping;

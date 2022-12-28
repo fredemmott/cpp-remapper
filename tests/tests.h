@@ -9,8 +9,8 @@
 
 #include <catch.hpp>
 
-#include "Source.h"
-#include "connections.h"
+#include <cpp-remapper/Source.h>
+#include <cpp-remapper/connections.h>
 
 namespace fredemmott::inputmapping {
 

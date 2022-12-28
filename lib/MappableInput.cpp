@@ -5,11 +5,11 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "MappableInput.h"
+#include <cpp-remapper/MappableInput.h>
 
-#include "AxisInformation.h"
-#include "EventSource.h"
-#include "InputDevice.h"
+#include <cpp-remapper/AxisInformation.h>
+#include <cpp-remapper/EventSource.h>
+#include <cpp-remapper/InputDevice.h>
 
 namespace fredemmott::inputmapping {
 

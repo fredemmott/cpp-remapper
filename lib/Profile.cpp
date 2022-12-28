@@ -5,19 +5,19 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include "Profile.h"
+#include <cpp-remapper/Profile.h>
 
 #include <algorithm>
 #include <cstdio>
 
-#include "EventLoop.h"
-#include "HidHide.h"
-#include "InputDevice.h"
-#include "InputDeviceCollection.h"
-#include "MappableInput.h"
-#include "MappableVJoyOutput.h"
-#include "VJoyDevice.h"
-#include "connections.h"
+#include <cpp-remapper/EventLoop.h>
+#include <cpp-remapper/HidHide.h>
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/InputDeviceCollection.h>
+#include <cpp-remapper/MappableInput.h>
+#include <cpp-remapper/MappableVJoyOutput.h>
+#include <cpp-remapper/VJoyDevice.h>
+#include <cpp-remapper/connections.h>
 
 using namespace fredemmott::inputmapping;
 
