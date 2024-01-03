@@ -49,7 +49,7 @@ MappableFAVHIDOutput::MappableFAVHIDOutput(std::shared_ptr<FAVHIDDevice> dev)
 #define AA(myMember, reportMember) A(myMember##Axis, reportMember)
     AA(X, x),
     AA(Y, y),
-    AA(Z, y),
+    AA(Z, z),
     AA(RX, rx),
     AA(RY, ry),
     AA(RZ, rz),

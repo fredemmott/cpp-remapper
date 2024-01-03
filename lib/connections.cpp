@@ -21,7 +21,7 @@ void AssignVJoyLike(MappableInput& s, const T& t) {
   s.RXAxis >> t.RXAxis;
   s.RYAxis >> t.RYAxis;
   s.RZAxis >> t.RZAxis;
-  s.Slider >> t.RZAxis;
+  s.Slider >> t.Slider;
   for (int i = 1; i <= s.getButtonCount(); ++i) {
     s.button(i) >> t.button(i);
   }
