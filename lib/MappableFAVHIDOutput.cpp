@@ -21,11 +21,29 @@ MappableFAVHIDOutput::MappableFAVHIDOutput(uint8_t favhid_id)
   : MappableFAVHIDOutput(std::make_shared<FAVHIDDevice>(favhid_id)) {
 }
 
+static decltype(FAVHID::FAVJoyState2::Report::x) ConvertAxisValue(
+  Axis::Value input) {
+  int64_t value = input;
+  value -= Axis::MIN;
+
+  constexpr auto inputRange = Axis::MAX - Axis::MIN;
+  using outputLimits
+    = std::numeric_limits<decltype(FAVHID::FAVJoyState2::Report::x)>;
+  constexpr auto outputRange = outputLimits::max() - outputLimits::min();
+
+  value *= outputRange;
+  value /= inputRange;
+
+  value += outputLimits::min();
+
+  return value;
+}
+
 MappableFAVHIDOutput::MappableFAVHIDOutput(std::shared_ptr<FAVHIDDevice> dev)
   : p(new Impl {dev}),
 #define A(myMember, reportMember) \
   myMember([this](long value) { \
-    p->mState.reportMember = value; \
+    p->mState.reportMember = ConvertAxisValue(value); \
     p->mDevice->set(p->mState); \
   })
 #define AA(myMember, reportMember) A(myMember##Axis, reportMember)
