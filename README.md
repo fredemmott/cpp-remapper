@@ -11,6 +11,7 @@ It integrates with:
 - vJoy for virtual DirectInput controllers
 - [ViGEmBus](https://github.com/ViGEm/ViGEmBus) for virtual XBox 360 and DualShock 4 controllers
 - [HidHide](https://github.com/ViGEm/HidHide) for automatically hiding remapped controllers from games
+- [FAVHID](https://github.com/fredemmott/FAVHID) for virtual DirectInput controllers via an Arduino Micro
 
 # Requirements
 
