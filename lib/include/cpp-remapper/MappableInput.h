@@ -7,11 +7,11 @@
  */
 #pragma once
 
-#include <cstdint>
-
 #include <cpp-remapper/AxisInformation.h>
 #include <cpp-remapper/InputDevice.h>
 #include <cpp-remapper/SourcePtr.h>
+
+#include <cstdint>
 
 namespace fredemmott::inputmapping {
 
@@ -39,7 +39,7 @@ class MappableInput final {
   size_t getButtonCount() const;
   size_t getHatCount() const;
 
-  AxisSourcePtr XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider;
+  AxisSourcePtr XAxis, YAxis, ZAxis, RXAxis, RYAxis, RZAxis, Slider, Dial;
 
   // `seq 1 128 | gsed 's/.\+/Button\0,/' | xargs -n 4 echo` :)
   ButtonSourcePtr Button1, Button2, Button3, Button4, Button5, Button6, Button7,

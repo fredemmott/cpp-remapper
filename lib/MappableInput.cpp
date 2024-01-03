@@ -5,11 +5,12 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include <cpp-remapper/MappableInput.h>
-
 #include <cpp-remapper/AxisInformation.h>
 #include <cpp-remapper/EventSource.h>
 #include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/MappableInput.h>
+
+#include <format>
 
 namespace fredemmott::inputmapping {
 
@@ -55,14 +56,23 @@ std::vector<std::shared_ptr<TSource>> fill_sources(size_t count) {
 AxisSourcePtr find_axis(
   const std::shared_ptr<InputDevice>& device,
   std::vector<std::shared_ptr<MIAxisSource>> inputs,
-  AxisType t) {
+  AxisType t,
+  uint8_t skip = 0) {
+  const auto skip_in = skip;
+
   const auto info = device->getAxisInformation();
   for (uint8_t i = 0; i < info.size(); ++i) {
     if (info[i].type == t) {
-      return inputs.at(i);
+      if (skip == 0) {
+        return inputs.at(i);
+      }
+      --skip;
     }
   }
   auto axis_name = AxisInformation(t).name;
+  if (skip_in) {
+    axis_name += std::format("[{}]", skip_in);
+  }
   auto product_name = device->getProductName();
   return std::make_shared<MissingSource<Axis>>(product_name, axis_name);
 }
@@ -102,6 +112,7 @@ MappableInput::MappableInput(const std::shared_ptr<InputDevice>& dev)
     A(RZ),
 #undef A
     Slider(find_axis(dev, p->axisInputs, AxisType::SLIDER)),
+    Dial(find_axis(dev, p->axisInputs, AxisType::SLIDER, 1)),
 #define B(x) Button##x(button(x))
     B(1),
     B(2),

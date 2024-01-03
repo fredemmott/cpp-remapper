@@ -73,6 +73,7 @@ enum_controls_callback(LPCDIDEVICEOBJECTINSTANCEA obj, LPVOID pvRef) {
     data->axes.push_back({AxisType::SLIDER, obj->tszName});
     return DIENUM_CONTINUE;
   }
+
   return DIENUM_CONTINUE;
 }
 }// namespace
