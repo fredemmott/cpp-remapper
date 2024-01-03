@@ -492,12 +492,11 @@ Either pass `-T ClangCL` to `cmake`, or use `build.ps1 -Clang -Config Debug`
 I make this for my own use, and I share this in the hope others find it useful;
 I'm not able to commit to support, bug fixes, or feature development.
 
-Please search for existing relevant discussions in the discussions tab on
-GitHub, and create a new one if you don't find a relevant one.
-
 I primarily work on this project to fit my needs, and am sharing in the hope
 other's find it useful; I will not be able to spend large amounts of time
 expanding it or in user support, but would greatly appreciate contributions :)
+
+Support may be available from the community [on Discord](https://go.fredemmott.com/discord).
 
 # LICENSE
 
