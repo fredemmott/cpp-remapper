@@ -11,4 +11,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(favhidclient)
 
+# Build against the same version. Generally a good idea, but especially needed
+# for /await compat with the obsolete toolchain on github actions
+target_link_libraries(favhid PUBLIC ThirdParty-CppWinRT)
+
 add_library(ThirdParty-FAVHIDClient ALIAS favhid)
