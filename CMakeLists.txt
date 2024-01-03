@@ -3,6 +3,18 @@ cmake_policy(SET CMP0135 NEW)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
+# Enable CMAKE_MSVC_RUNTIME_LIBRARY variable
+cmake_policy(SET CMP0091 NEW)
+
+set(
+  CMAKE_MSVC_RUNTIME_LIBRARY
+  "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)
+add_link_options(
+  "/DEFAULTLIB:ucrt$<$<CONFIG:Debug>:d>.lib" # include the dynamic UCRT
+  "/NODEFAULTLIB:libucrt$<$<CONFIG:Debug>:d>.lib" # remove the static UCRT 
+)
+
 set(VERSION_BUILD 0 CACHE STRING "Build component of the version number")
 project(cpp-remapper VERSION 0.4.0.${VERSION_BUILD} LANGUAGES CXX)
 
