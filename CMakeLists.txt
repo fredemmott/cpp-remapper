@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # - Use ASAN for debug builds
 # - statically link to statically link the ASAN runtime
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND NOT $ENV{GITHUB_RUN_NUMBER})
   add_compile_options(
     "$<$<CONFIG:Debug>:/fsanitize=address>"
     "$<$<CONFIG:Debug>:/MTd>"
