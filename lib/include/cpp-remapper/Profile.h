@@ -138,6 +138,17 @@ template <typename... Ts>
 auto get_devices(
   Profile* p,
   InputDeviceCollection* c,
+  const FAVHIDID& first,
+  Ts... rest) {
+  return std::tuple_cat(
+    std::make_tuple(MappableFAVHIDOutput(first.value)),
+    get_devices(p, c, rest...));
+}
+
+template <typename... Ts>
+auto get_devices(
+  Profile* p,
+  InputDeviceCollection* c,
   const ViGEmX360ID& _first,
   Ts... rest) {
   return std::tuple_cat(

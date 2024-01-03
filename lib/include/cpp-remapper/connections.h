@@ -18,10 +18,12 @@
 namespace fredemmott::inputmapping {
 
 class MappableInput;
+class MappableFAVHIDOutput;
 class MappableVJoyOutput;
 
 /// Convenience: copy an entire input device to vjoy
 void operator>>(MappableInput&, const MappableVJoyOutput&);
+void operator>>(MappableInput&, const MappableFAVHIDOutput&);
 
 /* Most of the 'how to tie stuff together' stuff works on '_ptr's, which is
  * essentially 'kinda looks like a `shared_ptr<>`.

@@ -21,6 +21,7 @@ class MappableVJoyOutput final : public MappableOutput {
   std::shared_ptr<VJoyDevice> mDevice;
 
  public:
+  MappableVJoyOutput() = delete;
   explicit MappableVJoyOutput(uint8_t vjoy_id);
   MappableVJoyOutput(std::shared_ptr<VJoyDevice> dev);
   ~MappableVJoyOutput();

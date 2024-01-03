@@ -19,6 +19,13 @@ using namespace fredemmott::inputmapping::devicedb;
 static void static_test_vjoy() {
   auto [p, stick, vj1] = create_profile(VPC_RIGHT_WARBRD, VJOY_1);
   stick.Button1 >> vj1.Button1;
+  stick >> vj1;
+}
+
+static void static_test_favhid() {
+  auto [p, stick, fh1] = create_profile(VPC_RIGHT_WARBRD, FAVHID_1);
+  stick.Button1 >> fh1.Button1;
+  stick >> fh1;
 }
 
 static void static_test_vigem() {

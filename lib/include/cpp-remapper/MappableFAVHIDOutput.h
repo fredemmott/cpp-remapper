@@ -17,10 +17,17 @@ namespace fredemmott::inputmapping {
 class FAVHIDDevice;
 
 class MappableFAVHIDOutput final : public MappableOutput {
+ private:
+  struct Impl;
+  // Must be initialized before the const members
+  std::shared_ptr<Impl> p;
+
  public:
+  MappableFAVHIDOutput() = delete;
   explicit MappableFAVHIDOutput(uint8_t vjoy_id);
   MappableFAVHIDOutput(std::shared_ptr<FAVHIDDevice> dev);
   ~MappableFAVHIDOutput();
+
   std::shared_ptr<OutputDevice> getDevice() const override;
 
   ButtonSinkPtr button(uint8_t id) const;
@@ -49,9 +56,5 @@ class MappableFAVHIDOutput final : public MappableOutput {
     Button127, Button128;
 
   const HatSinkPtr Hat1, Hat2, Hat3, Hat4;
-
- private:
-  struct Impl;
-  std::unique_ptr<Impl> p;
 };
 }// namespace fredemmott::inputmapping
