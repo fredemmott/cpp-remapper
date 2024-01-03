@@ -23,13 +23,14 @@ Visual Studio 2022 is required.
 #include <cpp-remapper/easymode.h>
 
 int main() {
-  auto [p, throttle, stick, vj1, vj2, x360, ds4] = create_profile(
+  auto [p, throttle, stick, vj1, vj2, x360, ds4, fh1] = create_profile(
     TM_WARTHOG_THROTTLE,
     VPC_RIGHT_WARBRD,
     VJOY_1,
     VJOY_2,
     VIGEM_X360_PAD,
     VIGEM_DS4_PAD,
+    FAVHID_1,
   );
 
   // Copy all inputs to outputs (only supported for VJoy outputs)
