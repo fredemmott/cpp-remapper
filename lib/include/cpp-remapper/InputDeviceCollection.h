@@ -7,13 +7,11 @@
  */
 #pragma once
 
+#include <cpp-remapper/DeviceSpecifier.h>
+#include <dinput.h>
+
 #include <memory>
 #include <vector>
-
-#include <cpp-remapper/DeviceSpecifier.h>
-
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
 
 namespace fredemmott::inputmapping {
 

@@ -7,19 +7,20 @@
  */
 #pragma once
 
-#include <memory>
-#include <tuple>
-#include <vector>
-
 #include <cpp-remapper/DeviceSpecifier.h>
 #include <cpp-remapper/EventLoop.h>
 #include <cpp-remapper/InputDeviceCollection.h>
 #include <cpp-remapper/MappableDS4Output.h>
+#include <cpp-remapper/MappableFAVHIDOutput.h>
 #include <cpp-remapper/MappableInput.h>
 #include <cpp-remapper/MappableOutput.h>
 #include <cpp-remapper/MappableVJoyOutput.h>
 #include <cpp-remapper/MappableX360Output.h>
 #include <cpp-remapper/OutputDevice.h>
+
+#include <memory>
+#include <tuple>
+#include <vector>
 
 namespace fredemmott::inputmapping {
 
@@ -29,7 +30,17 @@ struct ViGEmX360ID : public OutputID {};
 struct ViGEmDS4ID : public OutputID {};
 
 struct VJoyID : public OutputID {
+  VJoyID() = delete;
   VJoyID(uint8_t value) : value(value) {
+  }
+
+  const uint8_t value;
+};
+
+struct FAVHIDID : public OutputID {
+  FAVHIDID() = delete;
+
+  FAVHIDID(uint8_t value) : value(value) {
   }
 
   const uint8_t value;
@@ -40,6 +51,9 @@ struct VJoyID : public OutputID {
 const detail::VJoyID VJOY_1 {1}, VJOY_2 {2}, VJOY_3 {3}, VJOY_4 {4}, VJOY_5 {5},
   VJOY_6 {6}, VJOY_7 {7}, VJOY_8 {8}, VJOY_9 {9}, VJOY_10 {10}, VJOY_11 {11},
   VJOY_12 {12}, VJOY_13 {13}, VJOY_14 {14}, VJOY_15 {15}, VJOY_16 {16};
+
+const detail::FAVHIDID FAVHID_1 {0}, FAVHID_2 {1}, FAVHID_3 {2}, FAVHID_4 {3},
+  FAVHID_5 {4}, FAVHID_6 {5}, FAVHID_7 {6}, FAVHID_8 {7};
 
 const detail::ViGEmX360ID VIGEM_X360_PAD;
 const detail::ViGEmDS4ID VIGEM_DS4_PAD;

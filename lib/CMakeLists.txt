@@ -14,12 +14,14 @@ add_library(
   EventLoop.cpp
   EventSink.cpp
   EventSource.cpp
+  FAVHIDDevice.cpp
   HatToButtons.cpp
   HidHide.cpp
   InputDevice.cpp
   InputDeviceCollection.cpp
   LatchedToMomentaryButton.cpp
   MappableDS4Output.cpp
+  MappableFAVHIDOutput.cpp
   MappableInput.cpp
   MappableOutput.cpp
   MappableVJoyOutput.cpp
@@ -39,6 +41,7 @@ add_library(
 target_link_libraries(
   LibCppRemapper
   PRIVATE
+  ThirdParty-FAVHIDClient
   ThirdParty-ViGEmClient
   ThirdParty-VJoy
 )
@@ -51,6 +54,11 @@ target_include_directories(
   LibCppRemapper
   PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_compile_definitions(
+  LibCppRemapper
+  PUBLIC
+  "DIRECTINPUT_VERSION=0x0800"
 )
 
 install(TARGETS LibCppRemapper LIBRARY)

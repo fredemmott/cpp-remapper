@@ -1,4 +1,5 @@
 include(catch.cmake)
 include(cppwinrt.cmake)
+include(favhidclient.cmake)
 include(vjoy.cmake)
 include(vigemclient.cmake)
