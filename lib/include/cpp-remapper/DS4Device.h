@@ -7,10 +7,10 @@
  */
 #pragma once
 
+#include <cpp-remapper/OutputDevice.h>
+
 #include <cstdint>
 #include <memory>
-
-#include <cpp-remapper/OutputDevice.h>
 
 // clang-format off
 #define WIN32_LEAN_AND_MEAN
@@ -74,7 +74,7 @@ class DS4Device final : public OutputDevice {
   DS4Device* setRTrigger(long value);
 
  private:
-  struct Impl;
+  class Impl;
   std::unique_ptr<Impl> p;
 };
 

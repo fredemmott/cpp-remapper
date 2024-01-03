@@ -14,10 +14,8 @@
 namespace fredemmott::inputmapping {
 
 class Clock {
- protected:
-  Clock() = default;
-
  public:
+  virtual ~Clock() = default;
   static std::shared_ptr<Clock> get();
   static void set(const std::shared_ptr<Clock>&);
 
@@ -26,6 +24,9 @@ class Clock {
   virtual void setTimer(
     const std::chrono::steady_clock::duration& delay,
     const std::function<void()>& handler) noexcept;
+
+ protected:
+  Clock() = default;
 };
 
 }// namespace fredemmott::inputmapping

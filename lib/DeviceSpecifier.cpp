@@ -5,9 +5,7 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#pragma once
 #include <cpp-remapper/DeviceSpecifier.h>
-
 #include <cpp-remapper/InputDevice.h>
 
 namespace fredemmott::inputmapping {

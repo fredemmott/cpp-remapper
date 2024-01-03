@@ -14,9 +14,8 @@
 // clang-format on
 
 #include <Cfgmgr32.h>
-#include <setupapi.h>
-
 #include <cpp-remapper/AxisInformation.h>
+#include <setupapi.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -213,11 +212,11 @@ void InputDevice::activate() {
   const DWORD count = getAxisCount() + getHatCount() + getButtonCount();
   LPDIOBJECTDATAFORMAT df = new DIOBJECTDATAFORMAT[count];
   off_t offset = 0;
-  off_t i = 0;
+  off_t index = 0;
   const auto& controls = p->controls();
   const off_t firstAxis = offset;
-  for (const auto& axis: controls.axes) {
-    df[i++] = {
+  for (size_t i = 0; i < controls.axes.size(); ++i) {
+    df[index++] = {
       NULL,
       (DWORD)offset,
       DIDFT_AXIS | DIDFT_ANYINSTANCE,
@@ -226,8 +225,8 @@ void InputDevice::activate() {
     offset += sizeof(LONG);
   }
   const off_t firstHat = offset;
-  for (size_t j = 0; j < controls.hats; j++) {
-    df[i++] = {
+  for (size_t i = 0; i < controls.hats; i++) {
+    df[index++] = {
       NULL,
       (DWORD)offset,
       DIDFT_POV | DIDFT_ANYINSTANCE,
@@ -236,8 +235,8 @@ void InputDevice::activate() {
     offset += sizeof(int32_t);
   }
   const off_t firstButton = offset;
-  for (size_t j = 0; j < controls.buttons; j++) {
-    df[i++] = {
+  for (size_t i = 0; i < controls.buttons; i++) {
+    df[index++] = {
       NULL,
       (DWORD)offset,
       DIDFT_BUTTON | DIDFT_ANYINSTANCE,
@@ -252,10 +251,9 @@ void InputDevice::activate() {
     sizeof(DIOBJECTDATAFORMAT),
     DIDF_ABSAXIS,
     (DWORD)mDataSize,
-    (DWORD)i,
+    (DWORD)index,
     df,
   };
-
   p->diDevice->SetDataFormat(&data);
   mOffsets = {firstAxis, firstButton, firstHat};
   auto name = this->getProductName();

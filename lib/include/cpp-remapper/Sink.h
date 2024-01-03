@@ -7,11 +7,11 @@
  */
 #pragma once
 
+#include <cpp-remapper/Controls.h>
+
 #include <concepts>
 #include <functional>
 #include <type_traits>
-
-#include <cpp-remapper/Controls.h>
 
 namespace fredemmott::inputmapping {
 
@@ -24,6 +24,7 @@ class Sink : public AnySink {
   Sink() = default;
 
  public:
+  virtual ~Sink() = default;
   using InControl = TControl;
   using In = typename TControl::Value;
   virtual void map(In value) = 0;

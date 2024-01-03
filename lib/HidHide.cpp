@@ -5,9 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include <cpp-remapper/HidHide.h>
-
 #include <Windows.h>
+#include <cpp-remapper/HidHide.h>
+#include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/InputDeviceCollection.h>
 #include <winioctl.h>
 
 #include <cstdio>
@@ -15,9 +16,6 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-
-#include <cpp-remapper/InputDevice.h>
-#include <cpp-remapper/InputDeviceCollection.h>
 
 #pragma comment(lib, "Ole32")
 #pragma comment(lib, "WindowsApp")
@@ -310,7 +308,7 @@ void HidHide::ensureApplicationIsWhitelisted(
     std::string_view bufferView {
       reinterpret_cast<char*>(pathNames.data()),
       pathNamesLength * sizeof(wchar_t)};
-    for (const auto volumePath: bufferToWStringSet(bufferView)) {
+    for (const auto& volumePath: bufferToWStringSet(bufferView)) {
       if (
         volumePath.size() > bestMountPointLength
         && pathStr.starts_with(volumePath)) {

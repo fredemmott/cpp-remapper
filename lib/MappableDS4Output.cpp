@@ -5,11 +5,10 @@
  * This source code is licensed under the ISC license found in the LICENSE file
  * in the root directory of this source tree.
  */
-#include <cpp-remapper/MappableDS4Output.h>
-
 #include <cpp-remapper/AxisInformation.h>
 #include <cpp-remapper/DS4Device.h>
 #include <cpp-remapper/InputDevice.h>
+#include <cpp-remapper/MappableDS4Output.h>
 
 namespace fredemmott::inputmapping {
 
@@ -36,11 +35,11 @@ MappableDS4Output::MappableDS4Output(std::shared_ptr<DS4Device> dev)
 #define AA(a) A(a##Axis)
     AA(LX),
     AA(LY),
+    A(LTrigger),
     AA(RX),
     AA(RY),
-#undef AA
-    A(LTrigger),
     A(RTrigger),
+#undef AA
 #undef A
 #define B(name, enum) \
   Button##name( \
