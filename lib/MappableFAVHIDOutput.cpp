@@ -21,7 +21,7 @@ MappableFAVHIDOutput::MappableFAVHIDOutput(uint8_t favhid_id)
   : MappableFAVHIDOutput(std::make_shared<FAVHIDDevice>(favhid_id)) {
 }
 
-static decltype(FAVHID::FAVJoyState2::Report::x) ConvertAxisValue(
+static constexpr decltype(FAVHID::FAVJoyState2::Report::x) ConvertAxisValue(
   Axis::Value input) {
   int64_t value = input;
   value -= Axis::MIN;
@@ -209,14 +209,21 @@ std::shared_ptr<OutputDevice> MappableFAVHIDOutput::getDevice() const {
 
 ButtonSinkPtr MappableFAVHIDOutput::button(uint8_t id) const {
   return [this, id](Button::Value value) {
-    p->mState.SetButton(id, value);
+    p->mState.SetButton(id - 1, value);
     p->mDevice->set(p->mState);
   };
 }
 
+static constexpr int8_t ConvertHatValue(Hat::Value value) {
+  if (value == Hat::CENTER) {
+    return 0b1111;
+  }
+  return value / 4500;
+}
+
 HatSinkPtr MappableFAVHIDOutput::hat(uint8_t id) const {
   return [this, id](Hat::Value value) {
-    p->mState.SetPOV(id, value);
+    p->mState.SetPOV(id - 1, ConvertHatValue(value));
     p->mDevice->set(p->mState);
   };
 }

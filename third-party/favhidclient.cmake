@@ -1,11 +1,12 @@
 include(FetchContent)
 find_package(Git)
+
+set(FAVHID_REVISION "12979fd7b6021975407a39080d13327504c878ba")
 FetchContent_Declare(
     favhidclient
     GIT_REPOSITORY https://github.com/fredemmott/favhid-client.git
     GIT_TAG main
-    UPDATE_COMMAND
-    "${GIT_EXECUTABLE}" reset --hard e3d4f8a471c73ef7da3081544850b7604fb9c764
+    PATCH_COMMAND "${GIT_EXECUTABLE}" reset --hard "${FAVHID_REVISION}"
     EXCLUDE_FROM_ALL
 )
 
