@@ -16,6 +16,7 @@
 #include <Cfgmgr32.h>
 #include <cpp-remapper/AxisInformation.h>
 #include <setupapi.h>
+#include <winrt/base.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -151,9 +152,11 @@ InstanceID InputDevice::getInstanceID() const {
   std::vector<BYTE> id(id_size);
   CM_Get_Device_Interface_PropertyW(
     buf.wszPath, &DEVPKEY_Device_InstanceId, &type, id.data(), &id_size, 0);
-  char device_id[MAX_PATH];
-  snprintf(device_id, sizeof(device_id), "%S", (wchar_t*)id.data());
-  return {device_id};
+
+  std::wstring_view view {
+    reinterpret_cast<wchar_t*>(id.data()), (id_size / sizeof(wchar_t)) - 1};
+  auto utf8 = winrt::to_string(view);
+  return utf8;
 }
 
 HardwareID InputDevice::getHardwareID() const {
