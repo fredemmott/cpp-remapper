@@ -32,7 +32,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND NOT $ENV{GITHUB_RUN_NUMBER})
 endif()
 
 function(add_cppremapper_executable TARGET)
-  add_executable(${TARGET} ${ARGN})
+  add_executable(${TARGET} ${ARGN} "${CMAKE_SOURCE_DIR}/lib/manifest.xml")
   target_link_libraries(
     "${TARGET}"
     PRIVATE
