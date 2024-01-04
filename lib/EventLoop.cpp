@@ -6,7 +6,6 @@
  * in the root directory of this source tree.
  */
 #include <cpp-remapper/EventLoop.h>
-
 #include <cpp-remapper/EventSink.h>
 #include <cpp-remapper/EventSource.h>
 #include <cpp-remapper/InputDevice.h>
@@ -15,7 +14,7 @@ namespace fredemmott::inputmapping {
 
 namespace {
 
-HANDLE gExitEvent;
+HANDLE gExitEvent {};
 BOOL WINAPI exit_event_handler(DWORD dwCtrlType) {
   SetEvent(gExitEvent);
   return true;
@@ -134,6 +133,9 @@ void EventLoop::inject(
   auto timer = CreateWaitableTimer(nullptr, true, nullptr);
   SetWaitableTimer(
     timer, (LARGE_INTEGER*)&target_time, 0, nullptr, nullptr, false);
-  gActiveInstance->mInjected.emplace(timer, handler);
+  gActiveInstance->mInjected.emplace(timer, [handler, timer]() {
+    CloseHandle(timer);
+    handler();
+  });
 }
 }// namespace fredemmott::inputmapping
