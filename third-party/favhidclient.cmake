@@ -1,7 +1,7 @@
 include(FetchContent)
 find_package(Git)
 
-set(FAVHID_REVISION "dbf89ec03ccd57949731bc3304e7beb24baad708")
+set(FAVHID_REVISION "88f3f8f874b5587f473dd9ae78cb7abb7076d669")
 FetchContent_Declare(
     favhidclient
     GIT_REPOSITORY https://github.com/fredemmott/favhid-client.git
